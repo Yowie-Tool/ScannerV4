@@ -181,7 +181,7 @@ Builder.load_string("""
 				                origin: self.center
 				        canvas.after:
 				            PopMatrix
-				        font_size: '14sp'
+				        font_size: '12sp'
 				        valign: 'middle'
 		        		text: 'Current Angle'
 		        		text_size: self.size
