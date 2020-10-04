@@ -4,13 +4,15 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.widget import Widget
 from kivy.clock import Clock
+from kivy.uix.behaviors import ToggleButtonBehavior
 
 Builder.load_string("""
 
 <YowieScreen3>:
 
 	scan_progress_output: scan_progress_output
-
+	scan_toggle: scan_toggle
+	scan_toggle_label: scan_toggle_label
 	current_angle_output: current_angle_output
 	average_distance_output: average_distance_output
 	max_distance_output: max_distance_output
@@ -155,9 +157,11 @@ Builder.load_string("""
 			        width: dp(600)
 			        orientation: 'horizontal'
 
-			        Button:
-			        	on_press: root.start_scan()
+			        ToggleButton:
+			        	id: scan_toggle
+			        	on_press: root.start_stop_scan()
 			    		Label:
+			    			id: scan_toggle_label
 			    			center: self.parent.center
 			    			color: [1,1,1,1]
 			        		height: self.parent.width
@@ -400,8 +404,21 @@ class YowieScreen3(Screen):
 		self.update_scan_info_event = Clock.schedule_interval(self.update_all_outputs, 0.2)
 
 # START SCAN
+	def start_stop_scan(self):
+		if self.scan_toggle.state == 'down':
+			self.start_scan()
+			self.scan_toggle_label.text = 'Stop scan'
+
+		if self.scan_toggle.state == 'normal':
+			self.stop_scan()
+			self.scan_toggle_label.text = 'Start scan'
 
 	def start_scan(self):
+
+		# INSERT RELEVANT MACHINE FUNCTION
+		pass
+
+	def stop_scan(self):
 
 		# INSERT RELEVANT MACHINE FUNCTION
 		pass
