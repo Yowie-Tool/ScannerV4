@@ -39,6 +39,8 @@ class ScannerMachine(object):
 	scanstepscamera2=0
 	scanstepangle1=0
 	scanstepangle2=0
+	for_calc_1=[]
+	for_calc_2=[]
 	
 	def scansetup(self):
 		file_object=open("CalibrationValues.txt","r")
@@ -47,22 +49,6 @@ class ScannerMachine(object):
 			int=int+2
 			scannercalibration.append(file_object.readline(int)) #Camera 1 H FOV 0, V FOV 1, Base 2, mount distance 3, calibration 4, camera 2 H FOV 5, v FOV 6, Base 7, mount distance 8, calibration 9 
 		flie_object.close()
-		if self._90_degree_scan.state == 'down':
-			scanangle=90 
-		elif self._180_degree_scan.state == 'down':
-			scanangle=180
-		elif self._270_degree_scan.state == 'down':
-			scanangle=270
-		elif self._360_degree_scan.state == 'down':
-			scanangle=360
-		if self.low_res_fast.state == 'down':
-			scanresolution=1
-		elif self.full_res_short.state == 'down':
-			scanresolution=1
-		elif self.full_res_standard.state == 'down':
-			scanresolution=1
-		elif self.full_res_multiple.state == 'down':
-			scanresolution=3
 		scanstepscamera1=math.ceil((scanangle*scanresolution)/(float(scannercalibration[1])))
 		scanstepscamera2=math.ceil((scanangle*scanresolution)/(float(scannercalibration[6])))
 		scanstepangle1=float(scanangle/scanstepscamera1)
@@ -170,10 +156,55 @@ class ScannerMachine(object):
 		self.jog_relative(returntozero)
 		time.sleep(10) #won't be needed when feedback is enabled
 		return(current_angle)
+	
+	def weightedaverage(self,t):
+		tmax=max(t) # highest intensity value in row
+		maxvalue=np.argmax(t) # position of value
+		length=len(t) #length of array, should be equal to Y resolution....
+		tcurrent=0
+		tlast=tmax
+		tint=maxvalue
+		if maxvalue > 0:
+    		while tcurrent < tlast: 
+        		tlast=t[tint]
+          		tint=tint-1
+        	   	tcurrent=t[tint]
+			tminv=tint+1 #the last descending value position in the negative direction
+		elif maxvalue == 0:
+			tminv=0
+		tcurrent=0
+		tlast=tmax
+		tint=maxvalue
+		if maxvalue < length:
+    		while tcurrent < tlast:
+        		tlast=t[tint]
+          		tint=tint+1
+        	   	tcurrent=t[tint]
+			tmaxv=tint-1 #the last descending value position in the positive direction
+		elif maxvalue == length:
+			tmaxv=length
+		tint2 = tmaxv-tminv+1
+		tint3 = tminv
+		tint4 = tminv
+		tout1=0
+		for i in range(tint2):
+    		tout1=tout1+(tint3*(t[tint3]))
+      		tint3=tint3+1 # sum of position * intensity in limited array
+	  	tout2=0
+	  	for i2 in range(tint2):
+    		tout2=tout2+(t[tint4])
+      		tint4 = tint4 + 1 #sum of intensity in limited array
+      	if tout1 != (maxvalue*tmax):
+      		weighted=(tout1/tout2) #weighted value out, if laser line found to be more than 1 pixel wide (to eliminate random points)
+      	else:
+      		weighted = 0
+	  		  	
+		return(weighted)
 		
 	def readimages1(self,scanstepscamera1,photoangle1()):
-		or photographs in range(scanstepscamera1):
-        pnumstr=str(photographs)
+		succesful=0
+		for photographs in range(scanstepscamera1):
+        	pnumstr=str(photographs)
             loffname='1loff' + pnumstr + '.jpg'
             lonname='1lon'+pnumstr + '.jpg'
             #There is a way of taking photo's directly into opencv as an array, but previous attempts at this have been unsuccesful, it seems this only works at low resolutions.
@@ -189,16 +220,23 @@ class ScannerMachine(object):
             #find the location of minimum and maximum values in the image
             threshamount = maxVal*0.2 # maybe make the 0.2 a variable, but this was good in testing originally.
             #create a value that will remove any values below that, which is a proportion of the maximum value
-            retval, threshold = threshold(red1, threshamount, 255, cv.THRESH_TOZERO);
+            retval, threshold = threshold(red, threshamount, 255, cv.THRESH_TOZERO);
             #this then removes those from the image
             #(minVal, maxVal, MinLoc, maxLoc) = minMaxLoc(threshold) - #not sure if this is needed any more, so commented it out.
             #find the maximum value of the non blurred image
-            maxvalue1 = np.argmax(threshold,axis=1)
+            maxvalue = np.argmax(threshold,axis=1) # Just to check value is nonzero
             #Now find the maximum value in each column. Originally, this was then counted as the centre point of the laser, but we are now going to use a weighted average.
             os.remove(loffname1)
             os.remove(lonname1)
             #Delete the image files, to save space
-            succesful=0
-            
+            row, col = threshold.shape
+            for i in range (row):
+            	if maxvalue[i] != 0:
+            		newarray=threshold[[i],:]
+            		laserctr=self.weightedaverage(newarray)
+            		for_calc_1.append([i,laserctr,(photoangle1[photographs]),0])
+            		succesful=succesful+1
+            	else: succesful=succesful
+        print ("short range points captured %d" % (succesful))
 		
 		

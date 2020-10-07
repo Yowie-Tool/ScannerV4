@@ -365,13 +365,13 @@ class YowieScreen2(Screen):
 	def scan_angle_select(self):
 
 		if self._90_degree_scan.state == 'down':
-			pass
+			self.m.scanangle=90
 		elif self._180_degree_scan.state == 'down':
-			pass
+			self.m.scanangle=180
 		elif self._270_degree_scan.state == 'down':
-			pass
+			self.m.scanangle=270
 		elif self._360_degree_scan.state == 'down':
-			pass
+			self.m.scanangle=360
 
 
 # SCAN RESOLUTION OPTIONS
@@ -379,10 +379,10 @@ class YowieScreen2(Screen):
 	def resolution_select(self):
 		
 		if self.low_res_fast.state == 'down':
-			pass
+			self.m.scanresolution=1
 		elif self.full_res_short.state == 'down':
-			pass
+			self.m.scanresolution=1
 		elif self.full_res_standard.state == 'down':
-			pass
+			self.m.scanresolution=1
 		elif self.full_res_multiple.state == 'down':
-			pass
+			self.m.scanresolution=3
