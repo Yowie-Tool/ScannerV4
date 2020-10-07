@@ -1,0 +1,20 @@
+Horizontal Field of view camera 1
+25.72341265
+Vertical Field of view camera 1
+19.43477189
+Base angle camera 1
+56.81
+Mounting distance camera 1
+327
+Calibration value camera 1
+0
+Horizontal Field of view camera 2
+8.363569838
+Vertical Field of view camera 2
+6.277551901
+Base angle camera 2
+79.06
+Mounting distance camera 2
+406
+Calibration value camera 2
+0
