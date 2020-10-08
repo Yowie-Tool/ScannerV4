@@ -75,7 +75,10 @@ class ScannerMachine(object):
 
 	def camera_1_open(self,low_res_fast_state):
 		i2c='i2cset -y 1 0x70 0x00 0x04' #set camera 1 i2c
-		GPIO.output(chan_listc,(1,0,0)) #select camera 1 GPIO
+		os.system(i2c)
+		GPIO.output(chan_listc,(1,0,0))
+		 #select camera 1 GPIO
+		global camera
 		camera=PiCamera()
 		if low_res_fast_state=='down':
 			camera.resolution=(1640,1232)
@@ -87,8 +90,9 @@ class ScannerMachine(object):
 		
 	def camera2open(self,low_res_fast_state):
 		i2c='i2cset -y 1 0x70 0x00 0x06' #set camera 1 i2c
-		GPIO.output(chan_listc,(0,1,0)) #select camera 1 GPIO
-		camera=PiCamera()
+		os.system(i2c)
+		GPIO.output(chan_listc,(0,1,0))
+		 #select camera 2 GPIO
 		if low_res_fast_state=='down':
 			camera.resolution=(1640,1232)
 		elif low_res_fast_state=='up':
