@@ -380,9 +380,13 @@ class YowieScreen2(Screen):
 		
 		if self.low_res_fast.state == 'down':
 			self.m.scanresolution=1
+			self.m.scancameras=2
 		elif self.full_res_short.state == 'down':
 			self.m.scanresolution=1
+			self.m.scancameras=1
 		elif self.full_res_standard.state == 'down':
 			self.m.scanresolution=1
+			self.m.scancameras=2
 		elif self.full_res_multiple.state == 'down':
 			self.m.scanresolution=3
+			self.m.scancameras=2
