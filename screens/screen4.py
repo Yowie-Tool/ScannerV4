@@ -163,7 +163,7 @@ class YowieScreen4(Screen):
 
 # SAVE OUTPUT
 
-	def save_output(self):
+	def save_output(self,outputarray):
 
 		if self.usb_stick.is_usb_mounted_flag == True:
 
@@ -173,19 +173,17 @@ class YowieScreen4(Screen):
 				file_object = open(file_path, "w")
 
 				print ("Saving points file")
-				exportint = len(xdist) # Need to get this from machine object I think
+				exportint = len(outputarray) # Need to get this from machine object I think
 				#currently based on length of x array. Will change to a 2D or 3D array at some point to make the array smaller, as won't have to include 0 values.
 
 				for export in range (exportint):
 				    #I've deleted Z and RGB from this now. exports just a text file with X,Y coordinates
-				    xout = str(xdist[export])
-				    yout = str(ydist[export])
-				    file_object.write(xout + " " + yout + "\n")
+				    xout = str(outputarray[export,0])
+				    yout = str(outputarray[export,1])
+                    zout = str(outputarray[export,2])
+				    file_object.write(xout + " " + yout + " " + zout + "\n")
 
 				file_object.close()
-
-				saveendtime=time.time()
-				print("File outputted in %f seconds" % (int(saveendtime-calculateendtime)))
 
 				self.usb_stick.disable()
 

@@ -204,7 +204,7 @@ class ScannerMachine(object):
 		return(weighted)
 		
 	def read_images_1(self,scansteps,photoangle()):
-		succesful=0
+		succesful1=0
 		for photographs in range(scansteps):
         	pnumstr=str(photographs)
             loffname='1loff' + pnumstr + '.jpg'
@@ -237,12 +237,12 @@ class ScannerMachine(object):
             		newarray=threshold[[i],:]
             		laserctr=self.weighted_average(newarray)
             		for_calc_1.append([i,laserctr,(photoangle[photographs]),0])
-            		succesful=succesful+1
-            	else: succesful=succesful
-        print ("short range points captured %d" % (succesful))
+            		succesful1=succesful1+1
+            	else: succesful1=succesful1
+        print ("short range points captured %d" % (succesful1))
        
 	def read_images_2(self,scansteps,photoangle()):
-		succesful=0
+		succesful2=0
 		for photographs in range(scansteps):
         	pnumstr=str(photographs)
             loffname='2loff' + pnumstr + '.jpg'
@@ -275,9 +275,9 @@ class ScannerMachine(object):
             		newarray=threshold[[i],:]
             		laserctr=self.weighted_average(newarray)
             		for_calc_2.append([i,laserctr,(photoangle[photographs]),0])
-            		succesful=succesful+1
-            	else: succesful=succesful
-        print ("long range points captured %d" % (succesful))    
+            		succesful2=succesful2+1
+            	else: succesful2=succesful2
+        print ("long range points captured %d" % (succesful2))    
         
     def calculate_cloud_1(self,for_calc,calibration):
     	readlines=len(for_calc)
@@ -371,5 +371,3 @@ class ScannerMachine(object):
 		yout=hyp1*math.cos(rrad+tan1) # y output adjusted for rotation around Z axis
 		output.append([xout,yout,0]) # X, Y, Z coordinates for output. Z is assumed to be 0 for easy import into CAD		
 				
-			
-		
