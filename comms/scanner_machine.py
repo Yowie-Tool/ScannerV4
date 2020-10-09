@@ -49,8 +49,8 @@ class ScannerMachine(object):
 	output=[]
 	maxdistance=0
 	allengths=[]
-
 	low_res = True
+  averagedistance=0
 
 	def __init__(self, screen_manager):
 
@@ -59,7 +59,7 @@ class ScannerMachine(object):
 		# Establish 's'erial comms and initialise
 		self.s = serial_connection.SerialConnection(self, self.sm)
 		self.s.establish_connection()
-	
+
 	def scan_setup(self):
 		file_object=open("CalibrationValues.txt","r")
 		int=0
@@ -67,23 +67,46 @@ class ScannerMachine(object):
 			int=int+2
 			scannercalibration.append(file_object.readline(int)) #Camera 1 H FOV 0, V FOV 1, Base 2, Z mount distance 3, X Mount Distance 4, calibration 5, camera 2 H FOV 6, v FOV 67, Base 8, Z mount distance 9, X Mount Distance 10, calibration 11
 		flie_object.close()
-		self.scanstepscamera1 = math.ceil((self.scanangle*self.scan_passes)/(float(self.scannercalibration[1])))
-		self.scanstepscamera2 = math.ceil((self.scanangle*self.scan_passes)/(float(self.scannercalibration[6])))
-		self.scanstepangle1 = float(self.scanangle/self.scanstepscamera1)
-		self.scanstepangle2 = float(self.scanangle/self.scanstepscamera2)
-		if self.scan_cameras == 2:
-			self.scanstepstotal = self.scanstepscamera1 + self.scanstepscamera2
+
+# 		self.scanstepscamera1 = math.ceil((self.scanangle*self.scan_passes)/(float(self.scannercalibration[1])))
+# 		self.scanstepscamera2 = math.ceil((self.scanangle*self.scan_passes)/(float(self.scannercalibration[6])))
+# 		self.scanstepangle1 = float(self.scanangle/self.scanstepscamera1)
+# 		self.scanstepangle2 = float(self.scanangle/self.scanstepscamera2)
+# 		if self.scan_cameras == 2:
+# 			self.scanstepstotal = self.scanstepscamera1 + self.scanstepscamera2
+# 		else:
+# 			self.scanstepstotal = self.scanstepscamera1
+
+		scanstepscamera1=math.ceil((scanangle*scanresolution)/(float(scannercalibration[1])))
+		scanstepscamera2=math.ceil((scanangle*scanresolution)/(float(scannercalibration[6])))
+		scanstepangle1=float(scanangle/scanstepscamera1)
+		scanstepangle2=float(scanangle/scanstepscamera2)
+		if scancameras is 2:
+			scanstepstotal=scanstepscamera1 + scanstepscamera2
 		else:
-			self.scanstepstotal = self.scanstepscamera1
+			scanstepstotal=scanstepscamera1
+		currentangle=self.s.process_serial_output
 
 
 	# JOG FUNCTIONS
 	def jog_relative(self, angle):
-		strrotate = 'c' + str(angle*30)
-		self.s.write_command(strrotate.encode('utf-8'))
-		self.current_angle = self.current_angle + self.scanstepangle2 # update this to feed back information from stepper
-		time.sleep(1)#when we get feedback from the stepper, we can remove this. just need to make sure it's not moving when taking images
-		return(self.current_angle)
+
+# 		strrotate = 'c' + str(angle*30)
+# 		self.s.write_command(strrotate.encode('utf-8'))
+# 		self.current_angle = self.current_angle + self.scanstepangle2 # update this to feed back information from stepper
+# 		time.sleep(1)#when we get feedback from the stepper, we can remove this. just need to make sure it's not moving when taking images
+# 		return(self.current_angle)
+
+		strrotate='c'+(angle*30)
+		fullrotint=math.floor((angle*30)/360)
+		fullrotang=fullrotint*360
+		self.s.write(strrotate)
+		
+		current_angle= ((self.s.process_serial_output)+fullrotang)/30
+		time.sleep(1)#when we get feedback from the stepper, we can remove this. just need to make sure it's not moving when taking image
+			
+		return(current_angle)
+
 
 	def camera_1_open(self,resolution_bool):
 		i2c='i2cset -y 1 0x70 0x00 0x04' #set camera 1 i2c
