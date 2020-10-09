@@ -20,357 +20,357 @@ Builder.load_string("""
 	pass_output: pass_output
 	scan_time_output: scan_time_output
 
-    canvas:
-        Color: 
-            rgba: [1, 1, 1, 1]
-        Rectangle: 
-            size: self.size
-            pos: self.pos
+	canvas:
+		Color: 
+			rgba: [1, 1, 1, 1]
+		Rectangle: 
+			size: self.size
+			pos: self.pos
 
-    BoxLayout:
-        orientation: 'horizontal'
-        padding: 0
-        spacing: 0
-        size_hint: (None, None)
-        height: dp(480)
-        width: dp(800)
+	BoxLayout:
+		orientation: 'horizontal'
+		padding: 0
+		spacing: 0
+		size_hint: (None, None)
+		height: dp(480)
+		width: dp(800)
 
-        # SCREEN BUTTONS
-	    BoxLayout:
-	        orientation: 'horizontal'
-	        size_hint: (None, None)
-	        height: dp(480)
-	        width: dp(180)
+		# SCREEN BUTTONS
+		BoxLayout:
+			orientation: 'horizontal'
+			size_hint: (None, None)
+			height: dp(480)
+			width: dp(180)
 
-	        GridLayout:
-		        size: self.parent.size
-		        pos: self.parent.pos
-		        cols: 2
+			GridLayout:
+				size: self.parent.size
+				pos: self.parent.pos
+				cols: 2
 
-		        # Top right
-	        	Button:
-	        		on_press: root.go_s2()
-	        		Label:
-	        			center: self.parent.center
-	        			color: [1,1,1,1]
-		        		height: self.parent.width
-				        canvas.before:
-				            PushMatrix
-				            Rotate:
-				                angle: 90
-				                origin: self.center
-				        canvas.after:
-				            PopMatrix
-		        		text: 'Scan Settings'
+				# Top right
+				Button:
+					on_press: root.go_s2()
+					Label:
+						center: self.parent.center
+						color: [1,1,1,1]
+						height: self.parent.width
+						canvas.before:
+							PushMatrix
+							Rotate:
+								angle: 90
+								origin: self.center
+						canvas.after:
+							PopMatrix
+						text: 'Scan Settings'
 
-		        # Bottom right
-	        	Button:
-	        		on_press: root.go_s4()
-	        		Label:
-	        			center: self.parent.center
-	        			color: [1,1,1,1]
-		        		height: self.parent.width
-				        canvas.before:
-				            PushMatrix
-				            Rotate:
-				                angle: 90
-				                origin: self.center
-				        canvas.after:
-				            PopMatrix
-		        		text: 'Scan Output'
+				# Bottom right
+				Button:
+					on_press: root.go_s4()
+					Label:
+						center: self.parent.center
+						color: [1,1,1,1]
+						height: self.parent.width
+						canvas.before:
+							PushMatrix
+							Rotate:
+								angle: 90
+								origin: self.center
+						canvas.after:
+							PopMatrix
+						text: 'Scan Output'
 
-		        # Top left
-	        	Button:
-	        		on_press: root.go_s1()
-	        		Label:
-	        			center: self.parent.center
-	        			color: [1,1,1,1]
-		        		height: self.parent.width
-				        canvas.before:
-				            PushMatrix
-				            Rotate:
-				                angle: 90
-				                origin: self.center
-				        canvas.after:
-				            PopMatrix
-		        		text: 'Levelling'
+				# Top left
+				Button:
+					on_press: root.go_s1()
+					Label:
+						center: self.parent.center
+						color: [1,1,1,1]
+						height: self.parent.width
+						canvas.before:
+							PushMatrix
+							Rotate:
+								angle: 90
+								origin: self.center
+						canvas.after:
+							PopMatrix
+						text: 'Levelling'
 
-		        # Bottom left
-	        	Button:
-	        		on_press: root.go_s3()
-	        		Label:
-	        			center: self.parent.center
-	        			color: [1,1,1,1]
-		        		height: self.parent.width
-				        canvas.before:
-				            PushMatrix
-				            Rotate:
-				                angle: 90
-				                origin: self.center
-				        canvas.after:
-				            PopMatrix
-		        		text: 'Scan'
+				# Bottom left
+				Button:
+					on_press: root.go_s3()
+					Label:
+						center: self.parent.center
+						color: [1,1,1,1]
+						height: self.parent.width
+						canvas.before:
+							PushMatrix
+							Rotate:
+								angle: 90
+								origin: self.center
+						canvas.after:
+							PopMatrix
+						text: 'Scan'
 
 
 		# CAMERA SCAN
 
-	    BoxLayout:
-	        size_hint: (None, None)
-	        height: dp(480)
-	        width: dp(620)
-	        orientation: 'horizontal'
+		BoxLayout:
+			size_hint: (None, None)
+			height: dp(480)
+			width: dp(620)
+			orientation: 'horizontal'
 
-		    BoxLayout:
-		        size_hint: (None, None)
-		        height: dp(480)
-		        width: dp(20)
-	    		Label:
-	    			id: scan_progress_output
-	    			center: self.parent.center
-	    			color: [0,0,0,1]
-	        		height: self.parent.width
-			        canvas.before:
-			            PushMatrix
-			            Rotate:
-			                angle: 90
-			                origin: self.center
-			        canvas.after:
-			            PopMatrix
-			        # text_size: self.size
-	        		text: 'Scan progress: 0%'
+			BoxLayout:
+				size_hint: (None, None)
+				height: dp(480)
+				width: dp(20)
+				Label:
+					id: scan_progress_output
+					center: self.parent.center
+					color: [0,0,0,1]
+					height: self.parent.width
+					canvas.before:
+						PushMatrix
+						Rotate:
+							angle: 90
+							origin: self.center
+					canvas.after:
+						PopMatrix
+					# text_size: self.size
+					text: 'Scan progress: 0%'
 
 
-		    BoxLayout:
-		        size_hint: (None, None)
-		        height: dp(480)
-		        width: dp(600)
-		        orientation: 'vertical'
+			BoxLayout:
+				size_hint: (None, None)
+				height: dp(480)
+				width: dp(600)
+				orientation: 'vertical'
 
-			    BoxLayout:
-			        size_hint: (None, None)
-			        height: dp(400)
-			        width: dp(600)
+				BoxLayout:
+					size_hint: (None, None)
+					height: dp(400)
+					width: dp(600)
 
-			    BoxLayout:
-			        size_hint: (None, None)
-			        height: dp(80)
-			        width: dp(600)
-			        orientation: 'horizontal'
+				BoxLayout:
+					size_hint: (None, None)
+					height: dp(80)
+					width: dp(600)
+					orientation: 'horizontal'
 
-			        ToggleButton:
-			        	id: scan_toggle
-			        	on_press: root.start_stop_scan()
-			    		Label:
-			    			id: scan_toggle_label
-			    			center: self.parent.center
-			    			color: [1,1,1,1]
-			        		height: self.parent.width
-					        canvas.before:
-					            PushMatrix
-					            Rotate:
-					                angle: 90
-					                origin: self.center
-					        canvas.after:
-					            PopMatrix
-			        		text: 'Start Scan'
+					ToggleButton:
+						id: scan_toggle
+						on_press: root.start_stop_scan()
+						Label:
+							id: scan_toggle_label
+							center: self.parent.center
+							color: [1,1,1,1]
+							height: self.parent.width
+							canvas.before:
+								PushMatrix
+								Rotate:
+									angle: 90
+									origin: self.center
+							canvas.after:
+								PopMatrix
+							text: 'Start Scan'
 
-		    		Label:
-		    			center: self.parent.center
-		    			color: [0,0,0,1]
-		        		height: self.parent.width
-				        canvas.before:
-				            PushMatrix
-				            Rotate:
-				                angle: 90
-				                origin: self.center
-				        canvas.after:
-				            PopMatrix
-				        font_size: '12sp'
-				        valign: 'middle'
-		        		text: 'Current Angle'
-		        		text_size: self.size
+					Label:
+						center: self.parent.center
+						color: [0,0,0,1]
+						height: self.parent.width
+						canvas.before:
+							PushMatrix
+							Rotate:
+								angle: 90
+								origin: self.center
+						canvas.after:
+							PopMatrix
+						font_size: '12sp'
+						valign: 'middle'
+						text: 'Current Angle'
+						text_size: self.size
 
-		    		Label:
-		    			id: current_angle_output
-		    			center: self.parent.center
-		    			color: [0,0,0,1]
-		        		height: self.parent.width
-				        canvas.before:
-				            PushMatrix
-				            Rotate:
-				                angle: 90
-				                origin: self.center
-				        canvas.after:
-				            PopMatrix
-		        		text: 'XX'
-				        font_size: '14sp'
-				        valign: 'middle'
-		        		text_size: self.size
+					Label:
+						id: current_angle_output
+						center: self.parent.center
+						color: [0,0,0,1]
+						height: self.parent.width
+						canvas.before:
+							PushMatrix
+							Rotate:
+								angle: 90
+								origin: self.center
+						canvas.after:
+							PopMatrix
+						text: 'XX'
+						font_size: '14sp'
+						valign: 'middle'
+						text_size: self.size
 
-		    		Label:
-		    			center: self.parent.center
-		    			color: [0,0,0,1]
-		        		height: self.parent.width
-				        canvas.before:
-				            PushMatrix
-				            Rotate:
-				                angle: 90
-				                origin: self.center
-				        canvas.after:
-				            PopMatrix
-				        text_size: self.size
-				        font_size: '12sp'
-				        valign: 'middle'
-		        		text: 'Average distance'
+					Label:
+						center: self.parent.center
+						color: [0,0,0,1]
+						height: self.parent.width
+						canvas.before:
+							PushMatrix
+							Rotate:
+								angle: 90
+								origin: self.center
+						canvas.after:
+							PopMatrix
+						text_size: self.size
+						font_size: '12sp'
+						valign: 'middle'
+						text: 'Average distance'
 
-		    		Label:
-		    			id: average_distance_output
-		    			center: self.parent.center
-		    			color: [0,0,0,1]
-		        		height: self.parent.width
-				        canvas.before:
-				            PushMatrix
-				            Rotate:
-				                angle: 90
-				                origin: self.center
-				        canvas.after:
-				            PopMatrix
-		        		text: 'XX'
-		        		text_size: self.size
-				        font_size: '14sp'
-				        valign: 'middle'
+					Label:
+						id: average_distance_output
+						center: self.parent.center
+						color: [0,0,0,1]
+						height: self.parent.width
+						canvas.before:
+							PushMatrix
+							Rotate:
+								angle: 90
+								origin: self.center
+						canvas.after:
+							PopMatrix
+						text: 'XX'
+						text_size: self.size
+						font_size: '14sp'
+						valign: 'middle'
 
-		    		Label:
-		    			center: self.parent.center
-		    			color: [0,0,0,1]
-		        		height: self.parent.width
-				        canvas.before:
-				            PushMatrix
-				            Rotate:
-				                angle: 90
-				                origin: self.center
-				        canvas.after:
-				            PopMatrix
-				        text_size: self.size
-		        		text: 'Max distance'
-				        font_size: '12sp'
-				        valign: 'middle'
+					Label:
+						center: self.parent.center
+						color: [0,0,0,1]
+						height: self.parent.width
+						canvas.before:
+							PushMatrix
+							Rotate:
+								angle: 90
+								origin: self.center
+						canvas.after:
+							PopMatrix
+						text_size: self.size
+						text: 'Max distance'
+						font_size: '12sp'
+						valign: 'middle'
 
-		    		Label:
-		    			id: max_distance_output
-		    			center: self.parent.center
-		    			color: [0,0,0,1]
-		        		height: self.parent.width
-				        canvas.before:
-				            PushMatrix
-				            Rotate:
-				                angle: 90
-				                origin: self.center
-				        canvas.after:
-				            PopMatrix
-		        		text: 'XX'
-		        		text_size: self.size
-				        font_size: '14sp'
-				        valign: 'middle'
+					Label:
+						id: max_distance_output
+						center: self.parent.center
+						color: [0,0,0,1]
+						height: self.parent.width
+						canvas.before:
+							PushMatrix
+							Rotate:
+								angle: 90
+								origin: self.center
+						canvas.after:
+							PopMatrix
+						text: 'XX'
+						text_size: self.size
+						font_size: '14sp'
+						valign: 'middle'
 
-		    		Label:
-		    			center: self.parent.center
-		    			color: [0,0,0,1]
-		        		height: self.parent.width
-				        canvas.before:
-				            PushMatrix
-				            Rotate:
-				                angle: 90
-				                origin: self.center
-				        canvas.after:
-				            PopMatrix
-				        text_size: self.size
-		        		text: 'Points Rec'
-				        font_size: '16sp'
-				        valign: 'middle'
+					Label:
+						center: self.parent.center
+						color: [0,0,0,1]
+						height: self.parent.width
+						canvas.before:
+							PushMatrix
+							Rotate:
+								angle: 90
+								origin: self.center
+						canvas.after:
+							PopMatrix
+						text_size: self.size
+						text: 'Points Rec'
+						font_size: '16sp'
+						valign: 'middle'
 
-		    		Label:
-		    			id: points_rec_output
-		    			center: self.parent.center
-		    			color: [0,0,0,1]
-		        		height: self.parent.width
-				        canvas.before:
-				            PushMatrix
-				            Rotate:
-				                angle: 90
-				                origin: self.center
-				        canvas.after:
-				            PopMatrix
-		        		text: 'XX'
-		        		text_size: self.size
-				        font_size: '14sp'
-				        valign: 'middle'
+					Label:
+						id: points_rec_output
+						center: self.parent.center
+						color: [0,0,0,1]
+						height: self.parent.width
+						canvas.before:
+							PushMatrix
+							Rotate:
+								angle: 90
+								origin: self.center
+						canvas.after:
+							PopMatrix
+						text: 'XX'
+						text_size: self.size
+						font_size: '14sp'
+						valign: 'middle'
 
-		    		Label:
-		    			center: self.parent.center
-		    			color: [0,0,0,1]
-		        		height: self.parent.width
-				        canvas.before:
-				            PushMatrix
-				            Rotate:
-				                angle: 90
-				                origin: self.center
-				        canvas.after:
-				            PopMatrix
-				        text_size: self.size
-		        		text: 'Pass'
-				        font_size: '16sp'
-				        valign: 'middle'
+					Label:
+						center: self.parent.center
+						color: [0,0,0,1]
+						height: self.parent.width
+						canvas.before:
+							PushMatrix
+							Rotate:
+								angle: 90
+								origin: self.center
+						canvas.after:
+							PopMatrix
+						text_size: self.size
+						text: 'Pass'
+						font_size: '16sp'
+						valign: 'middle'
 
-		    		Label:
-		    			id: pass_output
-		    			center: self.parent.center
-		    			color: [0,0,0,1]
-		        		height: self.parent.width
-				        canvas.before:
-				            PushMatrix
-				            Rotate:
-				                angle: 90
-				                origin: self.center
-				        canvas.after:
-				            PopMatrix
-		        		text: 'XX'
-		        		text_size: self.size
-				        font_size: '14sp'
-				        valign: 'middle'
+					Label:
+						id: pass_output
+						center: self.parent.center
+						color: [0,0,0,1]
+						height: self.parent.width
+						canvas.before:
+							PushMatrix
+							Rotate:
+								angle: 90
+								origin: self.center
+						canvas.after:
+							PopMatrix
+						text: 'XX'
+						text_size: self.size
+						font_size: '14sp'
+						valign: 'middle'
 
-		    		Label:
-		    			id: scan_time_output
-		    			center: self.parent.center
-		    			color: [0,0,0,1]
-		        		height: self.parent.width
-				        canvas.before:
-				            PushMatrix
-				            Rotate:
-				                angle: 90
-				                origin: self.center
-				        canvas.after:
-				            PopMatrix
-				        text_size: self.size
-		        		text: 'Scan time'
-				        font_size: '16sp'
-				        valign: 'middle'
+					Label:
+						id: scan_time_output
+						center: self.parent.center
+						color: [0,0,0,1]
+						height: self.parent.width
+						canvas.before:
+							PushMatrix
+							Rotate:
+								angle: 90
+								origin: self.center
+						canvas.after:
+							PopMatrix
+						text_size: self.size
+						text: 'Scan time'
+						font_size: '16sp'
+						valign: 'middle'
 
-		    		Label:
-		    			center: self.parent.center
-		    			color: [0,0,0,1]
-		        		height: self.parent.width
-				        canvas.before:
-				            PushMatrix
-				            Rotate:
-				                angle: 90
-				                origin: self.center
-				        canvas.after:
-				            PopMatrix
-				        text_size: self.size
-		        		text: 'XX:XX'
-				        font_size: '14sp'
-				        valign: 'middle'
+					Label:
+						center: self.parent.center
+						color: [0,0,0,1]
+						height: self.parent.width
+						canvas.before:
+							PushMatrix
+							Rotate:
+								angle: 90
+								origin: self.center
+						canvas.after:
+							PopMatrix
+						text_size: self.size
+						text: 'XX:XX'
+						font_size: '14sp'
+						valign: 'middle'
 
 
 """)
@@ -415,18 +415,16 @@ class YowieScreen3(Screen):
 
 	def start_scan(self):
 		self.m.scan_setup
-		self.m.scan_camera_1(self.m.photonum1,self.m.photoangle1,self.m.scanstepangle1,self.m.scanstepscamera1)
-		if self.m.scancameras=2:
-			self.m.angle_adjust(self.current_angle)
-			self.m.scan_camera_2(self.m.photonum2,self.m.photoangle2,self.m.scanstepangle2,self.m.scanstepscamera2)
+		self.m.scan_camera_1()
+		if self.m.scan_cameras == 2:
+			self.m.angle_adjust(self.m.current_angle)
+			self.m.scan_camera_2(self.m.photonum2, self.m.photoangle2, self.m.scanstepangle2, self.m.scanstepscamera2)
 		self.m.read_images_1(self.m.scanstepscamera1,self.m.photoangle1())
-		if self.m.scancameras=2:
+		if self.m.scan_cameras == 2:
 			self.m.read_images_2(self.m.scanstepscamera2,self.m.photoangle2())
 		self.m.calcualte_cloud_1(self.m.for_calc_1,self.m.scannercalibration)
-		if self.m.scancameras=2:
+		if self.m.scan_cameras == 2:
 			self.m.calcualte_cloud_2(self.m.for_calc_2,self.m.scannercalibration)
-		
-		
 
 	def stop_scan(self):
 
@@ -452,7 +450,7 @@ class YowieScreen3(Screen):
 
 	def update_current_angle_output(self):
 
-		self.current_angle_output.text = str(self.m.current_angle)
+		self.current_angle_output.text = str(self.m.current_angle_readout)
 
 	def update_average_distance_output(self):
 
