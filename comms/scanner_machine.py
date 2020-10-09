@@ -6,11 +6,11 @@ import os.path
 from os import path, system
 from cv2 import imread, subtract, cvtColor, GaussianBlur, minMaxLoc, threshold
 import numpy as np
-from picamera import PiCamera
+# from picamera import PiCamera
 import time
 import array
 import math
-import RPi.GPIO as GPIO
+# import RPi.GPIO as GPIO
 
 from comms import serial_connection
 from scipy.special._ufuncs import hyp1f1
@@ -28,14 +28,14 @@ class ScannerMachine(object):
 	# GPIO.setup(self.chan_listc, GPIO.OUT)
 	# GPIO.setup(self.chan_listl, GPIO.OUT)
 	# GPIO.output(self.chan_listl,0)
-	photo1num=0
-	photo2num=0
+	photonum1 = 0
+	photonum2 = 0
 	photoangle1=[]
 	photoangle2=[]
 	current_angle = float(0)
 	current_angle_readout = float(0)
 	scanangle=90
-	scanresolution=1
+	scan_passes=1
 	scanrange=1
 	scannercalibration=[]
 	scanstepscamera1=0
@@ -43,12 +43,14 @@ class ScannerMachine(object):
 	scanstepstotal=0
 	scanstepangle1=float(0)
 	scanstepangle2=float(0)
-	scancameras=1
+	scan_cameras=1
 	for_calc_1=[]
 	for_calc_2=[]
 	output=[]
 	maxdistance=0
 	allengths=[]
+
+	low_res = True
 
 	def __init__(self, screen_manager):
 
@@ -65,49 +67,49 @@ class ScannerMachine(object):
 			int=int+2
 			scannercalibration.append(file_object.readline(int)) #Camera 1 H FOV 0, V FOV 1, Base 2, Z mount distance 3, X Mount Distance 4, calibration 5, camera 2 H FOV 6, v FOV 67, Base 8, Z mount distance 9, X Mount Distance 10, calibration 11
 		flie_object.close()
-		self.scanstepscamera1=math.ceil((self.scanangle*self.scanresolution)/(float(self.scannercalibration[1])))
-		self.scanstepscamera2=math.ceil((self.scanangle*self.scanresolution)/(float(self.scannercalibration[6])))
-		self.scanstepangle1=float(self.scanangle/self.scanstepscamera1)
-		self.scanstepangle2=float(self.scanangle/self.scanstepscamera2)
-		if self.scancameras == 2:
-			scanstepstotal=scanstepscamera1 + scanstepscamera2
+		self.scanstepscamera1 = math.ceil((self.scanangle*self.scan_passes)/(float(self.scannercalibration[1])))
+		self.scanstepscamera2 = math.ceil((self.scanangle*self.scan_passes)/(float(self.scannercalibration[6])))
+		self.scanstepangle1 = float(self.scanangle/self.scanstepscamera1)
+		self.scanstepangle2 = float(self.scanangle/self.scanstepscamera2)
+		if self.scan_cameras == 2:
+			self.scanstepstotal = self.scanstepscamera1 + self.scanstepscamera2
 		else:
-			scanstepstotal=scanstepscamera1
+			self.scanstepstotal = self.scanstepscamera1
 
 
 	# JOG FUNCTIONS
 	def jog_relative(self, angle):
-			strrotate='c'+(angle*30)
-			self.s.write_command(strrotate.encode('utf-8'))
-			self.current_angle = self.currentangle + self.scanstepangle2 # update this to feed back information from stepper
-			time.sleep(1)#when we get feedback from the stepper, we can remove this. just need to make sure it's not moving when taking images
-			return(self.current_angle)
+		strrotate = 'c' + str(angle*30)
+		self.s.write_command(strrotate.encode('utf-8'))
+		self.current_angle = self.current_angle + self.scanstepangle2 # update this to feed back information from stepper
+		time.sleep(1)#when we get feedback from the stepper, we can remove this. just need to make sure it's not moving when taking images
+		return(self.current_angle)
 
-	def camera_1_open(self,low_res_fast_state):
+	def camera_1_open(self,resolution_bool):
 		i2c='i2cset -y 1 0x70 0x00 0x04' #set camera 1 i2c
 		os.system(i2c)
 		GPIO.output(self.chan_listc,(1,0,0))
 		 #select camera 1 GPIO
 		global camera
 		camera=PiCamera()
-		if low_res_fast_state=='down':
+		if resolution_bool:
 			camera.resolution=(1640,1232)
-		elif low_res_fast_state=='up':
+		else:
 			camera.resolution=(3280,2464)
 		camera.meter_mode='backlit'
 		camera.start_preview(fullscreen=False,window=(200,80,600,400)) # check that this ends up with our screen in the right place!
 		time.sleep()
 		
-	def camera2open(self,low_res_fast_state):
+	def camera2open(self,resolution_bool):
 		i2c='i2cset -y 1 0x70 0x00 0x06' #set camera 1 i2c
 		os.system(i2c)
 		GPIO.output(self.chan_listc,(0,1,0))
 		 #select camera 2 GPIO
-		if low_res_fast_state=='down':
-			camera.resolution=(1640,1232)
-		elif low_res_fast_state=='up':
-			camera.resolution=(3280,2464)
-		camera.meter_mode='backlit'
+		if resolution_bool:
+			camera.resolution = (1640,1232)
+		else:
+			camera.resolution = (3280,2464)
+		camera.meter_mode = 'backlit'
 		camera.start_preview(fullscreen=False,window=(200,80,600,400)) # check that this ends up with our screen in the right place!
 		time.sleep()
 		
@@ -116,9 +118,9 @@ class ScannerMachine(object):
 		camera.stop_preview()
 		
 	def camera_1_take(self,photonum):
-		loffname='c1loff'+photonum+'.jpg'
-		lonname='c1on'+photonum+'.jpg'
-		expt=camera.exposure_speed
+		loffname = 'c1loff' + str(photonum) + '.jpg'
+		lonname = 'c1on' + str(photonum) + '.jpg'
+		expt = camera.exposure_speed
 		#query exposure speed from camera
 		if expt < 4000:
 			camera.shutter_speed=4000
@@ -132,9 +134,9 @@ class ScannerMachine(object):
 		camera.shutter_speed=0 # allows camera to adjust after taking both photos
 		
 	def camera_2_take(self,photonum):
-		loffname='c2loff'+photonum+'.jpg'
-		lonname='c2on'+photonum+'.jpg'
-		expt=camera.exposure_speed
+		loffname = 'c2loff' + str(photonum) + '.jpg'
+		lonname = 'c2on' + str(photonum) +'.jpg'
+		expt = camera.exposure_speed
 		#query exposure speed from camera
 		if expt < 4000:
 			camera.shutter_speed=4000
@@ -148,24 +150,24 @@ class ScannerMachine(object):
 		camera.shutter_speed=0 # allows camera to adjust after taking both photos	
 		
 	def scan_camera_1(self,photonum,photoangle1,scanstepangle,scansteps):
-		self.camera_1_open(low_res_fast.state)
+		self.camera_1_open(self.low_res)
 		while self.stop_scan != 'down':
 			for photonum in range(scansteps):
-				photoangle1.append(current_angle)
+				photoangle1.append(self.current_angle)
 				self.camera1take(photonum)
 				self.jog_relative(scanstepangle)
 		self.camera_close()
-		return(current_angle)
+		return(self.current_angle)
 		
 	def scan_camera_2(self,photonum,photoangle2,scanstepangle,scansteps):
-		self.camera_2_open(low_res_fast.state)
+		self.camera_2_open(self.low_res)
 		while self.stop_scan != 'down':
 			for photonum in range(scansteps):
-				photoangle2.append(current_angle)
+				photoangle2.append(self.current_angle)
 				self.camera_1_take(photonum)
 				self.jog_relative(scanstepangle)
 		self.camera_close()
-		return(current_angle)
+		return(self.current_angle)
 		
 	def angle_adjust(self,current_angle):
 		returntozero=float(360-current_angle)
@@ -303,7 +305,7 @@ class ScannerMachine(object):
 		laser=float(calibration[3])
 		camxoffset=float(calibration[4])
 		calib_value=float(calibration[5])
-		if low_res_fast.state == 'down':
+		if self.low_res:
 			xresolution=1640
 			yresolution=1232
 		else:
@@ -353,7 +355,7 @@ class ScannerMachine(object):
 		laser = float(calibration[9])
 		camxoffset = float(calibration[10])
 		calib_value = float(calibration[11])
-		if low_res_fast.state == 'down':
+		if self.low_res:
 			xresolution = 1640
 			yresolution = 1232
 		else:
