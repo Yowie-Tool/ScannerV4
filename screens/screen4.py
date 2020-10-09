@@ -10,124 +10,124 @@ Builder.load_string("""
 
 <YowieScreen4>:
 
-    canvas:
-        Color: 
-            rgba: [1, 1, 1, 1]
-        Rectangle: 
-            size: self.size
-            pos: self.pos
+	canvas:
+		Color: 
+			rgba: [1, 1, 1, 1]
+		Rectangle: 
+			size: self.size
+			pos: self.pos
 
-    BoxLayout:
-        orientation: 'horizontal'
-        padding: 0
-        spacing: 0
-        size_hint: (None, None)
-        height: dp(480)
-        width: dp(800)
+	BoxLayout:
+		orientation: 'horizontal'
+		padding: 0
+		spacing: 0
+		size_hint: (None, None)
+		height: dp(480)
+		width: dp(800)
 
-        # SCREEN BUTTONS
-	    BoxLayout:
-	        orientation: 'horizontal'
-	        size_hint: (None, None)
-	        height: dp(480)
-	        width: dp(180)
+		# SCREEN BUTTONS
+		BoxLayout:
+			orientation: 'horizontal'
+			size_hint: (None, None)
+			height: dp(480)
+			width: dp(180)
 
-	        GridLayout:
-		        size: self.parent.size
-		        pos: self.parent.pos
-		        cols: 2
+			GridLayout:
+				size: self.parent.size
+				pos: self.parent.pos
+				cols: 2
 
-		        # Top right
-	        	Button:
-	        		on_press: root.go_s2()
-	        		Label:
-	        			center: self.parent.center
-	        			color: [1,1,1,1]
-		        		height: self.parent.width
-				        canvas.before:
-				            PushMatrix
-				            Rotate:
-				                angle: 90
-				                origin: self.center
-				        canvas.after:
-				            PopMatrix
-		        		text: 'Scan Settings'
+				# Top right
+				Button:
+					on_press: root.go_s2()
+					Label:
+						center: self.parent.center
+						color: [1,1,1,1]
+						height: self.parent.width
+						canvas.before:
+							PushMatrix
+							Rotate:
+								angle: 90
+								origin: self.center
+						canvas.after:
+							PopMatrix
+						text: 'Scan Settings'
 
-		        # Bottom right
-	        	Button:
-	        		on_press: root.go_s4()
-	        		Label:
-	        			center: self.parent.center
-	        			color: [1,1,1,1]
-		        		height: self.parent.width
-				        canvas.before:
-				            PushMatrix
-				            Rotate:
-				                angle: 90
-				                origin: self.center
-				        canvas.after:
-				            PopMatrix
-		        		text: 'Scan Output'
+				# Bottom right
+				Button:
+					on_press: root.go_s4()
+					Label:
+						center: self.parent.center
+						color: [1,1,1,1]
+						height: self.parent.width
+						canvas.before:
+							PushMatrix
+							Rotate:
+								angle: 90
+								origin: self.center
+						canvas.after:
+							PopMatrix
+						text: 'Scan Output'
 
-		        # Top left
-	        	Button:
-	        		on_press: root.go_s1()
-	        		Label:
-	        			center: self.parent.center
-	        			color: [1,1,1,1]
-		        		height: self.parent.width
-				        canvas.before:
-				            PushMatrix
-				            Rotate:
-				                angle: 90
-				                origin: self.center
-				        canvas.after:
-				            PopMatrix
-		        		text: 'Levelling'
+				# Top left
+				Button:
+					on_press: root.go_s1()
+					Label:
+						center: self.parent.center
+						color: [1,1,1,1]
+						height: self.parent.width
+						canvas.before:
+							PushMatrix
+							Rotate:
+								angle: 90
+								origin: self.center
+						canvas.after:
+							PopMatrix
+						text: 'Levelling'
 
-		        # Bottom left
-	        	Button:
-	        		on_press: root.go_s3()
-	        		Label:
-	        			center: self.parent.center
-	        			color: [1,1,1,1]
-		        		height: self.parent.width
-				        canvas.before:
-				            PushMatrix
-				            Rotate:
-				                angle: 90
-				                origin: self.center
-				        canvas.after:
-				            PopMatrix
-		        		text: 'Scan'
+				# Bottom left
+				Button:
+					on_press: root.go_s3()
+					Label:
+						center: self.parent.center
+						color: [1,1,1,1]
+						height: self.parent.width
+						canvas.before:
+							PushMatrix
+							Rotate:
+								angle: 90
+								origin: self.center
+						canvas.after:
+							PopMatrix
+						text: 'Scan'
 
-	    BoxLayout:
-	        orientation: 'horizontal'
-	        size_hint: (None, None)
-	        height: dp(480)
-	        width: dp(200)
+		BoxLayout:
+			orientation: 'horizontal'
+			size_hint: (None, None)
+			height: dp(480)
+			width: dp(200)
 
 
 		Button:
-	        size_hint: (None, None)
-	        height: dp(480)
-	        width: dp(200)
-	        on_press: root.save_output()
+			size_hint: (None, None)
+			height: dp(480)
+			width: dp(200)
+			on_press: root.save_output()
 			Label:
-    			center: self.parent.center
-    			color: [1,1,1,1]
-        		height: self.parent.width
-        		width: self.parent.height
-		        canvas.before:
-		            PushMatrix
-		            Rotate:
-		                angle: 90
-		                origin: self.center
-		        canvas.after:
-		            PopMatrix
-		        markup: True
-		        font_size: '22sp'
-		        text: "Save"
+				center: self.parent.center
+				color: [1,1,1,1]
+				height: self.parent.width
+				width: self.parent.height
+				canvas.before:
+					PushMatrix
+					Rotate:
+						angle: 90
+						origin: self.center
+				canvas.after:
+					PopMatrix
+				markup: True
+				font_size: '22sp'
+				text: "Save"
 
 
 
@@ -168,7 +168,7 @@ class YowieScreen4(Screen):
 		if self.usb_stick.is_usb_mounted_flag == True:
 
 			file_path = self.usb_stick.get_path() + "RoomReaderScan.pts"
-	        #currently only one file name. 
+			#currently only one file name. 
 			try: 
 				file_object = open(file_path, "w")
 
@@ -177,11 +177,11 @@ class YowieScreen4(Screen):
 				#currently based on length of x array. Will change to a 2D or 3D array at some point to make the array smaller, as won't have to include 0 values.
 
 				for export in range (exportint):
-				    #I've deleted Z and RGB from this now. exports just a text file with X,Y coordinates
-				    xout = str(outputarray[export,0])
-				    yout = str(outputarray[export,1])
-                    zout = str(outputarray[export,2])
-				    file_object.write(xout + " " + yout + " " + zout + "\n")
+					#I've deleted Z and RGB from this now. exports just a text file with X,Y coordinates
+					xout = str(outputarray[export,0])
+					yout = str(outputarray[export,1])
+					zout = str(outputarray[export,2])
+					file_object.write(xout + " " + yout + " " + zout + "\n")
 
 				file_object.close()
 

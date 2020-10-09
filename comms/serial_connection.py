@@ -97,7 +97,7 @@ class SerialConnection(object):
 				except Exception as e:
 					log('serial.readline exception:\n' + str(e))
 					rec_temp = ''
-			else: 
+			else:
 				rec_temp = ''
 
 			# If something received from serial buffer, process it. 
@@ -106,7 +106,7 @@ class SerialConnection(object):
 
 	# SERIAL IS ONLY READING ANGLE: 
 	def process_serial_output(self, output):
-		self.m.current_angle = output # I expect this needs un-encoding
+		self.m.current_angle_readout = output.decode("utf-8")
 
 	def write_command(self, serialCommand):
 		self.write_command_buffer.append(serialCommand)
