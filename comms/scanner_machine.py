@@ -13,6 +13,7 @@ import math
 import RPi.GPIO as GPIO
 
 from comms import serial_connection
+from scipy.special._ufuncs import hyp1f1
 
 def log(message):
 	timestamp = datetime.now()
@@ -37,12 +38,15 @@ class ScannerMachine(object):
 	scannercalibration=[]
 	scanstepscamera1=0
 	scanstepscamera2=0
+	scanstepstotal=0
 	scanstepangle1=float(0)
 	scanstepangle2=float(0)
 	scancameras=1
 	for_calc_1=[]
 	for_calc_2=[]
 	output=[]
+	maxdistance=0
+	allengths=[]
 	
 	def scan_setup(self):
 		file_object=open("CalibrationValues.txt","r")
@@ -55,6 +59,11 @@ class ScannerMachine(object):
 		scanstepscamera2=math.ceil((scanangle*scanresolution)/(float(scannercalibration[6])))
 		scanstepangle1=float(scanangle/scanstepscamera1)
 		scanstepangle2=float(scanangle/scanstepscamera2)
+		if scancameras=2:
+			scanstepstotal=scanstepscamera1 + scanstepscamera2
+		else:
+			scanstepstotal=scanstepscamera1
+	
 				
 	def __init__(self, screen_manager):
 
@@ -322,12 +331,16 @@ class ScannerMachine(object):
 				u2=u-halfyres
 				theta=math.atan(u2/a2const)
 				x1=(w*math.tan(theta))+camxoffset # x would be a * value where it falls over halfway across CCD, then offset by amount camera is off centre
-		hyp1=math.sqrt((math.pow(x1,2))+(math.pow(y1,2))) # Find the hypotenuse of the newly created triangle of points (where opposite = x, adjacent =y)
-		tan1=math.atan(x1/y1) #find theta angle for new triangle				
-		rrad=r/(180/math.pi) # rotation of unit in radians
-		xout=hyp1*math.sin(rrad+tan1) # x output adjusted for rotation around Z axis
-		yout=hyp1*math.cos(rrad+tan1) # y output adjusted for rotation around Z axis
-		output.append([xout,yout,0]) # X, Y, Z coordinates for output. Z is assumed to be 0 for easy import into CAD
+			hyp1=math.sqrt((math.pow(x1,2))+(math.pow(y1,2))) # Find the hypotenuse of the newly created triangle of points (where opposite = x, adjacent =y)
+			if hyp1 > maxdistance:
+				maxdistance=hyp1
+			alllengths.append(hpy1)
+			averagedistance=numpy.mean(alllengths)
+			tan1=math.atan(x1/y1) #find theta angle for new triangle				
+			rrad=r/(180/math.pi) # rotation of unit in radians
+			xout=hyp1*math.sin(rrad+tan1) # x output adjusted for rotation around Z axis
+			yout=hyp1*math.cos(rrad+tan1) # y output adjusted for rotation around Z axis
+			output.append([xout,yout,0]) # X, Y, Z coordinates for output. Z is assumed to be 0 for easy import into CAD
 		
 	def calculate_cloud_2(self,for_calc,calibration):
 		readlines=len(for_calc)
@@ -368,10 +381,14 @@ class ScannerMachine(object):
 				u2=u-halfyres
 				theta=math.atan(u2/a2const)
 				x1=(w*math.tan(theta))+camxoffset				
-		hyp1=math.sqrt((math.pow(x1,2))+(math.pow(y1,2))) # Find the hypotenuse of the newly created triangle of points (where opposite = x, adjacent =y)
-		tan1=math.atan(x1/y1) #find theta angle for new triangle				
-		rrad=r/(180/math.pi) # rotation of unit in radians
-		xout=hyp1*math.sin(rrad+tan1) # x output adjusted for rotation around Z axis
-		yout=hyp1*math.cos(rrad+tan1) # y output adjusted for rotation around Z axis
-		output.append([xout,yout,0]) # X, Y, Z coordinates for output. Z is assumed to be 0 for easy import into CAD		
+			hyp1=math.sqrt((math.pow(x1,2))+(math.pow(y1,2))) # Find the hypotenuse of the newly created triangle of points (where opposite = x, adjacent =y)
+			if hyp1 > maxdistance:
+				maxdistance=hyp1
+			alllengths.append(hpy1)
+			averagedistance=numpy.mean(alllengths)
+			tan1=math.atan(x1/y1) #find theta angle for new triangle				
+			rrad=r/(180/math.pi) # rotation of unit in radians
+			xout=hyp1*math.sin(rrad+tan1) # x output adjusted for rotation around Z axis
+			yout=hyp1*math.cos(rrad+tan1) # y output adjusted for rotation around Z axis
+			output.append([xout,yout,0]) # X, Y, Z coordinates for output. Z is assumed to be 0 for easy import into CAD		
 				
