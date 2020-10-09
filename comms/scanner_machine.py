@@ -149,16 +149,23 @@ class ScannerMachine(object):
 		camera.capture(lonname,'jpeg',use_video_port=True)
 		camera.shutter_speed=0 # allows camera to adjust after taking both photos	
 		
-	def scan_camera_1(self,photonum,photoangle1,scanstepangle,scansteps):
+	def scan_camera_1(self):
 		self.camera_1_open(self.low_res)
-		while self.stop_scan != 'down':
-			for photonum in range(scansteps):
-				photoangle1.append(self.current_angle)
-				self.camera1take(photonum)
-				self.jog_relative(scanstepangle)
-		self.camera_close()
-		return(self.current_angle)
-		
+
+		def take_photo(dt):
+			self.photoangle1.append(self.current_angle)
+			self.camera1take(self.photonum1)
+			self.jog_relative(self.scanstepangle1)
+			self.photonum1 = self.photonum1 + 1
+
+			if self.photonum1 > self.scanstepscamera1: 
+				Clock.unschedule(scan_camera_1_event)
+				self.camera_close()
+				return(self.current_angle)				
+
+		scan_camera_1_event = Clock.schedule_interval(take_photo, 0.1)
+
+
 	def scan_camera_2(self,photonum,photoangle2,scanstepangle,scansteps):
 		self.camera_2_open(self.low_res)
 		while self.stop_scan != 'down':

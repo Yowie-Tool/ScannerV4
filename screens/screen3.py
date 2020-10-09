@@ -415,7 +415,7 @@ class YowieScreen3(Screen):
 
 	def start_scan(self):
 		self.m.scan_setup
-		self.m.scan_camera_1(self.m.photonum1, self.m.photoangle1, self.m.scanstepangle1, self.m.scanstepscamera1)
+		self.m.scan_camera_1()
 		if self.m.scan_cameras == 2:
 			self.m.angle_adjust(self.m.current_angle)
 			self.m.scan_camera_2(self.m.photonum2, self.m.photoangle2, self.m.scanstepangle2, self.m.scanstepscamera2)
