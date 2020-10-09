@@ -47,6 +47,7 @@ class ScannerMachine(object):
 	output=[]
 	maxdistance=0
 	allengths=[]
+	averagedistance=0
 	
 	def scan_setup(self):
 		file_object=open("CalibrationValues.txt","r")
@@ -59,10 +60,11 @@ class ScannerMachine(object):
 		scanstepscamera2=math.ceil((scanangle*scanresolution)/(float(scannercalibration[6])))
 		scanstepangle1=float(scanangle/scanstepscamera1)
 		scanstepangle2=float(scanangle/scanstepscamera2)
-		if scancameras=2:
+		if scancameras is 2:
 			scanstepstotal=scanstepscamera1 + scanstepscamera2
 		else:
 			scanstepstotal=scanstepscamera1
+		currentangle=self.s.process_serial_output
 	
 				
 	def __init__(self, screen_manager):
@@ -76,11 +78,15 @@ class ScannerMachine(object):
 
 	# JOG FUNCTIONS
 	def jog_relative(self, angle):
-			strrotate='c'+(angle*30)
-			self.s.write_command(strrotate.encode('utf-8'))
-			current_angle=currentangle+scanstepangle2 # update this to feed back information from stepper
-			time.sleep(1)#when we get feedback from the stepper, we can remove this. just need to make sure it's not moving when taking images
-			return(current_angle)
+		strrotate='c'+(angle*30)
+		fullrotint=math.floor((angle*30)/360)
+		fullrotang=fullrotint*360
+		self.s.write(strrotate)
+		
+		current_angle= ((self.s.process_serial_output)+fullrotang)/30
+		time.sleep(1)#when we get feedback from the stepper, we can remove this. just need to make sure it's not moving when taking image
+			
+		return(current_angle)
 
 	def camera_1_open(self,low_res_fast_state):
 		i2c='i2cset -y 1 0x70 0x00 0x04' #set camera 1 i2c
