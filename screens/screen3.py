@@ -414,17 +414,7 @@ class YowieScreen3(Screen):
 			self.scan_toggle_label.text = 'Start scan'
 
 	def start_scan(self):
-		self.m.scan_setup
-		self.m.scan_camera_1()
-		if self.m.scan_cameras == 2:
-			self.m.angle_adjust(self.m.current_angle)
-			self.m.scan_camera_2(self.m.photonum2, self.m.photoangle2, self.m.scanstepangle2, self.m.scanstepscamera2)
-		self.m.read_images_1(self.m.scanstepscamera1,self.m.photoangle1())
-		if self.m.scan_cameras == 2:
-			self.m.read_images_2(self.m.scanstepscamera2,self.m.photoangle2())
-		self.m.calcualte_cloud_1(self.m.for_calc_1,self.m.scannercalibration)
-		if self.m.scan_cameras == 2:
-			self.m.calcualte_cloud_2(self.m.for_calc_2,self.m.scannercalibration)
+		pass
 
 	def stop_scan(self):
 
