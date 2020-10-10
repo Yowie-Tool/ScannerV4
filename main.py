@@ -32,6 +32,8 @@ class YowieApp(App):
 		sm = ScreenManager(transition=NoTransition())
 		m = scanner_machine.ScannerMachine(sm)
 
+		m.read_in_calibration_values()
+
 		sm.add_widget(screen1.YowieScreen1(name='s1', screen_manager = sm, scanner = m))
 		sm.add_widget(screen2.YowieScreen2(name='s2', screen_manager = sm, scanner = m))
 		sm.add_widget(screen3.YowieScreen3(name='s3', screen_manager = sm, scanner = m))

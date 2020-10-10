@@ -330,7 +330,7 @@ Builder.load_string("""
 				        	markup: True
 				        Label: 
 				        	color: [0,0,0,1]
-				        	text: 'Standard'
+				        	text: 'Multi pass'
 				        	text_size: self.size
 				        	valign: 'top'
 				        	markup: True

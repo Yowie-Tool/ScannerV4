@@ -107,6 +107,7 @@ class SerialConnection(object):
 	# SERIAL IS ONLY READING ANGLE: 
 	def process_serial_output(self, output):
 		self.m.current_angle_readout = output.decode("utf-8")
+		self.m.return_angle_moved()
 
 	def write_command(self, serialCommand):
 		self.write_command_buffer.append(serialCommand)
