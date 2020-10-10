@@ -5,11 +5,11 @@ import os.path
 from os import path, system
 from cv2 import imread, subtract, cvtColor, GaussianBlur, minMaxLoc, threshold
 import numpy as np
-# from picamera import PiCamera
+from picamera import PiCamera
 import time
 import array
 import math
-# import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 
 from comms import serial_connection
 from scipy.special._ufuncs import hyp1f1
@@ -63,6 +63,10 @@ class ScannerMachine(object):
 	low_res = True
 	averagedistance=0
 
+	doing_scan_camera_1 = False
+	doing_scan_camera_2 = False
+	scan_progress = 0
+
 	def __init__(self, screen_manager):
 
 		self.sm = screen_manager
@@ -78,12 +82,23 @@ class ScannerMachine(object):
 
 		try:
 			print('Please wait, reading in calibration values...') 
+
 			file_object=open("CalibrationValues.txt","r")
-			int=0
-			while int <24:
-				int=int+2
-				self.scannercalibration.append(file_object.readline(int)) #Camera 1 H FOV 0, V FOV 1, Base 2, Z mount distance 3, X Mount Distance 4, calibration 5, camera 2 H FOV 6, v FOV 67, Base 8, Z mount distance 9, X Mount Distance 10, calibration 11
-			flie_object.close()
+
+			int = 0
+
+			while int < 24:
+
+				int += 1
+
+				if (int % 2) == 0:
+					self.scannercalibration.append(file_object.readline()) #Camera 1 H FOV 0, V FOV 1, Base 2, Z mount distance 3, X Mount Distance 4, calibration 5, camera 2 H FOV 6, v FOV 67, Base 8, Z mount distance 9, X Mount Distance 10, calibration 11
+				
+				else:
+					throwaway = file_object.readline()
+
+			file_object.close()
+
 		except: 
 			print('Could not read in calibration values, please check file!')
 
@@ -94,25 +109,37 @@ class ScannerMachine(object):
 		self.s.write_command(strrotate)
 		self.most_recent_angle_change = angle
 
-	# KEEP ANGLE OUTPUT UP TO DATE
-	def return_angle_moved(self):
+	# GET UP TO DATE VARIABLES
+	def update_angle_moved(self):
 		fullrotint = math.floor((self.most_recent_angle_change*30)/360)
 		fullrotang = fullrotint*360
 		self.current_angle = ((self.current_angle_readout)+fullrotang)/30
 
+	def get_scan_progress(self):
+
+		try: 
+			if self.scan_cameras == 1:
+				self.scan_progress = (self.photonum1/self.scanstepscamera1)
+
+			else:
+				self.scan_progress =  (self.photonum1/self.scanstepscamera1) + (self.photonum2/self.scanstepscamera2)
+		except:
+			self.scan_progress = 0
+
+		return self.scan_progress
+
 	# DO SCAN
 	def start_scan(self):
-		self.s.doing_scan = True
-		self.scan_setup
-		self.scan_camera_1()
-
-		if self.scan_cameras == 2:
-			self.set_scanner_to_origin(self.current_angle)
-			self.scan_camera_2()
+		self.scan_setup()
+		self.start_scan_camera_1()
+		# NB: star_scan_camera_2 is called in the end_scan() function in order to maintain proper timing
 
 	def stop_scan(self):
-		# use to pause scan
-		pass
+		if self.doing_scan_camera_1:
+			self.doing_scan_camera_1 = False
+
+		if self.doing_scan_camera_2:
+			self.doing_scan_camera_2 = False
 
 	def scan_setup(self):
 		self.scanstepscamera1 = math.ceil((self.scanangle*self.scan_passes)/(float(self.scannercalibration[1])))
@@ -124,12 +151,29 @@ class ScannerMachine(object):
 		else:
 			self.scanstepstotal = self.scanstepscamera1
 
+	def end_scan(self):
+		self.camera_close()
+
+		if self.doing_scan_camera_1:
+			self.doing_scan_camera_1 = False
+
+			if self.scan_cameras == 2:
+				self.set_scanner_to_origin(self.current_angle)
+				self.start_scan_camera_2()
+				return
+
+		elif self.doing_scan_camera_2:
+			self.doing_scan_camera_2 = False
+
+		self.process_scan()
+
 	def set_scanner_to_origin(self,current_angle):
 		angle_to_return_to_origin=float(360-current_angle)
 		self.jog_relative(angle_to_return_to_origin)
 		time.sleep(10) # need to replace this with a flag
 		return(current_angle)
 
+	# CAMERA FUNCTIONS
 	def camera_1_open(self,resolution_bool):
 		i2c='i2cset -y 1 0x70 0x00 0x04' #set camera 1 i2c
 		os.system(i2c)
@@ -190,40 +234,37 @@ class ScannerMachine(object):
 		GPIO.output(self.chan_listl, (1,0,0)) # this needs to be the IR laser, double check when able
 		camera.capture(lonname,'jpeg',use_video_port=True)
 		camera.shutter_speed=0 # allows camera to adjust after taking both photos	
-		
 
-	## MIGHT MOVE THIS INTO SERIAL COMMS - NEED TO ONLY RUN THESE AFTER THE MOVEMENT HAS HAPPENED
-	def scan_camera_1(self):
+	# CAMERA STEPS - THESE GET CALLED IN THE SERIAL LOOP EACH TIME A NEW LINE COMES IN
+	def start_scan_camera_1(self):
 		self.camera_1_open(self.low_res)
+		self.doing_scan_camera_1 = True
 
-		def do_scan_step_1(dt):
-			self.photoangle1.append(self.current_angle)
-			self.camera1take(self.photonum1)
+	def do_scan_step_camera1(self):
+		self.photoangle1.append(self.current_angle)
+		self.camera1take(self.photonum1)
+
+		if (self.photonum1 <= self.scanstepscamera1):
 			self.jog_relative(self.scanstepangle1)
 			self.photonum1 = self.photonum1 + 1
 
-			if self.photonum1 > self.scanstepscamera1: 
-				Clock.unschedule(scan_camera_1_event)
-				self.camera_close()			
+		else:
+			self.end_scan()
 
-		scan_camera_1_event = Clock.schedule_interval(do_scan_step_1, 0.1)
-
-
-	def scan_camera_2(self):
+	def start_scan_camera_2(self):
 		self.camera_2_open(self.low_res)
+		self.doing_scan_camera_2 = True
 
-		def do_scan_step_2(dt):
-			self.photoangle2.append(self.current_angle)
-			self.camera2take(self.photonum2)
+	def do_scan_step_2(self):
+		self.photoangle2.append(self.current_angle)
+		self.camera2take(self.photonum2)
+
+		if self.photonum2 <= self.scanstepscamera2: 
 			self.jog_relative(self.scanstepangle2)
 			self.photonum2 = self.photonum2 + 1
 
-			if self.photonum2 > self.scanstepscamera2: 
-				Clock.unschedule(scan_camera_2_event)
-				self.camera_close()			
-
-		scan_camera_2_event = Clock.schedule_interval(do_scan_step_2, 0.1)
-		
+		else:
+			self.end_scan()
 
 	# SCAN PROCESSING
 

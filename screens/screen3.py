@@ -406,20 +406,13 @@ class YowieScreen3(Screen):
 # START SCAN
 	def start_stop_scan(self):
 		if self.scan_toggle.state == 'down':
-			self.start_scan()
+			self.m.start_scan()
 			self.scan_toggle_label.text = 'Stop scan'
 
 		if self.scan_toggle.state == 'normal':
-			self.stop_scan()
+			self.m.stop_scan()
 			self.scan_toggle_label.text = 'Start scan'
 
-	def start_scan(self):
-		pass
-
-	def stop_scan(self):
-
-		# INSERT RELEVANT MACHINE FUNCTION
-		pass
 
 # SCAN OUTPUT
 
@@ -436,7 +429,7 @@ class YowieScreen3(Screen):
 
 	def update_scan_progress_output(self):
 		
-		self.scan_progress_output.text = 'Scan progress ' + '%'
+		self.scan_progress_output.text = 'Scan progress ' + str(self.m.scan_progress) + '%'
 
 	def update_current_angle_output(self):
 
@@ -444,11 +437,11 @@ class YowieScreen3(Screen):
 
 	def update_average_distance_output(self):
 
-		self.average_distance_output.text = ''
+		self.average_distance_output.text = str(self.m.averagedistance)
 
 	def update_max_distance_output(self):
 
-		self.max_distance_output.text = ''
+		self.max_distance_output.text = str(self.m.maxdistance)
 
 	def update_points_rec_output(self):
 
