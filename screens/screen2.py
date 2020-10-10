@@ -229,6 +229,7 @@ Builder.load_string("""
 			        CheckBox: 
 			        	id: low_res_fast
 			        	group: 'resolution_options'
+			        	on_press: root.resolution_select()
 
 				    BoxLayout:
 				        orientation: 'vertical'
@@ -259,6 +260,7 @@ Builder.load_string("""
 			        CheckBox:
 			        	id: full_res_short
 			        	group: 'resolution_options'
+			        	on_press: root.resolution_select()
 
 				    BoxLayout:
 				        orientation: 'vertical'
@@ -290,6 +292,7 @@ Builder.load_string("""
 			        CheckBox: 
 			        	id: full_res_standard
 			        	group: 'resolution_options'
+			        	on_press: root.resolution_select()
 
 				    BoxLayout:
 				        orientation: 'vertical'
@@ -320,6 +323,8 @@ Builder.load_string("""
 			        CheckBox:
 			        	id: full_res_multiple
 			        	group: 'resolution_options'
+			        	on_press: root.resolution_select()
+
 				    BoxLayout:
 				        orientation: 'vertical'
 				        Label: 
@@ -380,17 +385,17 @@ class YowieScreen2(Screen):
 		
 		if self.low_res_fast.state == 'down':
 			self.m.low_res = True
-			self.m.scanresolution  = 1
+			self.m.scan_passes  = 1
 			self.m.scancameras = 2
 		elif self.full_res_short.state == 'down':
 			self.m.low_res = False
-			self.m.scanresolution = 1
+			self.m.scan_passes = 1
 			self.m.scancameras = 1
 		elif self.full_res_standard.state == 'down':
 			self.m.low_res = False
-			self.m.scanresolution = 1
+			self.m.scan_passes = 1
 			self.m.scancameras = 2
 		elif self.full_res_multiple.state == 'down':
 			self.m.low_res = False
-			self.m.scanresolution = 3
+			self.m.scan_passes = 3
 			self.m.scancameras = 2

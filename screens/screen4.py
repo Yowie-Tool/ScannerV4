@@ -163,7 +163,7 @@ class YowieScreen4(Screen):
 
 # SAVE OUTPUT
 
-	def save_output(self,outputarray):
+	def save_output(self):
 
 		if self.usb_stick.is_usb_mounted_flag == True:
 
@@ -173,7 +173,7 @@ class YowieScreen4(Screen):
 				file_object = open(file_path, "w")
 
 				print ("Saving points file")
-				exportint = len(outputarray) # Need to get this from machine object I think
+				exportint = len(self.m.output) # Need to get this from machine object I think
 				#currently based on length of x array. Will change to a 2D or 3D array at some point to make the array smaller, as won't have to include 0 values.
 
 				for export in range (exportint):
