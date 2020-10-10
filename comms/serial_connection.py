@@ -104,10 +104,16 @@ class SerialConnection(object):
 			if len(rec_temp):  
 				self.process_serial_output(rec_temp)
 
+				if self.m.doing_scan_camera_1: 
+					self.m.do_scan_step_camera1()
+
+				if self.m.doing_scan_camera_2:
+					self.m.do_scan_step_camera1()
+
 	# SERIAL IS ONLY READING ANGLE: 
 	def process_serial_output(self, output):
 		self.m.current_angle_readout = output.decode("utf-8")
-		self.m.return_angle_moved()
+		self.m.update_angle_moved()
 
 	def write_command(self, serialCommand):
 		self.write_command_buffer.append(serialCommand)

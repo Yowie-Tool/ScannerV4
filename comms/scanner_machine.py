@@ -63,6 +63,9 @@ class ScannerMachine(object):
 	low_res = True
 	averagedistance=0
 
+	doing_scan_camera_1 = False
+	doing_scan_camera_2 = False
+
 	def __init__(self, screen_manager):
 
 		self.sm = screen_manager
@@ -95,7 +98,7 @@ class ScannerMachine(object):
 		self.most_recent_angle_change = angle
 
 	# KEEP ANGLE OUTPUT UP TO DATE
-	def return_angle_moved(self):
+	def update_angle_moved(self):
 		fullrotint = math.floor((self.most_recent_angle_change*30)/360)
 		fullrotang = fullrotint*360
 		self.current_angle = ((self.current_angle_readout)+fullrotang)/30
@@ -104,11 +107,11 @@ class ScannerMachine(object):
 	def start_scan(self):
 		self.s.doing_scan = True
 		self.scan_setup
-		self.scan_camera_1()
+		self.start_scan_camera_1()
 
 		if self.scan_cameras == 2:
 			self.set_scanner_to_origin(self.current_angle)
-			self.scan_camera_2()
+			self.start_scan_camera_2()
 
 	def stop_scan(self):
 		# use to pause scan
@@ -193,24 +196,23 @@ class ScannerMachine(object):
 		
 
 	## MIGHT MOVE THIS INTO SERIAL COMMS - NEED TO ONLY RUN THESE AFTER THE MOVEMENT HAS HAPPENED
-	def scan_camera_1(self):
+	def start_scan_camera_1(self):
 		self.camera_1_open(self.low_res)
+		self.doing_scan_camera_1 = True
 
-		def do_scan_step_1(dt):
-			self.photoangle1.append(self.current_angle)
-			self.camera1take(self.photonum1)
-			self.jog_relative(self.scanstepangle1)
-			self.photonum1 = self.photonum1 + 1
+	def do_scan_step_camera1(self):
+		self.photoangle1.append(self.current_angle)
+		self.camera1take(self.photonum1)
+		self.jog_relative(self.scanstepangle1)
+		self.photonum1 = self.photonum1 + 1
 
-			if self.photonum1 > self.scanstepscamera1: 
-				Clock.unschedule(scan_camera_1_event)
-				self.camera_close()			
+		if self.photonum1 > self.scanstepscamera1:
+			self.doing_scan_camera_1 = False
+			self.camera_close()
 
-		scan_camera_1_event = Clock.schedule_interval(do_scan_step_1, 0.1)
-
-
-	def scan_camera_2(self):
+	def start_scan_camera_2(self):
 		self.camera_2_open(self.low_res)
+		self.doing_scan_camera_2 = True
 
 		def do_scan_step_2(dt):
 			self.photoangle2.append(self.current_angle)
@@ -219,11 +221,9 @@ class ScannerMachine(object):
 			self.photonum2 = self.photonum2 + 1
 
 			if self.photonum2 > self.scanstepscamera2: 
-				Clock.unschedule(scan_camera_2_event)
-				self.camera_close()			
+				self.doing_scan_camera_2 = False
+				self.camera_close()
 
-		scan_camera_2_event = Clock.schedule_interval(do_scan_step_2, 0.1)
-		
 
 	# SCAN PROCESSING
 
