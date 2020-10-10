@@ -5,11 +5,11 @@ import os.path
 from os import path, system
 from cv2 import imread, subtract, cvtColor, GaussianBlur, minMaxLoc, threshold
 import numpy as np
-# from picamera import PiCamera
+from picamera import PiCamera
 import time
 import array
 import math
-# import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 
 from comms import serial_connection
 from scipy.special._ufuncs import hyp1f1
@@ -24,10 +24,10 @@ class ScannerMachine(object):
 	chan_listc=[12,16,18] #camera switcher pins
 	chan_listl=[29,31,33] #laser pins
 
-	# GPIO.setmode(GPIO.BOARD)
-	# GPIO.setup(self.chan_listc, GPIO.OUT)
-	# GPIO.setup(self.chan_listl, GPIO.OUT)
-	# GPIO.output(self.chan_listl,0)
+	GPIO.setmode(GPIO.BOARD)
+	GPIO.setup(self.chan_listc, GPIO.OUT)
+	GPIO.setup(self.chan_listl, GPIO.OUT)
+	GPIO.output(self.chan_listl,0)
 
 	photonum1 = 0
 	photonum2 = 0
@@ -75,8 +75,8 @@ class ScannerMachine(object):
 		self.s = serial_connection.SerialConnection(self, self.sm)
 		self.s.establish_connection()
 
-		# global camera
-		# camera=PiCamera()
+		global camera
+		camera=PiCamera()
 
 	def read_in_calibration_values(self):
 
