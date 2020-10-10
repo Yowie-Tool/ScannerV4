@@ -81,12 +81,23 @@ class ScannerMachine(object):
 
 		try:
 			print('Please wait, reading in calibration values...') 
+
 			file_object=open("CalibrationValues.txt","r")
-			int=0
-			while int <24:
-				int=int+2
-				self.scannercalibration.append(file_object.readline(int)) #Camera 1 H FOV 0, V FOV 1, Base 2, Z mount distance 3, X Mount Distance 4, calibration 5, camera 2 H FOV 6, v FOV 67, Base 8, Z mount distance 9, X Mount Distance 10, calibration 11
-			flie_object.close()
+
+			int = 0
+
+			while int < 24:
+
+				int += 1
+
+				if (int % 2) == 0:
+					self.scannercalibration.append(file_object.readline()) #Camera 1 H FOV 0, V FOV 1, Base 2, Z mount distance 3, X Mount Distance 4, calibration 5, camera 2 H FOV 6, v FOV 67, Base 8, Z mount distance 9, X Mount Distance 10, calibration 11
+				
+				else:
+					throwaway = file_object.readline()
+
+			file_object.close()
+
 		except: 
 			print('Could not read in calibration values, please check file!')
 
@@ -105,17 +116,16 @@ class ScannerMachine(object):
 
 	# DO SCAN
 	def start_scan(self):
-		self.s.doing_scan = True
-		self.scan_setup
+		self.scan_setup()
 		self.start_scan_camera_1()
-
-		if self.scan_cameras == 2:
-			self.set_scanner_to_origin(self.current_angle)
-			self.start_scan_camera_2()
+		# NB: star_scan_camera_2 is called in the end_scan() function in order to maintain proper timing
 
 	def stop_scan(self):
-		# use to pause scan
-		pass
+		if self.doing_scan_camera_1:
+			self.doing_scan_camera_1 = False
+
+		if self.doing_scan_camera_2:
+			self.doing_scan_camera_2 = False
 
 	def scan_setup(self):
 		self.scanstepscamera1 = math.ceil((self.scanangle*self.scan_passes)/(float(self.scannercalibration[1])))
@@ -203,26 +213,46 @@ class ScannerMachine(object):
 	def do_scan_step_camera1(self):
 		self.photoangle1.append(self.current_angle)
 		self.camera1take(self.photonum1)
-		self.jog_relative(self.scanstepangle1)
-		self.photonum1 = self.photonum1 + 1
 
-		if self.photonum1 > self.scanstepscamera1:
-			self.doing_scan_camera_1 = False
-			self.camera_close()
+		if (self.photonum1 <= self.scanstepscamera1):
+			self.jog_relative(self.scanstepangle1)
+			self.photonum1 = self.photonum1 + 1
+
+		else:
+			self.end_scan()
+
 
 	def start_scan_camera_2(self):
 		self.camera_2_open(self.low_res)
 		self.doing_scan_camera_2 = True
 
-		def do_scan_step_2(dt):
-			self.photoangle2.append(self.current_angle)
-			self.camera2take(self.photonum2)
+	def do_scan_step_2(self):
+		self.photoangle2.append(self.current_angle)
+		self.camera2take(self.photonum2)
+
+		if self.photonum2 <= self.scanstepscamera2: 
 			self.jog_relative(self.scanstepangle2)
 			self.photonum2 = self.photonum2 + 1
 
-			if self.photonum2 > self.scanstepscamera2: 
-				self.doing_scan_camera_2 = False
-				self.camera_close()
+		else:
+			self.end_scan()
+
+	def end_scan(self):
+
+		self.camera_close()
+
+		if self.doing_scan_camera_1:
+			self.doing_scan_camera_1 = False
+
+			if self.scan_cameras == 2:
+				self.set_scanner_to_origin(self.current_angle)
+				self.start_scan_camera_2()
+				return
+
+		elif self.doing_scan_camera_2:
+			self.doing_scan_camera_2 = False
+
+		self.process_scan()
 
 
 	# SCAN PROCESSING

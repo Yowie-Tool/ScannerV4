@@ -406,20 +406,13 @@ class YowieScreen3(Screen):
 # START SCAN
 	def start_stop_scan(self):
 		if self.scan_toggle.state == 'down':
-			self.start_scan()
+			self.m.start_scan()
 			self.scan_toggle_label.text = 'Stop scan'
 
 		if self.scan_toggle.state == 'normal':
-			self.stop_scan()
+			self.m.stop_scan()
 			self.scan_toggle_label.text = 'Start scan'
 
-	def start_scan(self):
-		pass
-
-	def stop_scan(self):
-
-		# INSERT RELEVANT MACHINE FUNCTION
-		pass
 
 # SCAN OUTPUT
 
