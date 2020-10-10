@@ -5,11 +5,11 @@ import os.path
 from os import path, system
 from cv2 import imread, subtract, cvtColor, GaussianBlur, minMaxLoc, threshold
 import numpy as np
-# from picamera import PiCamera
+from picamera import PiCamera
 import time
 import array
 import math
-# import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 
 from comms import serial_connection
 from scipy.special._ufuncs import hyp1f1
