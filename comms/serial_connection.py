@@ -56,8 +56,9 @@ class SerialConnection(object):
 
 		log('Starting services')
 		self.s.flushInput()  # Flush startup text in serial input
-		self.s.write(('e1/n').encode('utf-8')) #Enables the stepper motor driver, turns out the program light.
-		self.s.write(('z/n').encode('utf-8')) #Zeroes the encoder in the stepper
+		self.s.write(('\n\n').encode('utf-8'))
+		self.s.write(('e1\n').encode('utf-8')) #Enables the stepper motor driver, turns out the program light.
+		self.s.write(('z\n').encode('utf-8')) #Zeroes the encoder in the stepper
 		self.next_poll_time = time.time()
 		t = threading.Thread(target=self.serial_scan_loop)
 		t.daemon = True
