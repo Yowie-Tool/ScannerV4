@@ -4,7 +4,7 @@ from datetime import datetime
 import os.path
 from os import path
 
-os.environ['KIVY_WINDOW'] = 'egl_rpi'
+os.environ['KIVY_WINDOW'] = 'pygame'
 
 from kivy.config import Config
 from kivy.clock import Clock
