@@ -105,15 +105,15 @@ class ScannerMachine(object):
 
 	# JOG FUNCTION
 	def jog_relative(self, angle):
-		strrotate = 'c' + str(angle*30)
+		strrotate = 'c' + str(angle*10)
 		self.s.write_command(strrotate)
 		self.most_recent_angle_change = angle
 
 	# GET UP TO DATE VARIABLES
 	def update_angle_moved(self):
-		fullrotint = math.floor((self.most_recent_angle_change*30)/360)
+		fullrotint = math.floor((self.most_recent_angle_change*10)/360)
 		fullrotang = fullrotint*360
-		self.current_angle = ((self.current_angle_readout)+fullrotang)/30
+		self.current_angle = ((self.current_angle_readout)+fullrotang)/10
 
 	def get_scan_progress(self):
 
