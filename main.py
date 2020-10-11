@@ -4,7 +4,7 @@ from datetime import datetime
 import os.path
 from os import path
 
-os.environ['KIVY_WINDOW'] = 'pygame'
+os.environ['KIVY_WINDOW'] = 'sdl2'
 
 from kivy.config import Config
 from kivy.clock import Clock
