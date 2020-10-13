@@ -111,7 +111,7 @@ class SerialConnection(object):
 		self.m.update_angle_moved()
 
 	def write_command(self, serialCommand):
-		self.write_command_buffer.append(serialCommand)
+		self.write_command_buffer.append(str(serialCommand) + '\n')
 
 	def write_direct(self):
 
@@ -120,7 +120,7 @@ class SerialConnection(object):
 		if self.s:
 			try:
 				self.s.write((serialCommand).encode('utf-8')) # assume everything needs encoding??
-
+				log('write ' + serialCommand + ' to serial')
 			except:
 				print("FAILED to write to SERIAL: " + serialCommand + " (Alt text: " + str(altDisplayText) + ")")
 
