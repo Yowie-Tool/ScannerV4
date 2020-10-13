@@ -120,7 +120,7 @@ class SerialConnection(object):
 		if self.s:
 			try:
 				self.s.write((serialCommand).encode('utf-8')) # assume everything needs encoding??
-
+				log('write ' + serialCommand + ' to serial')
 			except:
 				print("FAILED to write to SERIAL: " + serialCommand + " (Alt text: " + str(altDisplayText) + ")")
 
