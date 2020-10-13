@@ -25,9 +25,9 @@ class ScannerMachine(object):
 	chan_listl=[29,31,33] #laser pins
 
 	GPIO.setmode(GPIO.BOARD)
-	GPIO.setup(self.chan_listc, GPIO.OUT)
-	GPIO.setup(self.chan_listl, GPIO.OUT)
-	GPIO.output(self.chan_listl,0)
+	GPIO.setup(chan_listc, GPIO.OUT)
+	GPIO.setup(chan_listl, GPIO.OUT)
+	GPIO.output(chan_listl,0)
 
 	photonum1 = 0
 	photonum2 = 0
