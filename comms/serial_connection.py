@@ -76,12 +76,6 @@ class SerialConnection(object):
 				self.s.flushInput()
 				self.FLUSH_FLAG = False
 
-
-			# Polling # REPLACE THIS SO THAT IT POLLS FOR THE ANGLE
-			if self.next_poll_time < time.time():
-				self.write_direct('?', realtime = True, show_in_sys = False, show_in_console = False)
-				self.next_poll_time = time.time() + self.STATUS_INTERVAL
-
 			# PROCESS COMMANDS GOING TO SERIAL:
 			command_counter = 0
 			for command in self.write_command_buffer:
