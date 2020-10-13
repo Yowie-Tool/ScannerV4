@@ -179,7 +179,7 @@ class ScannerMachine(object):
 		os.system(i2c)
 		GPIO.output(self.chan_listc,(1,0,0))
 		#select camera 1 GPIO
-		if self.resolution_bool:
+		if resolution_bool:
 			camera.resolution=(1640,1232)
 		else:
 			camera.resolution=(3280,2464)
@@ -192,7 +192,7 @@ class ScannerMachine(object):
 		os.system(i2c)
 		GPIO.output(self.chan_listc,(0,1,0))
 		#select camera 2 GPIO
-		if self.resolution_bool:
+		if resolution_bool:
 			camera.resolution = (1640,1232)
 		else:
 			camera.resolution = (3280,2464)
