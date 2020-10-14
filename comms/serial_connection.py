@@ -43,7 +43,7 @@ class SerialConnection(object):
 		log('Start to establish connection...')
 
 		try: 
-			self.s=serial.Serial('/dev/ttyAMA0',9600)
+			self.s=serial.Serial('/dev/ttyAMA0',9600, timeout = 6, writeTimeout = 20)
 
 			#Maybe we should add in some extra lines here to clear it as we found it didn't communicate immediately ?
 
