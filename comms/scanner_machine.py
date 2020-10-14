@@ -228,6 +228,7 @@ class ScannerMachine(object):
 
 		if self.doing_scan_camera_1:
 			self.doing_scan_camera_1 = False
+			Clock.unschedule(self.scan_step_event_1)
 
 			if self.scan_cameras == 2:
 				self.set_scanner_to_origin(self.current_angle)
@@ -236,6 +237,7 @@ class ScannerMachine(object):
 
 		elif self.doing_scan_camera_2:
 			self.doing_scan_camera_2 = False
+			Clock.unschedule(self.scan_step_event_2)
 
 		self.process_scan()
 
@@ -252,6 +254,7 @@ class ScannerMachine(object):
 			os.system(i2c)
 		except:
 			print("i2c switch failed")
+			Clock.schedule_once(lambda dt: self.camera_1_open(), 0.2)
 		GPIO.output(self.chan_listc,(1,0,0))
 		#select camera 1 GPIO
 		if resolution_bool:
@@ -262,12 +265,13 @@ class ScannerMachine(object):
 		camera.start_preview(fullscreen=False,window=(200,0,600,400)) # check that this ends up with our screen in the right place!
 		time.sleep(2)
 		
-	def camera2open(self,resolution_bool):
+	def camera_2_open(self,resolution_bool):
 		i2c='i2cset -y 1 0x70 0x00 0x06' #set camera 1 i2c
 		try:
 			os.system(i2c)
 		except:
 			print("i2c switch failed")
+			Clock.schedule_once(lambda dt: self.camera_2_open(), 0.2)
 		GPIO.output(self.chan_listc,(0,1,0))
 		#select camera 2 GPIO
 		if resolution_bool:
@@ -319,8 +323,10 @@ class ScannerMachine(object):
 	def start_scan_camera_1(self):
 		self.camera_1_open(self.low_res)
 		self.doing_scan_camera_1 = True
+		step_interval_seconds = self.scanstepangle1*0.15
+		self.scan_step_event_1 = Clock.schedule_interval(self.do_scan_step_camera1, step_interval_seconds)
 
-	def do_scan_step_camera1(self):
+	def do_scan_step_camera1(self, dt):
 		self.photoangle1.append(self.current_angle)
 		self.camera1take(self.photonum1)
 
@@ -334,8 +340,10 @@ class ScannerMachine(object):
 	def start_scan_camera_2(self):
 		self.camera_2_open(self.low_res)
 		self.doing_scan_camera_2 = True
+		step_interval_seconds = self.scanstepangle2*0.15
+		self.scan_step_event_2 = Clock.schedule_interval(self.do_scan_step_camera2, step_interval_seconds)
 
-	def do_scan_step_2(self):
+	def do_scan_step_camera2(self, dt):
 		self.photoangle2.append(self.current_angle)
 		self.camera2take(self.photonum2)
 
