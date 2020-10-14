@@ -194,7 +194,7 @@ class ScannerMachine(object):
 			camera.resolution=(3280,2464)
 		camera.meter_mode='backlit'
 		camera.start_preview(fullscreen=False,window=(200,80,600,400)) # check that this ends up with our screen in the right place!
-		time.sleep(2) #this needs a value
+		time.sleep(2)
 		
 	def camera2open(self,resolution_bool):
 		i2c='i2cset -y 1 0x70 0x00 0x06' #set camera 1 i2c
@@ -207,7 +207,7 @@ class ScannerMachine(object):
 			camera.resolution = (3280,2464)
 		camera.meter_mode = 'backlit'
 		camera.start_preview(fullscreen=False,window=(200,80,600,400)) # check that this ends up with our screen in the right place!
-		time.sleep(2) # this neesa a value
+		time.sleep(2)
 
 	def camera_close(self):
 		camera.stop_preview()
