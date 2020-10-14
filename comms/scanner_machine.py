@@ -228,6 +228,7 @@ class ScannerMachine(object):
 
 		if self.doing_scan_camera_1:
 			self.doing_scan_camera_1 = False
+			Clock.unschedule(self.scan_step_event_1)
 
 			if self.scan_cameras == 2:
 				self.set_scanner_to_origin(self.current_angle)
@@ -236,6 +237,7 @@ class ScannerMachine(object):
 
 		elif self.doing_scan_camera_2:
 			self.doing_scan_camera_2 = False
+			Clock.unschedule(self.scan_step_event_2)
 
 		self.process_scan()
 
@@ -319,8 +321,10 @@ class ScannerMachine(object):
 	def start_scan_camera_1(self):
 		self.camera_1_open(self.low_res)
 		self.doing_scan_camera_1 = True
+		step_interval_seconds = self.scanstepangle1*0.15
+		self.scan_step_event_1 = Clock.schedule_interval(self.do_scan_step_camera1, step_interval_seconds)
 
-	def do_scan_step_camera1(self):
+	def do_scan_step_camera1(self, dt):
 		self.photoangle1.append(self.current_angle)
 		self.camera1take(self.photonum1)
 
@@ -334,8 +338,10 @@ class ScannerMachine(object):
 	def start_scan_camera_2(self):
 		self.camera_2_open(self.low_res)
 		self.doing_scan_camera_2 = True
+		step_interval_seconds = self.scanstepangle2*0.15
+		self.scan_step_event_2 = Clock.schedule_interval(self.do_scan_step_camera2, step_interval_seconds)
 
-	def do_scan_step_2(self):
+	def do_scan_step_camera2(self, dt):
 		self.photoangle2.append(self.current_angle)
 		self.camera2take(self.photonum2)
 

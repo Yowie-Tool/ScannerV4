@@ -100,11 +100,11 @@ class SerialConnection(object):
 			if len(rec_temp):  
 				self.process_serial_output(rec_temp)
 
-				if self.m.doing_scan_camera_1:
-					self.m.do_scan_step_camera1()
+				# if self.m.doing_scan_camera_1:
+				# 	self.m.do_scan_step_camera1()
 
-				if self.m.doing_scan_camera_2:
-					self.m.do_scan_step_camera1()
+				# if self.m.doing_scan_camera_2:
+				# 	self.m.do_scan_step_camera2()
 
 	# SERIAL IS ONLY READING ANGLE: 
 	def process_serial_output(self, output):
