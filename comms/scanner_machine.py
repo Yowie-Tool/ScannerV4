@@ -390,7 +390,7 @@ class ScannerMachine(object):
 		tint=maxvalue
 		if maxvalue < length:
 			while tcurrent < tlast:
-				if tint < (length(t)-1):
+				if tint < (length-1):
 					tlast=t[tint]
 					tint=tint+1
 					tcurrent=t[tint]
