@@ -88,6 +88,8 @@ class SerialConnection(object):
 				# Read line in from serial buffer (rec_temp: received, temporary)
 				try:
 					rec_temp = self.s.readline().strip() #Block the executing thread indefinitely until a line arrives
+					print('raw readout is: ' + str(rec_temp))
+
 				except Exception as e:
 					log('serial.readline exception:\n' + str(e))
 					rec_temp = ''
@@ -98,7 +100,7 @@ class SerialConnection(object):
 			if len(rec_temp):  
 				self.process_serial_output(rec_temp)
 
-				if self.m.doing_scan_camera_1: 
+				if self.m.doing_scan_camera_1:
 					self.m.do_scan_step_camera1()
 
 				if self.m.doing_scan_camera_2:
