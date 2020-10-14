@@ -108,6 +108,16 @@ class ScannerMachine(object):
 		strrotate = 'c' + str(angle*10)
 		self.s.write_command(strrotate)
 		self.most_recent_angle_change = angle
+		
+	# VISIBLE LASER
+	def visible_laser_on(self):
+		GPIO.output(33,1)
+		
+	def visible_laser_off(self):
+		GPIO.output(33,0)
+		
+	#GYROSCOPE
+		#Will insert here once I've got an additional gyro installed.
 
 	# GET UP TO DATE VARIABLES
 	def update_angle_moved(self):
