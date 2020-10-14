@@ -420,7 +420,8 @@ class ScannerMachine(object):
 			loff=cv.imread(loffname)
 			lon=cv.imread(lonname)
 			src=cv.subtract(lon,loff)
-			print(src.shape)
+			row, col = src.shape
+			print('Rows %d Columns %d' % (row,column))
 			#subtract the laser on image from the laser off image. In theory, when we lock down the camera settings between the two photos, we should end up with just the laser line left. In practice, there is extra interference involved. 
 			blue=src[:,:,0]
 			#extract just the blue array, as this is the main proportion of the IR laser image
