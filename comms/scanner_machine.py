@@ -176,7 +176,10 @@ class ScannerMachine(object):
 	# CAMERA FUNCTIONS
 	def camera_1_open(self,resolution_bool):
 		i2c='i2cset -y 1 0x70 0x00 0x04' #set camera 1 i2c
-		os.system(i2c)
+		try:
+			os.system(i2c)
+		except:
+			print("i2c switch failed")
 		GPIO.output(self.chan_listc,(1,0,0))
 		#select camera 1 GPIO
 		if resolution_bool:
@@ -189,7 +192,10 @@ class ScannerMachine(object):
 		
 	def camera2open(self,resolution_bool):
 		i2c='i2cset -y 1 0x70 0x00 0x06' #set camera 1 i2c
-		os.system(i2c)
+		try:
+			os.system(i2c)
+		except:
+			print("i2c switch failed")
 		GPIO.output(self.chan_listc,(0,1,0))
 		#select camera 2 GPIO
 		if resolution_bool:
