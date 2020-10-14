@@ -10,6 +10,8 @@ import time
 import array
 import math
 import RPi.GPIO as GPIO
+import smbus
+import statistics
 
 from comms import serial_connection
 from scipy.special._ufuncs import hyp1f1
@@ -66,6 +68,12 @@ class ScannerMachine(object):
 	doing_scan_camera_1 = False
 	doing_scan_camera_2 = False
 	scan_progress = 0
+	
+	power_mgmt_1 = 0x6b
+	power_mgmt_2 = 0x6c
+	
+	bus = smbus.SMBus(1) # bus = smbus.SMBus(0) fuer Revision 1
+	address = 0x69       # Need to check address, will do when plugged in!
 
 	def __init__(self, screen_manager):
 
@@ -77,6 +85,11 @@ class ScannerMachine(object):
 
 		global camera
 		camera=PiCamera()
+		
+		try:
+			bus.write_byte_data(address, power_mgmt_1, 0)
+		except:
+			print("Gyro not available")
 
 	def read_in_calibration_values(self):
 
@@ -111,13 +124,53 @@ class ScannerMachine(object):
 		
 	# VISIBLE LASER
 	def visible_laser_on(self):
-		GPIO.output(33,1)
+		GPIO.output(31,1)
 		
 	def visible_laser_off(self):
-		GPIO.output(33,0)
+		GPIO.output(31,0)
 		
 	#GYROSCOPE
 		#Will insert here once I've got an additional gyro installed.
+	def gyro_read_byte(reg):
+		return bus.read_byte_data(address, reg)
+ 
+	def gyro_read_word(reg):
+		h = bus.read_byte_data(address, reg)
+     	l = bus.read_byte_data(address, reg+1)
+      	value = (h << 8) + l
+       	return value
+ 
+	def gyro_read_word_2c(reg):
+		val = read_word(reg)
+     	if (val >= 0x8000):
+        	return -((65535 - val) + 1)
+    	else:
+        	return val
+ 
+	def gyro_dist(a,b):
+		return math.sqrt((a*a)+(b*b))
+ 
+	def gyro_get_y_rotation(x,y,z):
+		radians = math.atan2(x, dist(y,z))
+		return -math.degrees(radians)
+ 
+	def gyro_get_x_rotation(x,y,z):
+		radians = math.atan2(y, dist(x,z))
+     	return math.degrees(radians)
+ 
+	def gyro_read_word_2c(reg):
+		val = read_word(reg)
+		if (val >= 0x8000):
+			return -((65535 - val) + 1)
+		else:
+			return val
+ 
+	def gyro_dist(a,b):
+		return math.sqrt((a*a)+(b*b))
+ 
+	def gyro_get_y_rotation(x,y,z):
+		radians = math.atan2(x, dist(y,z))
+		return -math.degrees(radians)
 
 	# GET UP TO DATE VARIABLES
 	def update_angle_moved(self):

@@ -152,7 +152,7 @@ Builder.load_string("""
 		            PopMatrix
 		        markup: True
 		        font_size: '22sp'
-		        text: "Visible light"
+		        text: "Visible laser off"
 
 		# X Y widget
 
