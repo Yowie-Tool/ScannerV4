@@ -104,12 +104,19 @@ class ScannerMachine(object):
 
 
 	# JOG FUNCTION
-	def jog_relative(self, angle):
+	def jog_clockwise(self, angle):
 		strrotate = 'c' + str(angle*10)
 		self.s.write_command(strrotate)
 		self.most_recent_angle_change = angle
 
-		log('jog relative ' + strrotate)
+		log('jog clockwise ' + strrotate)
+
+	def jog_anticlockwise(self, angle):
+		strrotate = 'a' + str(angle*10)
+		self.s.write_command(strrotate)
+		self.most_recent_angle_change = angle
+
+		log('jog anticlockwise ' + strrotate)
 
 	# GET UP TO DATE VARIABLES
 	def update_angle_moved(self):
