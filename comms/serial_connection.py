@@ -115,6 +115,7 @@ class SerialConnection(object):
 
 	def write_direct(self):
 
+		log('write direct')
 		# USE THIS FUNCTION TO FORMAT WHAT IS BEING WRITTEN TO SERIAL AS REQUIRED (i.e. any encoding)
 
 		if self.s:
