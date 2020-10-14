@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import time
 import sys, os
 from datetime import datetime
