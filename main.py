@@ -20,7 +20,7 @@ from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
 from kivy.core.window import Window
 
-from screens import screen1, screen2, screen3, screen4
+from screens import screen1, screen2, screen3, screen4, screen_welcome
 from comms import scanner_machine
 
 
