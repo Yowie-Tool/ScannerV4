@@ -53,6 +53,7 @@ class WelcomeScreenClass(Screen):
         
         super(WelcomeScreenClass, self).__init__()
         self.sm=kwargs['screen_manager']
+        self.name = kwargs['name']
         self.m=kwargs['scanner']
 
     def on_enter(self):
