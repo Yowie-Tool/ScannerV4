@@ -71,7 +71,7 @@ class SerialConnection(object):
 		log('Running serial scanner thread')
 
 		while True:
-						 
+			log('looping')
 			if self.FLUSH_FLAG == True:
 				self.s.flushInput()
 				self.FLUSH_FLAG = False
@@ -112,6 +112,7 @@ class SerialConnection(object):
 
 	def write_command(self, serialCommand):
 		self.write_command_buffer.append(str(serialCommand) + '\n')
+		log('appended to buffer')
 
 	def write_direct(self):
 
