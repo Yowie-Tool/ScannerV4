@@ -331,7 +331,7 @@ class ScannerMachine(object):
 		self.camera_1_take(self.photonum1)
 
 		if (self.photonum1 <= self.scanstepscamera1):
-			self.jog_relative(self.scanstepangle1)
+			self.jog_clockwise(self.scanstepangle1)
 			self.photonum1 = self.photonum1 + 1
 
 		else:
@@ -348,7 +348,7 @@ class ScannerMachine(object):
 		self.camera_2_take(self.photonum2)
 
 		if self.photonum2 <= self.scanstepscamera2: 
-			self.jog_relative(self.scanstepangle2)
+			self.jog_clockwise(self.scanstepangle2)
 			self.photonum2 = self.photonum2 + 1
 
 		else:
