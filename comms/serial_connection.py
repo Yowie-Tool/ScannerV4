@@ -111,7 +111,7 @@ class SerialConnection(object):
 		# self.m.update_angle_moved()
 
 	def write_command(self, serialCommand):
-		self.write_command_buffer.append(str(serialCommand) + '\n')
+		self.write_command_buffer.append(str(serialCommand))
 		log('appended to buffer')
 
 	def write_direct(self):
