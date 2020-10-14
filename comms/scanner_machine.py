@@ -10,6 +10,8 @@ import time
 import array
 import math
 import RPi.GPIO as GPIO
+import smbus
+import statistics
 
 from comms import serial_connection
 from scipy.special._ufuncs import hyp1f1
@@ -66,6 +68,12 @@ class ScannerMachine(object):
 	doing_scan_camera_1 = False
 	doing_scan_camera_2 = False
 	scan_progress = 0
+	
+	power_mgmt_1 = 0x6b
+	power_mgmt_2 = 0x6c
+	
+	bus = smbus.SMBus(1) # bus = smbus.SMBus(0) fuer Revision 1
+	address = 0x69       # Need to check address, will do when plugged in!
 
 	def __init__(self, screen_manager):
 
@@ -77,6 +85,11 @@ class ScannerMachine(object):
 
 		global camera
 		camera=PiCamera()
+		
+		try:
+			bus.write_byte_data(address, power_mgmt_1, 0)
+		except:
+			print("Gyro not available")
 
 	def read_in_calibration_values(self):
 
@@ -108,6 +121,56 @@ class ScannerMachine(object):
 		strrotate = 'c' + str(angle*10)
 		self.s.write_command(strrotate)
 		self.most_recent_angle_change = angle
+		
+	# VISIBLE LASER
+	def visible_laser_on(self):
+		GPIO.output(31,1)
+		
+	def visible_laser_off(self):
+		GPIO.output(31,0)
+		
+	#GYROSCOPE
+		#Will insert here once I've got an additional gyro installed.
+	def gyro_read_byte(reg):
+		return bus.read_byte_data(address, reg)
+ 
+	def gyro_read_word(reg):
+		h = bus.read_byte_data(address, reg)
+		l = bus.read_byte_data(address, reg+1)
+		value = (h << 8) + l
+		return value
+ 
+	def gyro_read_word_2c(reg):
+		val = read_word(reg)
+		if (val >= 0x8000):
+			return -((65535 - val) + 1)
+		else:
+			return val
+ 
+	def gyro_dist(a,b):
+		return math.sqrt((a*a)+(b*b))
+ 
+	def gyro_get_y_rotation(x,y,z):
+		radians = math.atan2(x, dist(y,z))
+		return -math.degrees(radians)
+ 
+	def gyro_get_x_rotation(x,y,z):
+		radians = math.atan2(y, dist(x,z))
+		return math.degrees(radians)
+ 
+	def gyro_read_word_2c(reg):
+		val = read_word(reg)
+		if (val >= 0x8000):
+			return -((65535 - val) + 1)
+		else:
+			return val
+ 
+	def gyro_dist(a,b):
+		return math.sqrt((a*a)+(b*b))
+ 
+	def gyro_get_y_rotation(x,y,z):
+		radians = math.atan2(x, dist(y,z))
+		return -math.degrees(radians)
 
 		log('jog clockwise ' + strrotate)
 
@@ -185,7 +248,10 @@ class ScannerMachine(object):
 	# CAMERA FUNCTIONS
 	def camera_1_open(self,resolution_bool):
 		i2c='i2cset -y 1 0x70 0x00 0x04' #set camera 1 i2c
-		os.system(i2c)
+		try:
+			os.system(i2c)
+		except:
+			print("i2c switch failed")
 		GPIO.output(self.chan_listc,(1,0,0))
 		#select camera 1 GPIO
 		if resolution_bool:
@@ -193,12 +259,15 @@ class ScannerMachine(object):
 		else:
 			camera.resolution=(3280,2464)
 		camera.meter_mode='backlit'
-		camera.start_preview(fullscreen=False,window=(200,80,600,400)) # check that this ends up with our screen in the right place!
+		camera.start_preview(fullscreen=False,window=(200,0,600,400)) # check that this ends up with our screen in the right place!
 		time.sleep(2)
 		
 	def camera2open(self,resolution_bool):
 		i2c='i2cset -y 1 0x70 0x00 0x06' #set camera 1 i2c
-		os.system(i2c)
+		try:
+			os.system(i2c)
+		except:
+			print("i2c switch failed")
 		GPIO.output(self.chan_listc,(0,1,0))
 		#select camera 2 GPIO
 		if resolution_bool:
@@ -206,7 +275,7 @@ class ScannerMachine(object):
 		else:
 			camera.resolution = (3280,2464)
 		camera.meter_mode = 'backlit'
-		camera.start_preview(fullscreen=False,window=(200,80,600,400)) # check that this ends up with our screen in the right place!
+		camera.start_preview(fullscreen=False,window=(200,0,600,400)) # check that this ends up with our screen in the right place!
 		time.sleep(2)
 
 	def camera_close(self):
@@ -223,8 +292,9 @@ class ScannerMachine(object):
 		else:
 			camera.shutter_speed=0
 		#doesn't override
+		GPIO.output(self.chan_listl, (0,0,0))
 		camera.capture(loffname,'jpeg',use_video_port=True)
-		GPIO.output(self.chan_listl, (1,0,0)) # this needs to be the IR laser, double check when able
+		GPIO.output(self.chan_listl, (0,0,1)) # this needs to be the IR laser, double check when able
 		camera.capture(lonname,'jpeg',use_video_port=True)
 		camera.shutter_speed=0 # allows camera to adjust after taking both photos
 		
@@ -239,8 +309,9 @@ class ScannerMachine(object):
 		else:
 			camera.shutter_speed=0
 		#doesn't override
+		GPIO.output(self.chan_listl, (0,0,0))
 		camera.capture(loffname,'jpeg',use_video_port=True)
-		GPIO.output(self.chan_listl, (1,0,0)) # this needs to be the IR laser, double check when able
+		GPIO.output(self.chan_listl, (0,0,1)) # this needs to be the IR laser, double check when able
 		camera.capture(lonname,'jpeg',use_video_port=True)
 		camera.shutter_speed=0 # allows camera to adjust after taking both photos	
 

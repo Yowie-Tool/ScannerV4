@@ -152,7 +152,7 @@ Builder.load_string("""
 		            PopMatrix
 		        markup: True
 		        font_size: '22sp'
-		        text: "Visible light"
+		        text: "Visible laser off"
 
 		# X Y widget
 
@@ -207,14 +207,13 @@ class YowieScreen1(Screen):
 # LASER TOGGLE BUTTON
 	def switch_laser_light(self):
 		if self.laser_toggle.state == 'normal':
-			self.laser_toggle_label.text = 'Visible light'
-
-			# INSERT COMMAND FOR MACHINE
+			self.laser_toggle_label.text = 'Visible laser on'
+			self.m.visible_laser_on()
 
 		if self.laser_toggle.state == 'down':
-			self.laser_toggle_label.text = 'Infrared light'
+			self.laser_toggle_label.text = 'Visible laser off'
+			self.m.visible_laser_off()
 
-			# INSERT COMMAND FOR MACHINE
 
 # ON LEAVE STOP UPDATING SCREEN
 
