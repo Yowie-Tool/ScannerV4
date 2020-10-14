@@ -446,7 +446,7 @@ class ScannerMachine(object):
 				if maxvalue[i] != 0:
 					newarray=threshold[[i],:]
 					laserctr=self.weighted_average(newarray)
-					for_calc_1.append([i,laserctr,(photoangle1[photographs]),0])
+					self.for_calc_1.append([i,laserctr,(photoangle1[photographs]),0])
 					succesful1=succesful1+1
 				else: succesful1=succesful1
 		print ("short range points captured %d" % (succesful1))
@@ -484,7 +484,7 @@ class ScannerMachine(object):
 				if maxvalue[i] != 0:
 					newarray=threshold[[i],:]
 					laserctr=self.weighted_average(newarray)
-					for_calc_2.append([i,laserctr,(photoangle2[photographs]),0])
+					self.for_calc_2.append([i,laserctr,(photoangle2[photographs]),0])
 					succesful2=succesful2+1
 				else: succesful2=succesful2
 		print ("long range points captured %d" % (succesful2))    
@@ -537,7 +537,7 @@ class ScannerMachine(object):
 			rrad=r/(180/math.pi) # rotation of unit in radians
 			xout=hyp1*math.sin(rrad+tan1) # x output adjusted for rotation around Z axis
 			yout=hyp1*math.cos(rrad+tan1) # y output adjusted for rotation around Z axis
-			output.append([xout,yout,0]) # X, Y, Z coordinates for output. Z is assumed to be 0 for easy import into CAD
+			self.output.append([xout,yout,0]) # X, Y, Z coordinates for output. Z is assumed to be 0 for easy import into CAD
 		
 	def calculate_cloud_2(self,for_calc,calibration):
 		readlines=len(for_calc)
@@ -587,5 +587,5 @@ class ScannerMachine(object):
 			rrad=r/(180/math.pi) # rotation of unit in radians
 			xout=hyp1*math.sin(rrad+tan1) # x output adjusted for rotation around Z axis
 			yout=hyp1*math.cos(rrad+tan1) # y output adjusted for rotation around Z axis
-			output.append([xout,yout,0]) # X, Y, Z coordinates for output. Z is assumed to be 0 for easy import into CAD		
+			self.output.append([xout,yout,0]) # X, Y, Z coordinates for output. Z is assumed to be 0 for easy import into CAD		
 				
