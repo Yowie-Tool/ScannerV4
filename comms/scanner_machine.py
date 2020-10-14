@@ -243,7 +243,7 @@ class ScannerMachine(object):
 
 	def set_scanner_to_origin(self,current_angle):
 		angle_to_return_to_origin=float(360-current_angle)
-		self.jog_relative(angle_to_return_to_origin)
+		self.jog_clockwise(angle_to_return_to_origin)
 		time.sleep(10) # need to replace this with a flag
 		return(current_angle)
 
