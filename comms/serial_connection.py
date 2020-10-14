@@ -78,7 +78,7 @@ class SerialConnection(object):
 			# PROCESS COMMANDS GOING TO SERIAL:
 			command_counter = 0
 			for command in self.write_command_buffer:
-				self.write_direct(*command)
+				self.write_direct(command)
 				command_counter += 1
 				
 			del self.write_command_buffer[0:(command_counter)]
