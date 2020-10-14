@@ -109,6 +109,8 @@ class ScannerMachine(object):
 		self.s.write_command(strrotate)
 		self.most_recent_angle_change = angle
 
+		log('jog relative ' + strrotate)
+
 	# GET UP TO DATE VARIABLES
 	def update_angle_moved(self):
 		fullrotint = math.floor((self.most_recent_angle_change*10)/360)
