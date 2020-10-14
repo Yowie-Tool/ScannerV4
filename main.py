@@ -34,11 +34,12 @@ class YowieApp(App):
 
 		m.read_in_calibration_values()
 
-		sm.add_widget(screen1.YowieScreen1(name='s1', screen_manager = sm, scanner = m))
-		sm.add_widget(screen2.YowieScreen2(name='s2', screen_manager = sm, scanner = m))
-		sm.add_widget(screen3.YowieScreen3(name='s3', screen_manager = sm, scanner = m))
-		sm.add_widget(screen4.YowieScreen4(name='s4', screen_manager = sm, scanner = m))
-		sm.current = 's1'
+		sm.add_widget(screen_welcome.WelcomeScreenClass(name ='welcome', screen_manager = sm, scanner = m))		
+		sm.add_widget(screen1.YowieScreen1(name = 's1', screen_manager = sm, scanner = m))
+		sm.add_widget(screen2.YowieScreen2(name = 's2', screen_manager = sm, scanner = m))
+		sm.add_widget(screen3.YowieScreen3(name = 's3', screen_manager = sm, scanner = m))
+		sm.add_widget(screen4.YowieScreen4(name = 's4', screen_manager = sm, scanner = m))
+		sm.current = 'welcome'
 		return sm
 
 YowieApp().run()
