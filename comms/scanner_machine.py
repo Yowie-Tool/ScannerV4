@@ -357,9 +357,9 @@ class ScannerMachine(object):
 	# SCAN PROCESSING
 
 	def process_scan(self):
-		self.read_images_1(self.scanstepscamera1,self.photoangle1())
+		self.read_images_1(self.scanstepscamera1,self.photoangle1)
 		if self.scan_cameras == 2:
-			self.read_images_2(self.scanstepscamera2,self.photoangle2())
+			self.read_images_2(self.scanstepscamera2,self.photoangle2)
 
 		self.calculate_cloud_1(self.for_calc_1,self.scannercalibration)
 		if self.scan_cameras == 2:
