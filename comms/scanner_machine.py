@@ -232,7 +232,7 @@ class ScannerMachine(object):
 			Clock.unschedule(self.scan_step_event_1)
 
 			if self.scan_cameras == 2:
-				self.set_scanner_to_origin(float(self.scanstepangle1*(self.scanstepscamera1-1)))
+				self.set_scanner_to_origin(self.current_angle)
 				self.start_scan_camera_2()
 				return
 
@@ -334,6 +334,7 @@ class ScannerMachine(object):
 		if (self.photonum1 < self.scanstepscamera1):
 			self.jog_clockwise(self.scanstepangle1)
 			self.photonum1 = self.photonum1 + 1
+			self.current_angle = self.current_angle + self.scanstepscamera1
 
 		else:
 			self.end_scan()
@@ -351,6 +352,7 @@ class ScannerMachine(object):
 		if self.photonum2 < self.scanstepscamera2: 
 			self.jog_clockwise(self.scanstepangle2)
 			self.photonum2 = self.photonum2 + 1
+			self.current_angle = self.current_angle + self.scanstepscamera2
 
 		else:
 			self.end_scan()
@@ -415,7 +417,7 @@ class ScannerMachine(object):
 		for photographs in range(scansteps):
 			pnumstr=str(photographs)
 			loffname='c1loff' + pnumstr + '.jpg'
-			lonname='c1lon'+ pnumstr + '.jpg'
+			lonname='c1on'+ pnumstr + '.jpg'
 			#There is a way of taking photo's directly into opencv as an array, but previous attempts at this have been unsuccesful, it seems this only works at low resolutions.
 			loff=cv.imread(loffname)
 			lon=cv.imread(lonname)
@@ -457,7 +459,7 @@ class ScannerMachine(object):
 		for photographs in range(scansteps):
 			pnumstr=str(photographs)
 			loffname='c2loff' + pnumstr + '.jpg'
-			lonname='c2lon'+pnumstr + '.jpg'
+			lonname='c2on'+pnumstr + '.jpg'
 			#There is a way of taking photo's directly into opencv as an array, but previous attempts at this have been unsuccesful, it seems this only works at low resolutions.
 			loff=cv.imread(loffname)
 			lon=cv.imread(lonname)
