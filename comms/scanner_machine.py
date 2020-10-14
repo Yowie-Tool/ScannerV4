@@ -444,7 +444,7 @@ class ScannerMachine(object):
 			os.remove(lonname)
 			#Delete the image files, to save space
 			row, col = threshold.shape
-			for i in range (row):
+			for i in range(row):
 				if maxvalue[i] != 0:
 					newarray=threshold[[i],:]
 					laserctr=self.weighted_average(newarray)
@@ -482,7 +482,7 @@ class ScannerMachine(object):
 			os.remove(lonname)
 			#Delete the image files, to save space
 			row, col = threshold.shape
-			for i in range (row):
+			for i in range(row):
 				if maxvalue[i] != 0:
 					newarray=threshold[[i],:]
 					laserctr=self.weighted_average(newarray)
@@ -512,6 +512,7 @@ class ScannerMachine(object):
 		aconstsqrd = math.pow(aconst,2)
 		a2const=halfyres/math.tan(camanglev/2)
 		for i in range(readlines):
+			log('in_scan')
 			u=for_calc[i][0] # camera vertical vector - In world view this is actually horizontal
 			v=for_calc[i][1] # camera horizontal vector - In world view this is actually vertical
 			r=for_calc[i][2] # machine rotation around camera Z axis
