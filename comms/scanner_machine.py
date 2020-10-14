@@ -369,6 +369,7 @@ class ScannerMachine(object):
 			self.calculate_cloud_2(self.for_calc_2,self.scannercalibration)
 
 	def weighted_average(self,t):
+		t = t.flatten()
 		tmax=max(t) # highest intensity value in row
 		maxvalue=np.argmax(t) # position of value
 		length=t.size #length of array, should be equal to Y resolution....
