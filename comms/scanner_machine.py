@@ -377,10 +377,11 @@ class ScannerMachine(object):
 		tlast=tmax
 		tint=maxvalue
 		if maxvalue > 0:
-			while tcurrent < tlast: 
-				tlast=t[tint]
-				tint=tint-1
-				tcurrent=t[tint]
+			while tcurrent < tlast:
+				if tint > 0:
+					tlast=t[tint]
+					tint=tint-1
+					tcurrent=t[tint]
 			tminv=tint+1 #the last descending value position in the negative direction
 		elif maxvalue == 0:
 			tminv=0
@@ -389,9 +390,10 @@ class ScannerMachine(object):
 		tint=maxvalue
 		if maxvalue < length:
 			while tcurrent < tlast:
-				tlast=t[tint]
-				tint=tint+1
-				tcurrent=t[tint]
+				if tint < length(t)-1:
+					tlast=t[tint]
+					tint=tint+1
+					tcurrent=t[tint]
 			tmaxv=tint-1 #the last descending value position in the positive direction
 		elif maxvalue == length:
 			tmaxv=length
