@@ -232,7 +232,7 @@ class ScannerMachine(object):
 			Clock.unschedule(self.scan_step_event_1)
 
 			if self.scan_cameras == 2:
-				self.set_scanner_to_origin(float(self.scanstepangle1*self.scanstepscamera1))
+				self.set_scanner_to_origin(float(self.scanstepangle1*(self.scanstepscamera1-1)))
 				self.start_scan_camera_2()
 				return
 
@@ -419,6 +419,8 @@ class ScannerMachine(object):
 			#There is a way of taking photo's directly into opencv as an array, but previous attempts at this have been unsuccesful, it seems this only works at low resolutions.
 			loff=cv.imread(loffname)
 			lon=cv.imread(lonname)
+			print(loff.shape)
+			print(lon.shape)
 			src=cv.subtract(lon,loff)
 			print(src.shape)
 			#subtract the laser on image from the laser off image. In theory, when we lock down the camera settings between the two photos, we should end up with just the laser line left. In practice, there is extra interference involved. 
