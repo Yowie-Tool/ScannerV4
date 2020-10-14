@@ -254,6 +254,7 @@ class ScannerMachine(object):
 			os.system(i2c)
 		except:
 			print("i2c switch failed")
+			Clock.schedule_once(lambda dt: self.camera_1_open(), 0.2)
 		GPIO.output(self.chan_listc,(1,0,0))
 		#select camera 1 GPIO
 		if resolution_bool:
@@ -264,12 +265,13 @@ class ScannerMachine(object):
 		camera.start_preview(fullscreen=False,window=(200,0,600,400)) # check that this ends up with our screen in the right place!
 		time.sleep(2)
 		
-	def camera2open(self,resolution_bool):
+	def camera_2_open(self,resolution_bool):
 		i2c='i2cset -y 1 0x70 0x00 0x06' #set camera 1 i2c
 		try:
 			os.system(i2c)
 		except:
 			print("i2c switch failed")
+			Clock.schedule_once(lambda dt: self.camera_2_open(), 0.2)
 		GPIO.output(self.chan_listc,(0,1,0))
 		#select camera 2 GPIO
 		if resolution_bool:
