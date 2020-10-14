@@ -136,7 +136,7 @@ class ScannerMachine(object):
  
 	def gyro_read_word(reg):
 		h = bus.read_byte_data(address, reg)
-     	l = bus.read_byte_data(address, reg+1)
+		l = bus.read_byte_data(address, reg+1)
       	value = (h << 8) + l
        	return value
  
