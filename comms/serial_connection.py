@@ -108,7 +108,7 @@ class SerialConnection(object):
 	def process_serial_output(self, output):
 		self.m.current_angle_readout = output.decode("utf-8")
 		log('angle moved is: ' + self.m.current_angle_readout)
-		# self.m.update_angle_moved()
+		self.m.update_angle_moved()
 
 	def write_command(self, serialCommand):
 		self.write_command_buffer.append(str(serialCommand))

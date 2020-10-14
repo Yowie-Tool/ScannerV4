@@ -285,8 +285,9 @@ class ScannerMachine(object):
 		else:
 			camera.shutter_speed=0
 		#doesn't override
+		GPIO.output(self.chan_listl, (0,0,0))
 		camera.capture(loffname,'jpeg',use_video_port=True)
-		GPIO.output(self.chan_listl, (1,0,0)) # this needs to be the IR laser, double check when able
+		GPIO.output(self.chan_listl, (0,0,1)) # this needs to be the IR laser, double check when able
 		camera.capture(lonname,'jpeg',use_video_port=True)
 		camera.shutter_speed=0 # allows camera to adjust after taking both photos
 		
@@ -301,8 +302,9 @@ class ScannerMachine(object):
 		else:
 			camera.shutter_speed=0
 		#doesn't override
+		GPIO.output(self.chan_listl, (0,0,0))
 		camera.capture(loffname,'jpeg',use_video_port=True)
-		GPIO.output(self.chan_listl, (1,0,0)) # this needs to be the IR laser, double check when able
+		GPIO.output(self.chan_listl, (0,0,1)) # this needs to be the IR laser, double check when able
 		camera.capture(lonname,'jpeg',use_video_port=True)
 		camera.shutter_speed=0 # allows camera to adjust after taking both photos	
 
