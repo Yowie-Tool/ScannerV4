@@ -71,7 +71,6 @@ class SerialConnection(object):
 		log('Running serial scanner thread')
 
 		while True:
-			log('looping')
 			if self.FLUSH_FLAG == True:
 				self.s.flushInput()
 				self.FLUSH_FLAG = False
