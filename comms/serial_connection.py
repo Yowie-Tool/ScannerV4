@@ -78,7 +78,7 @@ class SerialConnection(object):
 			# PROCESS COMMANDS GOING TO SERIAL:
 			command_counter = 0
 			for command in self.write_command_buffer:
-				self.write_direct(command)
+				self.write_direct(*command)
 				command_counter += 1
 				
 			del self.write_command_buffer[0:(command_counter)]
@@ -113,7 +113,7 @@ class SerialConnection(object):
 	def write_command(self, serialCommand):
 		self.write_command_buffer.append(str(serialCommand))
 
-	def write_direct(self):
+	def write_direct(self, serialCommand):
 
 		log('write direct')
 		# USE THIS FUNCTION TO FORMAT WHAT IS BEING WRITTEN TO SERIAL AS REQUIRED (i.e. any encoding)
