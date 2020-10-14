@@ -172,6 +172,8 @@ class ScannerMachine(object):
 		radians = math.atan2(x, dist(y,z))
 		return -math.degrees(radians)
 
+		log('jog relative ' + strrotate)
+
 	# GET UP TO DATE VARIABLES
 	def update_angle_moved(self):
 		fullrotint = math.floor((self.most_recent_angle_change*10)/360)

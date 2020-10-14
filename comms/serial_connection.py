@@ -43,7 +43,7 @@ class SerialConnection(object):
 		log('Start to establish connection...')
 
 		try: 
-			self.s=serial.Serial('/dev/ttyAMA0',9600)
+			self.s=serial.Serial('/dev/ttyAMA0',9600, timeout = 6, writeTimeout = 20)
 
 			#Maybe we should add in some extra lines here to clear it as we found it didn't communicate immediately ?
 
@@ -71,7 +71,6 @@ class SerialConnection(object):
 		log('Running serial scanner thread')
 
 		while True:
-						 
 			if self.FLUSH_FLAG == True:
 				self.s.flushInput()
 				self.FLUSH_FLAG = False
@@ -79,7 +78,7 @@ class SerialConnection(object):
 			# PROCESS COMMANDS GOING TO SERIAL:
 			command_counter = 0
 			for command in self.write_command_buffer:
-				self.write_direct(*command)
+				self.write_direct(command)
 				command_counter += 1
 				
 			del self.write_command_buffer[0:(command_counter)]
@@ -108,14 +107,13 @@ class SerialConnection(object):
 	# SERIAL IS ONLY READING ANGLE: 
 	def process_serial_output(self, output):
 		self.m.current_angle_readout = output.decode("utf-8")
-		self.m.update_angle_moved()
+		log('angle moved is: ' + self.m.current_angle_readout)
+		# self.m.update_angle_moved()
 
 	def write_command(self, serialCommand):
-		self.write_command_buffer.append(str(serialCommand) + '\n')
+		self.write_command_buffer.append(str(serialCommand))
 
-	def write_direct(self):
-
-		# USE THIS FUNCTION TO FORMAT WHAT IS BEING WRITTEN TO SERIAL AS REQUIRED (i.e. any encoding)
+	def write_direct(self, serialCommand):
 
 		if self.s:
 			try:
