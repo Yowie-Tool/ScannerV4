@@ -3,7 +3,8 @@ import sys, os
 from datetime import datetime
 import os.path
 from os import path, system
-from cv2 import imread, subtract, cvtColor, GaussianBlur, minMaxLoc, threshold
+# from cv2 import imread, subtract, cvtColor, GaussianBlur, minMaxLoc, threshold
+import cv2 as cv
 import numpy as np
 from picamera import PiCamera
 import time
@@ -416,20 +417,20 @@ class ScannerMachine(object):
 			loffname='1loff' + pnumstr + '.jpg'
 			lonname='1lon'+pnumstr + '.jpg'
 			#There is a way of taking photo's directly into opencv as an array, but previous attempts at this have been unsuccesful, it seems this only works at low resolutions.
-			loff=imread(loffname)
-			lon=imread(lonname)
-			src=subtract(lon,loff)
+			loff=cv.imread(loffname)
+			lon=cv.imread(lonname)
+			src=cv.subtract(lon,loff)
 			print(src.shape)
 			#subtract the laser on image from the laser off image. In theory, when we lock down the camera settings between the two photos, we should end up with just the laser line left. In practice, there is extra interference involved. 
 			blue=src[:,:,0]
 			#extract just the blue array, as this is the main proportion of the IR laser image
-			blur=GaussianBlur(blue,(5,5),0)
+			blur=cv.GaussianBlur(blue,(5,5),0)
 			#create a blurred image to find the maximum value from. This means that any anomalies are removed
-			(minVal, maxVal, MinLoc, maxLoc) = minMaxLoc(blur)
+			(minVal, maxVal, MinLoc, maxLoc) = cv.minMaxLoc(blur)
 			#find the location of minimum and maximum values in the image
 			threshamount = maxVal*0.2 # maybe make the 0.2 a variable, but this was good in testing originally.
 			#create a value that will remove any values below that, which is a proportion of the maximum value
-			retval, threshold = threshold(blue, threshamount, 255, cv.THRESH_TOZERO);
+			retval, threshold = cv.threshold(blue, threshamount, 255, cv.THRESH_TOZERO);
 			#this then removes those from the image
 			#(minVal, maxVal, MinLoc, maxLoc) = minMaxLoc(threshold) - #not sure if this is needed any more, so commented it out.
 			#find the maximum value of the non blurred image
@@ -455,19 +456,19 @@ class ScannerMachine(object):
 			loffname='2loff' + pnumstr + '.jpg'
 			lonname='2lon'+pnumstr + '.jpg'
 			#There is a way of taking photo's directly into opencv as an array, but previous attempts at this have been unsuccesful, it seems this only works at low resolutions.
-			loff=imread(loffname)
-			lon=imread(lonname)
-			src=subtract(lon,loff)
+			loff=cv.imread(loffname)
+			lon=cv.imread(lonname)
+			src=cv.subtract(lon,loff)
 			#subtract the laser on image from the laser off image. In theory, when we lock down the camera settings between the two photos, we should end up with just the laser line left. In practice, there is extra interference involved. 
 			blue=src[:,:,0]
 			#extract just the blue array, as this is the main proportion of the IR laser image
-			blur=GaussianBlur(blue,(5,5),0)
+			blur=cv.GaussianBlur(blue,(5,5),0)
 			#create a blurred image to find the maximum value from. This means that any anomalies are removed
-			(minVal, maxVal, MinLoc, maxLoc) = minMaxLoc(blur)
+			(minVal, maxVal, MinLoc, maxLoc) = cv.minMaxLoc(blur)
 			#find the location of minimum and maximum values in the image
 			threshamount = maxVal*0.2 # maybe make the 0.2 a variable, but this was good in testing originally.
 			#create a value that will remove any values below that, which is a proportion of the maximum value
-			retval, threshold = threshold(blue, threshamount, 255, cv.THRESH_TOZERO);
+			retval, threshold = cv.threshold(blue, threshamount, 255, cv.THRESH_TOZERO);
 			#this then removes those from the image
 			#(minVal, maxVal, MinLoc, maxLoc) = minMaxLoc(threshold) - #not sure if this is needed any more, so commented it out.
 			#find the maximum value of the non blurred image
