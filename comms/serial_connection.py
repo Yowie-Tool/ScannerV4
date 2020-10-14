@@ -106,17 +106,14 @@ class SerialConnection(object):
 
 	# SERIAL IS ONLY READING ANGLE: 
 	def process_serial_output(self, output):
-		print(output.decode("utf-8"))
-		# self.m.current_angle_readout = float(output.decode("utf-8"))
+		self.m.current_angle_readout = output.decode("utf-8")
+		log('angle moved is: ' + self.m.current_angle_readout)
 		# self.m.update_angle_moved()
 
 	def write_command(self, serialCommand):
 		self.write_command_buffer.append(str(serialCommand))
 
 	def write_direct(self, serialCommand):
-
-		log('write direct')
-		# USE THIS FUNCTION TO FORMAT WHAT IS BEING WRITTEN TO SERIAL AS REQUIRED (i.e. any encoding)
 
 		if self.s:
 			try:

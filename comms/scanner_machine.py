@@ -5,7 +5,7 @@ import os.path
 from os import path, system
 from cv2 import imread, subtract, cvtColor, GaussianBlur, minMaxLoc, threshold
 import numpy as np
-# from picamera import PiCamera
+from picamera import PiCamera
 import time
 import array
 import math
@@ -75,8 +75,8 @@ class ScannerMachine(object):
 		self.s = serial_connection.SerialConnection(self, self.sm)
 		self.s.establish_connection()
 
-		# global camera
-		# camera=PiCamera()
+		global camera
+		camera=PiCamera()
 
 	def read_in_calibration_values(self):
 
