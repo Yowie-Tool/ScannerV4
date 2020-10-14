@@ -328,7 +328,7 @@ class ScannerMachine(object):
 
 	def do_scan_step_camera1(self, dt):
 		self.photoangle1.append(self.current_angle)
-		self.camera1take(self.photonum1)
+		self.camera_1_take(self.photonum1)
 
 		if (self.photonum1 <= self.scanstepscamera1):
 			self.jog_relative(self.scanstepangle1)
@@ -345,7 +345,7 @@ class ScannerMachine(object):
 
 	def do_scan_step_camera2(self, dt):
 		self.photoangle2.append(self.current_angle)
-		self.camera2take(self.photonum2)
+		self.camera_2_take(self.photonum2)
 
 		if self.photonum2 <= self.scanstepscamera2: 
 			self.jog_relative(self.scanstepangle2)
