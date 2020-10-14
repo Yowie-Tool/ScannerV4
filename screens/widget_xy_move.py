@@ -164,17 +164,17 @@ class XYMove(Widget):
 	def buttonJogXY(self, case):
 
 		if self.jogMode == 'plus_5':
-			if case == 'X+': self.m.jog_relative(5)
-			if case == 'X-': self.m.jog_relative(-5)
+			if case == 'X+': self.m.jog_clockwise(5)
+			if case == 'X-': self.m.jog_anticlockwise(5)
 
 		elif self.jogMode == 'plus_10':
-			if case == 'X+': self.m.jog_relative(10)
-			if case == 'X-': self.m.jog_relative(-10)
+			if case == 'X+': self.m.jog_clockwise(10)
+			if case == 'X-': self.m.jog_anticlockwise(10)
 
 		elif self.jogMode == 'plus_20':
-			if case == 'X+': self.m.jog_relative(20)
-			if case == 'X-': self.m.jog_relative(-20)
+			if case == 'X+': self.m.jog_clockwise(20)
+			if case == 'X-': self.m.jog_anticlockwise(20)
 
 		elif self.jogMode == 'plus_180':
-			if case == 'X+': self.m.jog_relative(180)
-			if case == 'X-': self.m.jog_relative(-180)
+			if case == 'X+': self.m.jog_clockwise(180)
+			if case == 'X-': self.m.jog_anticlockwise(180)
