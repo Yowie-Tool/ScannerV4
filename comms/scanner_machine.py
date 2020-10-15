@@ -462,19 +462,19 @@ class ScannerMachine(object):
 			#find the location of minimum and maximum values in the image
 			threshamount = maxVal*0.2 # maybe make the 0.2 a variable, but this was good in testing originally.
 			#create a value that will remove any values below that, which is a proportion of the maximum value
-			retval, threshold = threshold(blue, threshamount, 255, THRESH_TOZERO);
+			retval, threshold_ar = threshold(blue, threshamount, 255, THRESH_TOZERO);
 			#this then removes those from the image
 			#(minVal, maxVal, MinLoc, maxLoc) = minMaxLoc(threshold) - #not sure if this is needed any more, so commented it out.
 			#find the maximum value of the non blurred image
-			maxvalue = np.argmax(threshold,axis=1) # Just to check value is nonzero
+			maxvalue = np.argmax(threshold_ar,axis=1) # Just to check value is nonzero
 			#Now find the maximum value in each column. Originally, this was then counted as the centre point of the laser, but we are now going to use a weighted average.
 			os.remove(loffname)
 			os.remove(lonname)
 			#Delete the image files, to save space
-			row, col = threshold.shape
+			row, col = threshold_ar.shape
 			for i in range(row):
 				if maxvalue[i] != 0:
-					newarray=threshold[[i],:]
+					newarray=threshold_ar[[i],:]
 					laserctr=self.weighted_average(newarray)
 					self.for_calc_1.append([i,laserctr,(photoangle1[photographs]),0])
 					succesful1=succesful1+1
@@ -502,19 +502,19 @@ class ScannerMachine(object):
 			#find the location of minimum and maximum values in the image
 			threshamount = maxVal*0.2 # maybe make the 0.2 a variable, but this was good in testing originally.
 			#create a value that will remove any values below that, which is a proportion of the maximum value
-			retval, threshold = threshold(blue, threshamount, 255, THRESH_TOZERO);
+			retval, threshold_ar = threshold(blue, threshamount, 255, THRESH_TOZERO);
 			#this then removes those from the image
 			#(minVal, maxVal, MinLoc, maxLoc) = minMaxLoc(threshold) - #not sure if this is needed any more, so commented it out.
 			#find the maximum value of the non blurred image
-			maxvalue = np.argmax(threshold,axis=1) # Just to check value is nonzero. We could do this in the weighted average part, but it's potentially quicker here.
+			maxvalue = np.argmax(threshold_ar, axis=1) # Just to check value is nonzero. We could do this in the weighted average part, but it's potentially quicker here.
 			#Now find the maximum value in each column. Originally, this was then counted as the centre point of the laser, but we are now going to use a weighted average.
 			os.remove(loffname)
 			os.remove(lonname)
 			#Delete the image files, to save space
-			row, col = threshold.shape
+			row, col = threshold_ar.shape
 			for i in range(row):
 				if maxvalue[i] != 0:
-					newarray=threshold[[i],:]
+					newarray=threshold_ar[[i],:]
 					laserctr=self.weighted_average(newarray)
 					self.for_calc_2.append([i,laserctr,(photoangle2[photographs]),0])
 					succesful2=succesful2+1
