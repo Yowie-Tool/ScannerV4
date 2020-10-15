@@ -6,13 +6,15 @@ from os import path, system
 # from cv2 import imread, subtract, cvtColor, GaussianBlur, minMaxLoc, threshold
 import cv2 as cv
 import numpy as np
-from picamera import PiCamera
 import time
 import array
 import math
-import RPi.GPIO as GPIO
-import smbus
 import statistics
+
+if sys.platform != 'win32' and sys.platform != 'darwin':
+	import RPi.GPIO as GPIO
+	from picamera import PiCamera
+	import smbus
 
 from comms import serial_connection
 from scipy.special._ufuncs import hyp1f1
@@ -27,10 +29,13 @@ class ScannerMachine(object):
 	chan_listc=[12,16,18] #camera switcher pins
 	chan_listl=[29,31,33] #laser pins
 
-	GPIO.setmode(GPIO.BOARD)
-	GPIO.setup(chan_listc, GPIO.OUT)
-	GPIO.setup(chan_listl, GPIO.OUT)
-	GPIO.output(chan_listl,0)
+	if sys.platform != 'win32' and sys.platform != 'darwin':
+		GPIO.setmode(GPIO.BOARD)
+		GPIO.setup(chan_listc, GPIO.OUT)
+		GPIO.setup(chan_listl, GPIO.OUT)
+		GPIO.output(chan_listl,0)
+		bus = smbus.SMBus(1) # bus = smbus.SMBus(0) fuer Revision 1
+		address = 0x69       # Need to check address, will do when plugged in!
 
 	photonum1 = 0
 	photonum2 = 0
@@ -72,9 +77,6 @@ class ScannerMachine(object):
 	
 	power_mgmt_1 = 0x6b
 	power_mgmt_2 = 0x6c
-	
-	bus = smbus.SMBus(1) # bus = smbus.SMBus(0) fuer Revision 1
-	address = 0x69       # Need to check address, will do when plugged in!
 
 	def __init__(self, screen_manager):
 
@@ -84,8 +86,9 @@ class ScannerMachine(object):
 		self.s = serial_connection.SerialConnection(self, self.sm)
 		self.s.establish_connection()
 
-		global camera
-		camera=PiCamera()
+		if sys.platform != 'win32' and sys.platform != 'darwin':
+			global camera
+			camera=PiCamera()
 		
 		try:
 			bus.write_byte_data(address, power_mgmt_1, 0)
@@ -116,7 +119,7 @@ class ScannerMachine(object):
 		except: 
 			print('Could not read in calibration values, please check file!')
 			
-	def camera_test(self):
+	def camera_test(self, dt):
 		i2c='i2cset -y 1 0x70 0x00 0x04'
 		try:
 			os.system(i2c)
