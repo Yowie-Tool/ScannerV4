@@ -85,9 +85,9 @@ class ScannerMachine(object):
 		self.s = serial_connection.SerialConnection(self, self.sm)
 		self.s.establish_connection()
 
-		# if sys.platform != 'win32' and sys.platform != 'darwin':
-		# 	global camera
-		# 	camera=PiCamera()
+		if sys.platform != 'win32' and sys.platform != 'darwin':
+			global camera
+			camera=PiCamera()
 		
 		try:
 			bus.write_byte_data(address, power_mgmt_1, 0)

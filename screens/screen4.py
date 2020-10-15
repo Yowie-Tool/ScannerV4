@@ -144,8 +144,8 @@ class YowieScreen4(Screen):
 
 		super(YowieScreen4, self).__init__()
 
-		self.usb_stick = usb_storage.USB_storage(self.sm)
-		self.usb_stick.enable()
+		# self.usb_stick = usb_storage.USB_storage(self.sm)
+		# self.usb_stick.enable()
 
 # SCREEN BUTTONS
 	def go_s1(self):
@@ -165,30 +165,33 @@ class YowieScreen4(Screen):
 
 	def save_output(self):
 
-		if self.usb_stick.is_usb_mounted_flag == True:
+		file_path = '/media/pi/SCANFILES/' + "RoomReaderScan.pts"
 
-			file_path = self.usb_stick.get_path() + "RoomReaderScan.pts"
-			#currently only one file name. 
-			try: 
-				file_object = open(file_path, "w")
+		# if self.usb_stick.is_usb_mounted_flag == True:
 
-				print ("Saving points file")
-				exportint = len(self.m.output) # Need to get this from machine object I think
-				#currently based on length of x array. Will change to a 2D or 3D array at some point to make the array smaller, as won't have to include 0 values.
+		# 	file_path = self.usb_stick.get_path() + "RoomReaderScan.pts"
+		# 	#currently only one file name. 
 
-				for export in range (exportint):
-					#I've deleted Z and RGB from this now. exports just a text file with X,Y coordinates
-					xout = str(outputarray[export,0])
-					yout = str(outputarray[export,1])
-					zout = str(outputarray[export,2])
-					file_object.write(xout + " " + yout + " " + zout + "\n")
+		try:
+			file_object = open(file_path, "w")
 
-				file_object.close()
+			print("Saving points file")
+			exportint = len(self.m.output) # Need to get this from machine object I think
+			#currently based on length of x array. Will change to a 2D or 3D array at some point to make the array smaller, as won't have to include 0 values.
 
-				self.usb_stick.disable()
+			for export in range(exportint):
+				#I've deleted Z and RGB from this now. exports just a text file with X,Y coordinates
+				xout = str(outputarray[export,0])
+				yout = str(outputarray[export,1])
+				zout = str(outputarray[export,2])
+				file_object.write(xout + " " + yout + " " + zout + "\n")
 
-			except: 
-				print('Could not save file')
+			file_object.close()
+
+			# self.usb_stick.disable()
+
+		except: 
+			print('Could not save file')
 
 
 

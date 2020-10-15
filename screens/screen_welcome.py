@@ -82,7 +82,7 @@ class WelcomeScreenClass(Screen):
                 # Allow kivy to have fully loaded before doing any calls which require scheduling
                 Clock.schedule_once(self.m.s.start_services, 4)
                 # Test the camera
-                # Clock.schedule_once(lambda dt: self.m.camera_test_part_1(), 4.5)
+                Clock.schedule_once(lambda dt: self.m.camera_test_part_1(), 4.5)
                 # Allow time for machine reset sequence
                 Clock.schedule_once(self.go_to_next_screen, 5)
 
