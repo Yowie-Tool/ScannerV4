@@ -523,9 +523,9 @@ class ScannerMachine(object):
 			print ('Short Range Image [%d] of [%d] read\r'%(photographs,scansteps),end="")
 		print ("")
 		print ("long range points captured %d" % (succesful2))    
-		
+
 	def calculate_cloud_1(self,for_calc,calibration):
-		readlines=len(for_calc)
+		total_lines_to_read = len(for_calc)
 		camangleh = ((float(calibration[0]))/(180/math.pi))
 		camanglev = ((float(calibration[1]))/(180/math.pi))
 		camangled=((float(calibration[2]))/(180/math.pi))
@@ -544,36 +544,82 @@ class ScannerMachine(object):
 		aconst = (xresolution*(math.sin(Bconst)))/(math.sin(camangleh))
 		aconstsqrd = math.pow(aconst,2)
 		a2const=halfyres/math.tan(camanglev/2)
-		for i in range(readlines):
-			log('in_scan 1 ' + str(i) + ' of ' + str(readlines))
-			u=for_calc[i][0] # camera vertical vector - In world view this is actually horizontal
-			v=for_calc[i][1] # camera horizontal vector - In world view this is actually vertical
-			r=for_calc[i][2] # machine rotation around camera Z axis
-			cosC=((2*aconstsqrd)-(2*aconst*(v+1)*cosB))/((2*aconst*(math.sqrt((aconstsqrd+((v+1)*(v+1))-(2*aconst*(v+1)*cosB)))))) # My trusty old calculation
-			angle=math.acos(cosC) # find the angle in radians
-			totalangle=angle+camangled # add it to the base angle
-			y1=(laser*(math.tan(totalangle)))+calib_value #Y (world) value before the rotation taken into account
-			w=math.sqrt((math.pow(y1,2))+(math.pow(laser,2))) # camera w vector 
-			if u < halfyres:
-				u2=halfyres-u
-				theta=math.atan(u2/a2const)
-				x1=(-(w*math.tan(theta)))+camxoffset # x would be a - value where it falls less than half way across CCD, then offset by amount camera is off centre
-			if u == halfyres:
-				x1=camxoffset # would be 0 where it falls in the centre of the CCD, then offset by the amount the camera is off centre
-			if u > halfyres:
-				u2=u-halfyres
-				theta=math.atan(u2/a2const)
-				x1=(w*math.tan(theta))+camxoffset # x would be a * value where it falls over halfway across CCD, then offset by amount camera is off centre
-			hyp1=math.sqrt((math.pow(x1,2))+(math.pow(y1,2))) # Find the hypotenuse of the newly created triangle of points (where opposite = x, adjacent =y)
-			if hyp1 > self.maxdistance:
-				self.maxdistance=hyp1
-			self.alllengths.append(hyp1)
-			self.averagedistance=np.mean(self.alllengths)
-			tan1=math.atan(x1/y1) #find theta angle for new triangle				
-			rrad=r/(180/math.pi) # rotation of unit in radians
-			xout=hyp1*math.sin(rrad+tan1) # x output adjusted for rotation around Z axis
-			yout=hyp1*math.cos(rrad+tan1) # y output adjusted for rotation around Z axis
-			self.output.append([xout,yout,0]) # X, Y, Z coordinates for output. Z is assumed to be 0 for easy import into CAD
+
+        # # a lot of this wrapper code is to force a break in the loops so we can allow Kivy to update
+        # if self.lines_scrubbed < self.total_lines_in_job_file_pre_scrubbed:
+            
+        #     break_threshold = min(self.line_threshold_to_pause_and_update_at, self.total_lines_in_job_file_pre_scrubbed)
+
+        #     # main scrubbing loop
+        #     while self.lines_scrubbed < break_threshold:
+
+		interrupt_line_threshold = 200
+		interrupt_delay = 0.1
+
+        lines_read = 0
+        line_threshold_to_pause_and_update_at = interrupt_line_threshold
+
+        def nested_calculate_cloud_for_loop():
+
+			## Wrapper forces a break in the for loop so that we can update the screen with progress
+			if lines_read < total_lines_to_read:
+            
+				break_threshold = min(line_threshold_to_pause_and_update_at, total_lines_to_read)
+
+				for i in range(lines_read, total_lines_to_read):
+
+					if lines_read < break_threshold:
+
+						log('in_scan 1 ' + str(i) + ' of ' + str(total_lines_to_read))
+						u=for_calc[i][0] # camera vertical vector - In world view this is actually horizontal
+						v=for_calc[i][1] # camera horizontal vector - In world view this is actually vertical
+						r=for_calc[i][2] # machine rotation around camera Z axis
+						cosC=((2*aconstsqrd)-(2*aconst*(v+1)*cosB))/((2*aconst*(math.sqrt((aconstsqrd+((v+1)*(v+1))-(2*aconst*(v+1)*cosB)))))) # My trusty old calculation
+						angle=math.acos(cosC) # find the angle in radians
+						totalangle=angle+camangled # add it to the base angle
+						y1=(laser*(math.tan(totalangle)))+calib_value #Y (world) value before the rotation taken into account
+						w=math.sqrt((math.pow(y1,2))+(math.pow(laser,2))) # camera w vector 
+						if u < halfyres:
+							u2=halfyres-u
+							theta=math.atan(u2/a2const)
+							x1=(-(w*math.tan(theta)))+camxoffset # x would be a - value where it falls less than half way across CCD, then offset by amount camera is off centre
+						if u == halfyres:
+							x1=camxoffset # would be 0 where it falls in the centre of the CCD, then offset by the amount the camera is off centre
+						if u > halfyres:
+							u2=u-halfyres
+							theta=math.atan(u2/a2const)
+							x1=(w*math.tan(theta))+camxoffset # x would be a * value where it falls over halfway across CCD, then offset by amount camera is off centre
+						hyp1=math.sqrt((math.pow(x1,2))+(math.pow(y1,2))) # Find the hypotenuse of the newly created triangle of points (where opposite = x, adjacent =y)
+						if hyp1 > self.maxdistance:
+							self.maxdistance=hyp1
+						self.alllengths.append(hyp1)
+						self.averagedistance=np.mean(self.alllengths)
+						tan1=math.atan(x1/y1) #find theta angle for new triangle				
+						rrad=r/(180/math.pi) # rotation of unit in radians
+						xout=hyp1*math.sin(rrad+tan1) # x output adjusted for rotation around Z axis
+						yout=hyp1*math.cos(rrad+tan1) # y output adjusted for rotation around Z axis
+						self.output.append([xout,yout,0]) # X, Y, Z coordinates for output. Z is assumed to be 0 for easy import into CAD
+
+						lines_read = i
+					else:
+						break
+
+				# take a breather and update progress report
+				line_threshold_to_pause_and_update_at += interrupt_line_threshold
+				self.m.scan_progress = int((lines_read * 1.0 / total_lines_to_read * 1.0) * 100.0)
+				string_to_update_screen_with = 'Calculating first cloud... ' + str(self.m.scan_progress) + '%'
+				self.sm.get_screen('s3').update_scan_progress_output(string_to_update_screen_with)
+				Clock.schedule_once(lambda dt: nested_calculate_cloud_for_loop(), interrupt_delay)
+
+			else: 
+				log('CALCULATED CLOUD 1!')
+				string_to_update_screen_with = 'FIRST CLOUD CALCULATED!'
+				self.sm.get_screen('s3').update_scan_progress_output(string_to_update_screen_with)				
+
+		string_to_update_screen_with = 'START CALCULATING FIRST CLOUD...'
+		self.sm.get_screen('s3').update_scan_progress_output(string_to_update_screen_with)
+		Clock.schedule_once(lambda dt: nested_calculate_cloud_for_loop(), 2)
+
 		
 	def calculate_cloud_2(self,for_calc,calibration):
 		readlines=len(for_calc)

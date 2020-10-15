@@ -419,7 +419,7 @@ class YowieScreen3(Screen):
 	# INSERT RELEVANT VARIABLES THAT COME OUT OF SERIAL:
 
 	def update_all_outputs(self, dt):
-		self.update_scan_progress_output()
+		# self.update_scan_progress_output()
 		self.update_current_angle_output()
 		self.update_average_distance_output()
 		self.update_max_distance_output()
@@ -427,9 +427,9 @@ class YowieScreen3(Screen):
 		self.update_pass_output()
 		self.update_scan_time_output()
 
-	def update_scan_progress_output(self):
+	def update_scan_progress_output(self, string_input):
 		
-		self.scan_progress_output.text = 'Scan progress ' + str(self.m.scan_progress) + '%'
+		self.scan_progress_output.text = string_input
 
 	def update_current_angle_output(self):
 
