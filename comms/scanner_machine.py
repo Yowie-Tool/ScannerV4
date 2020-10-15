@@ -274,7 +274,7 @@ class ScannerMachine(object):
 	def set_scanner_to_origin(self,current_angle):
 		angle_to_return_to_origin=float(360-current_angle)
 		self.jog_clockwise(angle_to_return_to_origin)
-		time.sleep(angle_to_return_to_origin*0.15)
+		time.sleep(abs(angle_to_return_to_origin*0.15))
 
 	# CAMERA FUNCTIONS
 	def camera_1_open(self,resolution_bool):
