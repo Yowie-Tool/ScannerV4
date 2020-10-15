@@ -313,6 +313,7 @@ class ScannerMachine(object):
 
 	def camera_close(self):
 		camera.stop_preview()
+		GPIO.output(self.chan_listl, (0,0,0))
 		
 	def camera_1_take(self,photonum):
 		loffname = 'c1loff' + str(photonum) + '.jpg'
@@ -406,7 +407,7 @@ class ScannerMachine(object):
 		tint=maxvalue
 		if maxvalue > 0:
 			while tcurrent < tlast and tcurrent != 0:
-				if tint > 0:
+				if tint > 1:
 					tlast=t[tint]
 					tint=tint-1
 					tcurrent=t[tint]
@@ -436,7 +437,7 @@ class ScannerMachine(object):
 		for i2 in range(tint2):
 			tout2=tout2+(t[tint4])
 			tint4 = tint4 + 1 #sum of intensity in limited array
-		if tout1 != (maxvalue*tmax):
+		if tout1 != (maxvalue*tmax) and tout1 != 0 and tout2 != 0:
 			weighted=(tout1/tout2) #weighted value out, if laser line found to be more than 1 pixel wide (to eliminate random points)
 		else:
 			weighted = 0
