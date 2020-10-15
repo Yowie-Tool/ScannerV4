@@ -660,11 +660,11 @@ class ScannerMachine(object):
 			yout=hyp1*math.cos(rrad+tan1) # y output adjusted for rotation around Z axis
 			self.output.append([xout,yout,0]) # X, Y, Z coordinates for output. Z is assumed to be 0 for easy import into CAD
 	
-    log('CALCULATED CLOUD 1!')
-    string_to_update_screen_with = 'FIRST CLOUD CALCULATED!'
-    self.sm.get_screen('s3').update_scan_progress_output(string_to_update_screen_with)
-    self.sm.get_screen('s3').update_average_distance_output()
-    self.sm.get_screen('s3').update_max_distance_output()
+		log('CALCULATED CLOUD 1!')
+		string_to_update_screen_with = 'FIRST CLOUD CALCULATED!'
+		self.sm.get_screen('s3').update_scan_progress_output(string_to_update_screen_with)
+		self.sm.get_screen('s3').update_average_distance_output()
+		self.sm.get_screen('s3').update_max_distance_output()
   
 	def calculate_cloud_2(self,for_calc,calibration):
 		readlines=len(for_calc)
@@ -716,10 +716,10 @@ class ScannerMachine(object):
 			xout=hyp1*math.sin(rrad+tan1) # x output adjusted for rotation around Z axis
 			yout=hyp1*math.cos(rrad+tan1) # y output adjusted for rotation around Z axis
 			self.output.append([xout,yout,0]) # X, Y, Z coordinates for output. Z is assumed to be 0 for easy import into CAD
-      
-    log('CALCULATED CLOUD 2!')
-    string_to_update_screen_with = 'SECOND CLOUD CALCULATED!'
-    self.sm.get_screen('s3').update_scan_progress_output(string_to_update_screen_with)
-    self.sm.get_screen('s3').update_average_distance_output()
-    self.sm.get_screen('s3').update_max_distance_output()
+	  
+		log('CALCULATED CLOUD 2!')
+		string_to_update_screen_with = 'SECOND CLOUD CALCULATED!'
+		self.sm.get_screen('s3').update_scan_progress_output(string_to_update_screen_with)
+		self.sm.get_screen('s3').update_average_distance_output()
+		self.sm.get_screen('s3').update_max_distance_output()
 				
