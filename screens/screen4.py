@@ -176,14 +176,13 @@ class YowieScreen4(Screen):
 			file_object = open(file_path, "w")
 
 			print("Saving points file")
-			exportint = len(self.m.output) # Need to get this from machine object I think
-			#currently based on length of x array. Will change to a 2D or 3D array at some point to make the array smaller, as won't have to include 0 values.
+			exportint = len(self.m.output) 
 
 			for export in range(exportint):
 				#I've deleted Z and RGB from this now. exports just a text file with X,Y coordinates
-				xout = str(outputarray[export,0])
-				yout = str(outputarray[export,1])
-				zout = str(outputarray[export,2])
+				xout = str(self.m.output[export,0])
+				yout = str(self.m.output[export,1])
+				zout = str(self.m.output[export,2])
 				file_object.write(xout + " " + yout + " " + zout + "\n")
 
 			file_object.close()
