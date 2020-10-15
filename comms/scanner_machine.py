@@ -567,61 +567,61 @@ class ScannerMachine(object):
 			
 				# break_threshold = min(line_threshold_to_pause_and_update_at, total_lines_to_read)
 
-				for i in range(lines_read, total_lines_to_read):
+			for i in range(lines_read, total_lines_to_read):
 
-					if lines_read < total_lines_to_read:
+				if lines_read < total_lines_to_read:
 
-						if lines_read < break_threshold:
+					if lines_read < break_threshold:
 
-							log('in_scan 1 ' + str(i) + ' of ' + str(total_lines_to_read))
-							u=for_calc[i][0] # camera vertical vector - In world view this is actually horizontal
-							v=for_calc[i][1] # camera horizontal vector - In world view this is actually vertical
-							r=for_calc[i][2] # machine rotation around camera Z axis
-							cosC=((2*aconstsqrd)-(2*aconst*(v+1)*cosB))/((2*aconst*(math.sqrt((aconstsqrd+((v+1)*(v+1))-(2*aconst*(v+1)*cosB)))))) # My trusty old calculation
-							angle=math.acos(cosC) # find the angle in radians
-							totalangle=angle+camangled # add it to the base angle
-							y1=(laser*(math.tan(totalangle)))+calib_value #Y (world) value before the rotation taken into account
-							w=math.sqrt((math.pow(y1,2))+(math.pow(laser,2))) # camera w vector 
-							if u < halfyres:
-								u2=halfyres-u
-								theta=math.atan(u2/a2const)
-								x1=(-(w*math.tan(theta)))+camxoffset # x would be a - value where it falls less than half way across CCD, then offset by amount camera is off centre
-							if u == halfyres:
-								x1=camxoffset # would be 0 where it falls in the centre of the CCD, then offset by the amount the camera is off centre
-							if u > halfyres:
-								u2=u-halfyres
-								theta=math.atan(u2/a2const)
-								x1=(w*math.tan(theta))+camxoffset # x would be a * value where it falls over halfway across CCD, then offset by amount camera is off centre
-							hyp1=math.sqrt((math.pow(x1,2))+(math.pow(y1,2))) # Find the hypotenuse of the newly created triangle of points (where opposite = x, adjacent =y)
-							if hyp1 > self.maxdistance:
-								self.maxdistance=hyp1
-							self.alllengths.append(hyp1)
-							self.averagedistance=np.mean(self.alllengths)
-							tan1=math.atan(x1/y1) #find theta angle for new triangle				
-							rrad=r/(180/math.pi) # rotation of unit in radians
-							xout=hyp1*math.sin(rrad+tan1) # x output adjusted for rotation around Z axis
-							yout=hyp1*math.cos(rrad+tan1) # y output adjusted for rotation around Z axis
-							self.output.append([xout,yout,0]) # X, Y, Z coordinates for output. Z is assumed to be 0 for easy import into CAD
+						log('in_scan 1 ' + str(i) + ' of ' + str(total_lines_to_read))
+						u=for_calc[i][0] # camera vertical vector - In world view this is actually horizontal
+						v=for_calc[i][1] # camera horizontal vector - In world view this is actually vertical
+						r=for_calc[i][2] # machine rotation around camera Z axis
+						cosC=((2*aconstsqrd)-(2*aconst*(v+1)*cosB))/((2*aconst*(math.sqrt((aconstsqrd+((v+1)*(v+1))-(2*aconst*(v+1)*cosB)))))) # My trusty old calculation
+						angle=math.acos(cosC) # find the angle in radians
+						totalangle=angle+camangled # add it to the base angle
+						y1=(laser*(math.tan(totalangle)))+calib_value #Y (world) value before the rotation taken into account
+						w=math.sqrt((math.pow(y1,2))+(math.pow(laser,2))) # camera w vector 
+						if u < halfyres:
+							u2=halfyres-u
+							theta=math.atan(u2/a2const)
+							x1=(-(w*math.tan(theta)))+camxoffset # x would be a - value where it falls less than half way across CCD, then offset by amount camera is off centre
+						if u == halfyres:
+							x1=camxoffset # would be 0 where it falls in the centre of the CCD, then offset by the amount the camera is off centre
+						if u > halfyres:
+							u2=u-halfyres
+							theta=math.atan(u2/a2const)
+							x1=(w*math.tan(theta))+camxoffset # x would be a * value where it falls over halfway across CCD, then offset by amount camera is off centre
+						hyp1=math.sqrt((math.pow(x1,2))+(math.pow(y1,2))) # Find the hypotenuse of the newly created triangle of points (where opposite = x, adjacent =y)
+						if hyp1 > self.maxdistance:
+							self.maxdistance=hyp1
+						self.alllengths.append(hyp1)
+						self.averagedistance=np.mean(self.alllengths)
+						tan1=math.atan(x1/y1) #find theta angle for new triangle				
+						rrad=r/(180/math.pi) # rotation of unit in radians
+						xout=hyp1*math.sin(rrad+tan1) # x output adjusted for rotation around Z axis
+						yout=hyp1*math.cos(rrad+tan1) # y output adjusted for rotation around Z axis
+						self.output.append([xout,yout,0]) # X, Y, Z coordinates for output. Z is assumed to be 0 for easy import into CAD
 
-							lines_read = i
-						else:
-							# break
+						lines_read = i
+					else:
+						# break
 
-							# take a breather and update progress report
-							line_threshold_to_pause_and_update_at += interrupt_line_threshold
-							self.m.scan_progress = int((lines_read * 1.0 / total_lines_to_read * 1.0) * 100.0)
-							string_to_update_screen_with = 'Calculating first cloud... ' + str(self.m.scan_progress) + '%'
-							self.sm.get_screen('s3').update_scan_progress_output(string_to_update_screen_with)
-							# Clock.schedule_once(lambda dt: nested_calculate_cloud_for_loop(), interrupt_delay)
-							time.sleep(1)
-							break_threshold = min(line_threshold_to_pause_and_update_at, total_lines_to_read)
-
-					else: 
-						log('CALCULATED CLOUD 1!')
-						string_to_update_screen_with = 'FIRST CLOUD CALCULATED!'
+						# take a breather and update progress report
+						line_threshold_to_pause_and_update_at += interrupt_line_threshold
+						self.m.scan_progress = int((lines_read * 1.0 / total_lines_to_read * 1.0) * 100.0)
+						string_to_update_screen_with = 'Calculating first cloud... ' + str(self.m.scan_progress) + '%'
 						self.sm.get_screen('s3').update_scan_progress_output(string_to_update_screen_with)
-						self.sm.get_screen('s3').update_average_distance_output()
-						self.sm.get_screen('s3').update_max_distance_output()			
+						# Clock.schedule_once(lambda dt: nested_calculate_cloud_for_loop(), interrupt_delay)
+						time.sleep(1)
+						break_threshold = min(line_threshold_to_pause_and_update_at, total_lines_to_read)
+
+				else: 
+					log('CALCULATED CLOUD 1!')
+					string_to_update_screen_with = 'FIRST CLOUD CALCULATED!'
+					self.sm.get_screen('s3').update_scan_progress_output(string_to_update_screen_with)
+					self.sm.get_screen('s3').update_average_distance_output()
+					self.sm.get_screen('s3').update_max_distance_output()			
 
 		string_to_update_screen_with = 'START CALCULATING FIRST CLOUD...'
 		self.sm.get_screen('s3').update_scan_progress_output(string_to_update_screen_with)
