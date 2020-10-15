@@ -567,8 +567,8 @@ class ScannerMachine(object):
 			hyp1=math.sqrt((math.pow(x1,2))+(math.pow(y1,2))) # Find the hypotenuse of the newly created triangle of points (where opposite = x, adjacent =y)
 			if hyp1 > self.maxdistance:
 				self.maxdistance=hyp1
-			self.alllengths.append(hpy1)
-			averagedistance=numpy.mean(self.alllengths)
+			self.alllengths.append(hyp1)
+			self.averagedistance=numpy.mean(self.alllengths)
 			tan1=math.atan(x1/y1) #find theta angle for new triangle				
 			rrad=r/(180/math.pi) # rotation of unit in radians
 			xout=hyp1*math.sin(rrad+tan1) # x output adjusted for rotation around Z axis
@@ -617,8 +617,8 @@ class ScannerMachine(object):
 			hyp1=math.sqrt((math.pow(x1,2))+(math.pow(y1,2))) # Find the hypotenuse of the newly created triangle of points (where opposite = x, adjacent =y)
 			if hyp1 > self.maxdistance:
 				self.maxdistance=hyp1
-			self.alllengths.append(hpy1)
-			averagedistance=numpy.mean(self.alllengths)
+			self.alllengths.append(hyp1)
+			self.averagedistance=numpy.mean(self.alllengths)
 			tan1=math.atan(x1/y1) #find theta angle for new triangle				
 			rrad=r/(180/math.pi) # rotation of unit in radians
 			xout=hyp1*math.sin(rrad+tan1) # x output adjusted for rotation around Z axis
