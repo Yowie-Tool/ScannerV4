@@ -525,7 +525,7 @@ class ScannerMachine(object):
 		print ("long range points captured %d" % (succesful2))    
 
 	def calculate_cloud_1(self,for_calc,calibration):
-		total_lines_to_read = len(for_calc)
+		readlines = len(for_calc)
 		camangleh = ((float(calibration[0]))/(180/math.pi))
 		camanglev = ((float(calibration[1]))/(180/math.pi))
 		camangled=((float(calibration[2]))/(180/math.pi))
