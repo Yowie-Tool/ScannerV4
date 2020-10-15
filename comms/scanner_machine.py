@@ -402,6 +402,7 @@ class ScannerMachine(object):
 		tmax=max(t) # highest intensity value in row
 		maxvalue=np.argmax(t) # position of value
 		length=t.size #length of array, should be equal to Y resolution....
+		print(length)
 		tcurrent=0
 		tlast=tmax
 		tint=maxvalue
@@ -475,7 +476,7 @@ class ScannerMachine(object):
 			row, col = threshold_ar.shape
 			for i in range(row):
 				if maxvalue[i] != 0:
-					newarray=threshold_ar[[i],:]
+					newarray=threshold_ar[i,:]
 					laserctr=self.weighted_average(newarray)
 					if laserctr != 0:
 						self.for_calc_1.append([i,laserctr,(photoangle1[photographs]),0])
@@ -516,10 +517,11 @@ class ScannerMachine(object):
 			row, col = threshold_ar.shape
 			for i in range(row):
 				if maxvalue[i] != 0:
-					newarray=threshold_ar[[i],:]
+					newarray=threshold_ar[i,:]
 					laserctr=self.weighted_average(newarray)
-					self.for_calc_2.append([i,laserctr,(photoangle2[photographs]),0])
-					succesful2=succesful2+1
+					if laserctr != 0:
+						self.for_calc_2.append([i,laserctr,(photoangle2[photographs]),0])
+						succesful2=succesful2+1
 				else: succesful2=succesful2
 			print ('Short Range Image [%d] of [%d] read\r'%(photographs,scansteps),end="")
 		print ("")
