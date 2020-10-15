@@ -184,7 +184,7 @@ class YowieScreen4(Screen):
 				print(export)
 
 				#I've deleted Z and RGB from this now. exports just a text file with X,Y coordinates
-				[xout, yout, zout] = self.m.output[export]
+				[xout, yout, zout] = self.m.output[export, :]
 
 				file_object.write(xout + " " + yout + " " + zout + "\n")
 
