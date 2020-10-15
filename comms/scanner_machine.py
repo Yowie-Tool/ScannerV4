@@ -115,7 +115,26 @@ class ScannerMachine(object):
 
 		except: 
 			print('Could not read in calibration values, please check file!')
-
+			
+	def camera_test(self):
+		i2c='i2cset -y 1 0x70 0x00 0x04'
+		try:
+			os.system(i2c)
+		except:
+			print("i2c switch failed")
+		GPIO.output(self.chan_listc,(1,0,0))
+		camera.resolution=(3280,2464)
+		camera.start_preview()
+		time.sleep(1)
+		i2c='i2cset -y 1 0x70 0x00 0x06' #set camera 2 i2c
+		try:
+			os.system(i2c)
+		except:
+			print("i2c switch failed")
+		GPIO.output(self.chan_listc,(0,1,0))
+		time.sleep(1)
+		camera.stop_preview()
+		
 
 	# JOG FUNCTION
 	def jog_clockwise(self, angle):
