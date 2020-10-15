@@ -405,7 +405,6 @@ class ScannerMachine(object):
 		tcurrent=0
 		tlast=tmax
 		tint=maxvalue
-		print('tlast %d tint %d' % (tlast,tint))
 		if maxvalue > 0:
 			while tcurrent < tlast and tcurrent != 0:
 				if tint > 1:
@@ -438,6 +437,7 @@ class ScannerMachine(object):
 		for i2 in range(tint2):
 			tout2=tout2+(t[tint4])
 			tint4 = tint4 + 1 #sum of intensity in limited array
+		print('tout1 %d tout2 %d' % (tout1,tout2))		
 		if tout2 != 0:
 			weighted=(tout1/tout2) #weighted value out, if laser line found to be more than 1 pixel wide (to eliminate random points)
 		else:
