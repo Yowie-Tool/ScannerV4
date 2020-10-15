@@ -565,8 +565,8 @@ class ScannerMachine(object):
 				theta=math.atan(u2/a2const)
 				x1=(w*math.tan(theta))+camxoffset # x would be a * value where it falls over halfway across CCD, then offset by amount camera is off centre
 			hyp1=math.sqrt((math.pow(x1,2))+(math.pow(y1,2))) # Find the hypotenuse of the newly created triangle of points (where opposite = x, adjacent =y)
-			if hyp1 > maxdistance:
-				maxdistance=hyp1
+			if hyp1 > self.maxdistance:
+				self.maxdistance=hyp1
 			self.alllengths.append(hpy1)
 			averagedistance=numpy.mean(self.alllengths)
 			tan1=math.atan(x1/y1) #find theta angle for new triangle				
@@ -615,8 +615,8 @@ class ScannerMachine(object):
 				theta=math.atan(u2/a2const)
 				x1=(w*math.tan(theta))+camxoffset				
 			hyp1=math.sqrt((math.pow(x1,2))+(math.pow(y1,2))) # Find the hypotenuse of the newly created triangle of points (where opposite = x, adjacent =y)
-			if hyp1 > maxdistance:
-				maxdistance=hyp1
+			if hyp1 > self.maxdistance:
+				self.maxdistance=hyp1
 			self.alllengths.append(hpy1)
 			averagedistance=numpy.mean(self.alllengths)
 			tan1=math.atan(x1/y1) #find theta angle for new triangle				
