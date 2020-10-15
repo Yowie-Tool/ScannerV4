@@ -626,7 +626,7 @@ class ScannerMachine(object):
 		string_to_update_screen_with = 'START CALCULATING FIRST CLOUD...'
 		self.sm.get_screen('s3').update_scan_progress_output(string_to_update_screen_with)
 		# Clock.schedule_once(lambda dt: nested_calculate_cloud_for_loop(), 2)
-		nested_calculate_cloud_for_loop()
+		return nested_calculate_cloud_for_loop
 
 		
 	def calculate_cloud_2(self,for_calc,calibration):
