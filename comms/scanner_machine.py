@@ -545,25 +545,25 @@ class ScannerMachine(object):
 		aconstsqrd = math.pow(aconst,2)
 		a2const=halfyres/math.tan(camanglev/2)
 
-        # # a lot of this wrapper code is to force a break in the loops so we can allow Kivy to update
-        # if self.lines_scrubbed < self.total_lines_in_job_file_pre_scrubbed:
-            
-        #     break_threshold = min(self.line_threshold_to_pause_and_update_at, self.total_lines_in_job_file_pre_scrubbed)
+		# # a lot of this wrapper code is to force a break in the loops so we can allow Kivy to update
+		# if self.lines_scrubbed < self.total_lines_in_job_file_pre_scrubbed:
+			
+		#     break_threshold = min(self.line_threshold_to_pause_and_update_at, self.total_lines_in_job_file_pre_scrubbed)
 
-        #     # main scrubbing loop
-        #     while self.lines_scrubbed < break_threshold:
+		#     # main scrubbing loop
+		#     while self.lines_scrubbed < break_threshold:
 
 		interrupt_line_threshold = 200
 		interrupt_delay = 0.1
 
-        lines_read = 0
-        line_threshold_to_pause_and_update_at = interrupt_line_threshold
+		lines_read = 0
+		line_threshold_to_pause_and_update_at = interrupt_line_threshold
 
-        def nested_calculate_cloud_for_loop():
+		def nested_calculate_cloud_for_loop():
 
 			## Wrapper forces a break in the for loop so that we can update the screen with progress
 			if lines_read < total_lines_to_read:
-            
+			
 				break_threshold = min(line_threshold_to_pause_and_update_at, total_lines_to_read)
 
 				for i in range(lines_read, total_lines_to_read):
