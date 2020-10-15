@@ -611,16 +611,16 @@ class ScannerMachine(object):
 				# take a breather and update progress report
 				line_threshold_to_pause_and_update_at += interrupt_line_threshold
 				self.m.scan_progress = int((lines_read * 1.0 / total_lines_to_read * 1.0) * 100.0)
-				string_to_update_screen_with = 'Calculating first cloud... ' + str(self.m.scan_progress) + '%'
+				string_to_update_screen_with = 'Calculating first cloud... ' + str(self.scan_progress) + '%'
 				self.sm.get_screen('s3').update_scan_progress_output(string_to_update_screen_with)
+				self.sm.get_screen('s3').update_average_distance_output()
+				self.sm.get_screen('s3').update_max_distance_output()
 				# Clock.schedule_once(lambda dt: nested_calculate_cloud_for_loop(), interrupt_delay)
 				time.sleep(1)
 
 		log('CALCULATED CLOUD 1!')
 		string_to_update_screen_with = 'FIRST CLOUD CALCULATED!'
-		self.sm.get_screen('s3').update_scan_progress_output(string_to_update_screen_with)
-		self.sm.get_screen('s3').update_average_distance_output()
-		self.sm.get_screen('s3').update_max_distance_output()			
+		self.sm.get_screen('s3').update_scan_progress_output(string_to_update_screen_with)		
 
 		# # Clock.schedule_once(lambda dt: nested_calculate_cloud_for_loop(), 2)
 		# return nested_calculate_cloud_for_loop
