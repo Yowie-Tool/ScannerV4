@@ -402,10 +402,10 @@ class ScannerMachine(object):
 		tmax=max(t) # highest intensity value in row
 		maxvalue=np.argmax(t) # position of value
 		length=t.size #length of array, should be equal to Y resolution....
-		print(length)
 		tcurrent=0
 		tlast=tmax
 		tint=maxvalue
+		print('tlast %d tint %d' % (tlast,tint))
 		if maxvalue > 0:
 			while tcurrent < tlast and tcurrent != 0:
 				if tint > 1:
