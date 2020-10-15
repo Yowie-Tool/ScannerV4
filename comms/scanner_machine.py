@@ -616,7 +616,7 @@ class ScannerMachine(object):
 				self.sm.get_screen('s3').update_average_distance_output()
 				self.sm.get_screen('s3').update_max_distance_output()
 				# Clock.schedule_once(lambda dt: nested_calculate_cloud_for_loop(), interrupt_delay)
-				time.sleep(2)
+				# time.sleep(2)
 
 		log('CALCULATED CLOUD 1!')
 		string_to_update_screen_with = 'FIRST CLOUD CALCULATED!'
