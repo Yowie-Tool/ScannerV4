@@ -66,7 +66,7 @@ class ScannerMachine(object):
 	output=[]
 
 	maxdistance=0
-	allengths=[]
+	alllengths=[]
 	low_res = True
 	averagedistance=0
 
