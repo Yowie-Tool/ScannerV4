@@ -558,6 +558,7 @@ class ScannerMachine(object):
 
 		lines_read = 0
 		line_threshold_to_pause_and_update_at = interrupt_line_threshold
+		break_threshold = line_threshold_to_pause_and_update_at
 
 		def nested_calculate_cloud_for_loop():
 
