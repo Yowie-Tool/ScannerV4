@@ -610,7 +610,7 @@ class ScannerMachine(object):
 
 				# take a breather and update progress report
 				line_threshold_to_pause_and_update_at += interrupt_line_threshold
-				self.m.scan_progress = int((lines_read * 1.0 / total_lines_to_read * 1.0) * 100.0)
+				self.scan_progress = int((lines_read * 1.0 / total_lines_to_read * 1.0) * 100.0)
 				string_to_update_screen_with = 'Calculating first cloud... ' + str(self.scan_progress) + '%'
 				self.sm.get_screen('s3').update_scan_progress_output(string_to_update_screen_with)
 				self.sm.get_screen('s3').update_average_distance_output()
