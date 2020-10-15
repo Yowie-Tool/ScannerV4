@@ -437,11 +437,11 @@ class YowieScreen3(Screen):
 
 	def update_average_distance_output(self):
 
-		self.average_distance_output.text = str(self.m.averagedistance)
+		self.average_distance_output.text = str(int(self.m.averagedistance))
 
 	def update_max_distance_output(self):
 
-		self.max_distance_output.text = str(self.m.maxdistance)
+		self.max_distance_output.text = str(int(self.m.maxdistance))
 
 	def update_points_rec_output(self):
 

@@ -180,10 +180,18 @@ class YowieScreen4(Screen):
 			#currently based on length of x array. Will change to a 2D or 3D array at some point to make the array smaller, as won't have to include 0 values.
 
 			for export in range(exportint):
+
+				print(str(outputarray[export,0]))
+				print(str(outputarray[export,1]))
+				print(str(outputarray[export,2]))
+
 				#I've deleted Z and RGB from this now. exports just a text file with X,Y coordinates
 				xout = str(outputarray[export,0])
 				yout = str(outputarray[export,1])
 				zout = str(outputarray[export,2])
+
+				print(xout + " " + yout + " " + zout + "\n")
+
 				file_object.write(xout + " " + yout + " " + zout + "\n")
 
 			file_object.close()
