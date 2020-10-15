@@ -3,7 +3,7 @@ import sys, os
 from datetime import datetime
 import os.path
 from os import path, system
-from cv2 import imread, subtract, cvtColor, GaussianBlur, minMaxLoc, threshold
+from cv2 import imread, subtract, cvtColor, GaussianBlur, minMaxLoc, threshold, THRESH_TOZERO
 import numpy as np
 import time
 import array
@@ -462,7 +462,7 @@ class ScannerMachine(object):
 			#find the location of minimum and maximum values in the image
 			threshamount = maxVal*0.2 # maybe make the 0.2 a variable, but this was good in testing originally.
 			#create a value that will remove any values below that, which is a proportion of the maximum value
-			retval, threshold = threshold(blue, threshamount, 255, cv.THRESH_TOZERO);
+			retval, threshold = threshold(blue, threshamount, 255, THRESH_TOZERO);
 			#this then removes those from the image
 			#(minVal, maxVal, MinLoc, maxLoc) = minMaxLoc(threshold) - #not sure if this is needed any more, so commented it out.
 			#find the maximum value of the non blurred image
@@ -502,7 +502,7 @@ class ScannerMachine(object):
 			#find the location of minimum and maximum values in the image
 			threshamount = maxVal*0.2 # maybe make the 0.2 a variable, but this was good in testing originally.
 			#create a value that will remove any values below that, which is a proportion of the maximum value
-			retval, threshold = threshold(blue, threshamount, 255, cv.THRESH_TOZERO);
+			retval, threshold = threshold(blue, threshamount, 255, THRESH_TOZERO);
 			#this then removes those from the image
 			#(minVal, maxVal, MinLoc, maxLoc) = minMaxLoc(threshold) - #not sure if this is needed any more, so commented it out.
 			#find the maximum value of the non blurred image
