@@ -181,12 +181,10 @@ class YowieScreen4(Screen):
 
 			for export in range(exportint):
 
-				#I've deleted Z and RGB from this now. exports just a text file with X,Y coordinates
-				xout = str(self.m.output[export,0])
-				yout = str(self.m.output[export,1])
-				zout = str(self.m.output[export,2])
+				print(export)
 
-				print(xout + " " + yout + " " + zout + "\n")
+				#I've deleted Z and RGB from this now. exports just a text file with X,Y coordinates
+				[xout, yout, zout] = exportint[export]
 
 				file_object.write(xout + " " + yout + " " + zout + "\n")
 
