@@ -377,7 +377,7 @@ class ScannerMachine(object):
 		tlast=tmax
 		tint=maxvalue
 		if maxvalue > 0:
-			while tcurrent < tlast:
+			while tcurrent < tlast and tcurrent != 0:
 				if tint > 0:
 					tlast=t[tint]
 					tint=tint-1
@@ -389,7 +389,7 @@ class ScannerMachine(object):
 		tlast=tmax
 		tint=maxvalue
 		if maxvalue < length:
-			while tcurrent < tlast:
+			while tcurrent < tlast and tcurrent != 0:
 				if tint < (length-1):
 					tlast=t[tint]
 					tint=tint+1
@@ -451,6 +451,8 @@ class ScannerMachine(object):
 					self.for_calc_1.append([i,laserctr,(photoangle1[photographs]),0])
 					succesful1=succesful1+1
 				else: succesful1=succesful1
+			print ('Short Range Image [%d] of [%d] read\r'%(photographs,scansteps),end="")
+		print ("")
 		print ("short range points captured %d" % (succesful1))
 	   
 	def read_images_2(self,scansteps,photoangle2):
@@ -489,6 +491,8 @@ class ScannerMachine(object):
 					self.for_calc_2.append([i,laserctr,(photoangle2[photographs]),0])
 					succesful2=succesful2+1
 				else: succesful2=succesful2
+			print ('Short Range Image [%d] of [%d] read\r'%(photographs,scansteps),end="")
+		print ("")
 		print ("long range points captured %d" % (succesful2))    
 		
 	def calculate_cloud_1(self,for_calc,calibration):
