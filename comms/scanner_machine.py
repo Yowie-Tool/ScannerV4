@@ -426,9 +426,9 @@ class ScannerMachine(object):
 			tmaxv=tint-1 #the last descending value position in the positive direction
 		elif maxvalue == length:
 			tmaxv=length
-		tint2 = tmaxv-tminv+1
-		tint3 = tminv
-		tint4 = tminv
+		tint2 = tminv-tmaxv+1
+		tint3 = tmaxv
+		tint4 = tmaxv
 		tout1=0
 		print('tminv %d tmaxv %d tint2 %d' % (tminv,tmaxv,tint2))
 		for i in range(tint2):
