@@ -477,8 +477,9 @@ class ScannerMachine(object):
 				if maxvalue[i] != 0:
 					newarray=threshold_ar[[i],:]
 					laserctr=self.weighted_average(newarray)
-					self.for_calc_1.append([i,laserctr,(photoangle1[photographs]),0])
-					succesful1=succesful1+1
+					if laserctr != 0:
+						self.for_calc_1.append([i,laserctr,(photoangle1[photographs]),0])
+						succesful1=succesful1+1
 				else: succesful1=succesful1
 			print ('Short Range Image [%d] of [%d] read\r'%(photographs,scansteps),end="")
 		print ("")
