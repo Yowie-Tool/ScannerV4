@@ -147,8 +147,6 @@ class ScannerMachine(object):
 			log("i2c switch failed")
 			self.camera_test_part_2()
 
-		
-
 	# JOG FUNCTION
 	def jog_clockwise(self, angle):
 		strrotate = 'c' + str(angle*10)
@@ -277,8 +275,7 @@ class ScannerMachine(object):
 	def set_scanner_to_origin(self,current_angle):
 		angle_to_return_to_origin=float(360-current_angle)
 		self.jog_clockwise(angle_to_return_to_origin)
-		time.sleep(current_angle*0.15) # need to replace this with a flag
-		return(current_angle)
+		time.sleep(angle_to_return_to_origin*0.15)
 
 	# CAMERA FUNCTIONS
 	def camera_1_open(self,resolution_bool):
