@@ -545,7 +545,7 @@ class ScannerMachine(object):
 		aconstsqrd = math.pow(aconst,2)
 		a2const=halfyres/math.tan(camanglev/2)
 		for i in range(readlines):
-			log('in_scan')
+			log('in_scan 1 ' + str(i) + ' of ' + str(readlines))
 			u=for_calc[i][0] # camera vertical vector - In world view this is actually horizontal
 			v=for_calc[i][1] # camera horizontal vector - In world view this is actually vertical
 			r=for_calc[i][2] # machine rotation around camera Z axis
@@ -596,6 +596,7 @@ class ScannerMachine(object):
 		aconstsqrd = math.pow(aconst,2)
 		a2const = halfyres/math.tan(camanglev/2)
 		for i in range(readlines):
+			log('in_scan 2 ' + str(i) + ' of ' + str(readlines))
 			u = for_calc[i][0] # camera vertical vector - In world view this is actually horizontal
 			v = for_calc[i][1] # camera horizontal vector - In world view this is actually vertical
 			r = for_calc[i][2] # machine rotation around camera Z axis
