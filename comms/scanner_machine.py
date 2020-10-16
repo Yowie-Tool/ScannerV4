@@ -279,7 +279,7 @@ class ScannerMachine(object):
 		angle_to_return_to_origin=float(360-current_angle)
 		self.jog_clockwise(angle_to_return_to_origin)
 		time.sleep(abs(angle_to_return_to_origin*0.15))
-		self.current_angle = self.current_angle - current_angle 
+		self.current_angle = self.current_angle - current_angle
 
 	# CAMERA FUNCTIONS
 	def camera_1_open(self,resolution_bool):
@@ -435,7 +435,7 @@ class ScannerMachine(object):
 		time_taken_seconds = int(self.time_started - self.time_finished)
 		minutes = int(time_taken_seconds / 60)
 		seconds_remainder = time_taken_seconds % 60
-		time_string = minutes + ':' + seconds
+		time_string = str(minutes) + ':' + str(seconds)
 		self.sm.get_screen('s3').update_scan_time_output(time_string)
 
 	def weighted_average(self,t):
