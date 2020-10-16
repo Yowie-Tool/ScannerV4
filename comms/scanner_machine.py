@@ -427,8 +427,8 @@ class ScannerMachine(object):
 		elif maxvalue == length:
 			tmaxv=length
 		tint2 = tminv-tmaxv+1
-		tint3 = tmaxv
-		tint4 = tmaxv
+		tint3 = tmaxv-1
+		tint4 = tmaxv-1
 		tout1=0
 		print('tminv %d tmaxv %d tint2 %d' % (tminv,tmaxv,tint2))
 		for i in range(tint2):
