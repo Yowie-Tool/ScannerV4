@@ -435,7 +435,7 @@ class ScannerMachine(object):
 		time_taken_seconds = int(self.time_started - self.time_finished)
 		minutes = int(time_taken_seconds / 60)
 		seconds_remainder = time_taken_seconds % 60
-		time_string = str(minutes) + ':' + str(seconds)
+		time_string = str(minutes) + ':' + str(seconds_remainder)
 		self.sm.get_screen('s3').update_scan_time_output(time_string)
 
 	def weighted_average(self,t):
