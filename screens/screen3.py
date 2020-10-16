@@ -425,7 +425,7 @@ class YowieScreen3(Screen):
 		self.update_max_distance_output()
 		self.update_points_rec_output()
 		self.update_pass_output()
-		self.update_scan_time_output()
+		# self.update_scan_time_output()
 
 	def update_scan_progress_output(self, string_input):
 		
