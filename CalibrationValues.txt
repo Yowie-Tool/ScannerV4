@@ -1,9 +1,9 @@
 Horizontal Field of view camera 1
-25.72341265
+23.27
 Vertical Field of view camera 1
-19.43477189
+17.72
 Base angle camera 1
-82.53341265
+58.05
 Z Mounting distance camera 1
 327
 X Mounting distance camera 1
@@ -15,7 +15,7 @@ Horizontal Field of view camera 2
 Vertical Field of view camera 2
 6.277551901
 Base angle camera 2
-83.241784919
+74.88546
 Z Mounting distance camera 2
 406
 X Mounting distance camera 2

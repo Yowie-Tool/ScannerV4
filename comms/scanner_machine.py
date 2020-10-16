@@ -467,8 +467,8 @@ class ScannerMachine(object):
 		elif maxvalue == length:
 			tmaxv=length
 		tint2 = tminv-tmaxv+1
-		tint3 = tmaxv
-		tint4 = tmaxv
+		tint3 = tmaxv-1
+		tint4 = tmaxv-1
 		tout1=0
 		print('tminv %d tmaxv %d tint2 %d' % (tminv,tmaxv,tint2))
 		for i in range(tint2):
@@ -680,7 +680,7 @@ class ScannerMachine(object):
 			r=for_calc[i][2] # machine rotation around camera Z axis
 			cosC=((2*aconstsqrd)-(2*aconst*(v+1)*cosB))/((2*aconst*(math.sqrt((aconstsqrd+((v+1)*(v+1))-(2*aconst*(v+1)*cosB)))))) # My trusty old calculation
 			angle=math.acos(cosC) # find the angle in radians
-			totalangle=camangled - angle # add it to the base angle
+			totalangle=camangled + angle # add it to the base angle
 			y1=(laser*(math.tan(totalangle)))+calib_value #Y (world) value before the rotation taken into account
 			w=math.sqrt((math.pow(y1,2))+(math.pow(laser,2))) # camera w vector 
 			if u < halfyres:
@@ -737,7 +737,7 @@ class ScannerMachine(object):
 			r = for_calc[i][2] # machine rotation around camera Z axis
 			cosC = ((2*aconstsqrd)-(2*aconst*(v+1)*cosB))/((2*aconst*(math.sqrt((aconstsqrd+((v+1)*(v+1))-(2*aconst*(v+1)*cosB)))))) # My trusty old calculation
 			angle = math.acos(cosC) # find the angle in radians
-			totalangle=camangled - angle # add it to the base angle
+			totalangle=camangled + angle # add it to the base angle
 			y1 = (laser*(math.tan(totalangle)))+calib_value #Y (world) value before the rotation taken into account
 			w = math.sqrt((y1*y1)+(laser*laser)) # camera w vector 
 			if u < halfyres:
