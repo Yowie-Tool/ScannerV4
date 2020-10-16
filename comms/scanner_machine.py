@@ -77,6 +77,9 @@ class ScannerMachine(object):
 	power_mgmt_1 = 0x6b
 	power_mgmt_2 = 0x6c
 
+	time_started = 0
+	time_finished = 0
+
 	def __init__(self, screen_manager):
 
 		self.sm = screen_manager
@@ -232,6 +235,7 @@ class ScannerMachine(object):
 
 	# DO SCAN
 	def start_scan(self):
+		self.time_started = time.time()
 		self.scan_setup()
 		self.start_scan_camera_1()
 		# NB: star_scan_camera_2 is called in the end_scan() function in order to maintain proper timing
@@ -368,6 +372,11 @@ class ScannerMachine(object):
 		else:
 			self.end_scan()
 
+		string_to_update_screen_with = 'Scan progress camera 1: ' + str(int(float(self.photonum1/self.scanstepscamera1))) + '%' 
+		self.sm.get_screen('s3').update_scan_progress_output(string_to_update_screen_with)
+		self.show_time_on_screen_3()
+
+
 	def start_scan_camera_2(self):
 		self.camera_2_open(self.low_res)
 		self.doing_scan_camera_2 = True
@@ -386,16 +395,47 @@ class ScannerMachine(object):
 		else:
 			self.end_scan()
 
+		string_to_update_screen_with = 'Scan progress camera 2: ' + str(int(float(self.photonum2/self.scanstepscamera2))) + '%' 
+		self.sm.get_screen('s3').update_scan_progress_output(string_to_update_screen_with)
+		self.show_time_on_screen_3()
+
 	# SCAN PROCESSING
 
 	def process_scan(self):
+
+		string_to_update_screen_with = 'Reading images from camera 1...'
+		self.sm.get_screen('s3').update_scan_progress_output(string_to_update_screen_with)
+		self.show_time_on_screen_3()
 		self.read_images_1(self.scanstepscamera1,self.photoangle1)
+
 		if self.scan_cameras == 2:
+			string_to_update_screen_with = 'Reading images from camera 2...'
+			self.sm.get_screen('s3').update_scan_progress_output(string_to_update_screen_with)
+			self.show_time_on_screen_3()
 			self.read_images_2(self.scanstepscamera2,self.photoangle2)
 
+		string_to_update_screen_with = 'Calculating first cloud...'
+		self.sm.get_screen('s3').update_scan_progress_output(string_to_update_screen_with)
+		self.show_time_on_screen_3()
 		self.calculate_cloud_1(self.for_calc_1,self.scannercalibration)
+
 		if self.scan_cameras == 2:
+			string_to_update_screen_with = 'Calculating second cloud...'
+			self.sm.get_screen('s3').update_scan_progress_output(string_to_update_screen_with)
+			self.show_time_on_screen_3()
 			self.calculate_cloud_2(self.for_calc_2,self.scannercalibration)
+
+		string_to_update_screen_with = 'Finished processing'
+		self.sm.get_screen('s3').update_scan_progress_output(string_to_update_screen_with)
+		self.show_time_on_screen_3()
+
+	def show_time_on_screen_3(self):
+		self.time_finished = time.time()
+		time_taken_seconds = int(self.time_started - self.time_finished)
+		minutes = int(time_taken_seconds / 60)
+		seconds_remainder = time_taken_seconds % 60
+		time_string = minutes + ':' + seconds
+		self.sm.get_screen('s3').update_scan_time_output(time_string)
 
 	def weighted_average(self,t):
 		t = t.flatten()
@@ -526,7 +566,7 @@ class ScannerMachine(object):
 				else: succesful2=succesful2
 			print ('Short Range Image [%d] of [%d] read\r'%(photographs,scansteps),end="")
 		print ("")
-		print ("long range points captured %d" % (succesful2))    
+		print ("long range points captured %d" % (succesful2))  
 
 	def calculate_cloud_1(self,for_calc,calibration):
 		readlines = len(for_calc)

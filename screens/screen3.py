@@ -433,7 +433,7 @@ class YowieScreen3(Screen):
 
 	def update_current_angle_output(self):
 
-		self.current_angle_output.text = str(self.m.current_angle_readout)
+		self.current_angle_output.text = str(self.m.current_angle)
 
 	def update_average_distance_output(self):
 
@@ -451,9 +451,9 @@ class YowieScreen3(Screen):
 
 		self.pass_output.text = ''
 
-	def update_scan_time_output(self):
+	def update_scan_time_output(self, string_input):
 
-		self.scan_time_output.text = ''
+		self.scan_time_output.text = string_input
 
 # ON LEAVE STOP UPDATING SCREEN
 
