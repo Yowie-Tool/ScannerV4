@@ -432,7 +432,7 @@ class ScannerMachine(object):
 
 	def show_time_on_screen_3(self):
 		self.time_finished = time.time()
-		time_taken_seconds = int(self.time_started - self.time_finished)
+		time_taken_seconds = int(self.time_finished - self.time_started)
 		minutes = int(time_taken_seconds / 60)
 		seconds_remainder = time_taken_seconds % 60
 		time_string = str(minutes) + ':' + str(seconds_remainder)
