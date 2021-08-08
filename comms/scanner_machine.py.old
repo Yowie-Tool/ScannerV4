@@ -9,7 +9,6 @@ import time
 import array
 import math
 import statistics
-from YowieScanner import *
 
 if sys.platform != 'win32' and sys.platform != 'darwin':
 	import RPi.GPIO as GPIO
@@ -85,10 +84,7 @@ class ScannerMachine(object):
 		# Establish 's'erial comms and initialise
 		self.s = serial_connection.SerialConnection(self, self.sm)
 		self.s.establish_connection()
-		self.world = ScannerPart()
-		self.camera1Scanner = Scanner(world, Vector3(0, 0, 0), Vector3(0, 0, 0), 2, Vector3(0, 0, 345), 2464, 3280, 2.76, 3.68, 8)
-		self.camera2Scanner = Scanner(world, Vector3(0, 0, 0), Vector3(0, 0, 0), 2, Vector3(0, 0, 450), 2464, 3280, 2.76, 3.68, 25)
-		self.oldRotation = 0.0
+
 		if sys.platform != 'win32' and sys.platform != 'darwin':
 			global camera
 			camera=PiCamera()
@@ -533,7 +529,6 @@ class ScannerMachine(object):
 		print ("long range points captured %d" % (succesful2))    
 
 	def calculate_cloud_1(self,for_calc,calibration):
-		self.oldRotation = 0.0 # IS THIS NEEDED HERE? - AB
 		readlines = len(for_calc)
 		camangleh = ((float(calibration[0]))/(180/math.pi))
 		camanglev = ((float(calibration[1]))/(180/math.pi))
@@ -667,13 +662,6 @@ class ScannerMachine(object):
 			rrad=r/(180/math.pi) # rotation of unit in radians
 			xout=hyp1*math.sin(rrad+tan1) # x output adjusted for rotation around Z axis
 			yout=hyp1*math.cos(rrad+tan1) # y output adjusted for rotation around Z axis
-			
-			newR = rrad - self.oldRotation
-			self.camera1Scanner.scanner.RotateV(newR)
-			self.oldRotation = rrad
-			pixel = (u, v)
-			cam1point = self.camera1Scanner.lightSource.CameraPixelCoordinatesArePointInMyPlane(self.camera1Scanner.camera, pixel)
-			#self.output.append([ cam1point[0], cam1point[1], cam1point[2] ])
 			self.output.append([xout,yout,0]) # X, Y, Z coordinates for output. Z is assumed to be 0 for easy import into CAD
 	
 		log('CALCULATED CLOUD 1!')
@@ -683,7 +671,6 @@ class ScannerMachine(object):
 		self.sm.get_screen('s3').update_max_distance_output()
   
 	def calculate_cloud_2(self,for_calc,calibration):
-		self.oldRotation = 0.0 # IS THIS NEEDED HERE? - AB
 		readlines=len(for_calc)
 		camangleh = ((float(calibration[6]))/(180/math.pi))
 		camanglev = ((float(calibration[7]))/(180/math.pi))
@@ -732,13 +719,6 @@ class ScannerMachine(object):
 			rrad=r/(180/math.pi) # rotation of unit in radians
 			xout=hyp1*math.sin(rrad+tan1) # x output adjusted for rotation around Z axis
 			yout=hyp1*math.cos(rrad+tan1) # y output adjusted for rotation around Z axis
-			
-			newR = rrad - self.oldRotation
-			self.camera2Scanner.scanner.RotateV(newR)
-			self.oldRotation = rrad
-			pixel = (u, v)
-			cam2point = self.camera2Scanner.lightSource.CameraPixelCoordinatesArePointInMyPlane(self.camera2Scanner.camera, pixel)
-			#self.output.append([ cam2point[0], cam2point[1], cam2point[2] ])
 			self.output.append([xout,yout,0]) # X, Y, Z coordinates for output. Z is assumed to be 0 for easy import into CAD
 	  
 		log('CALCULATED CLOUD 2!')
