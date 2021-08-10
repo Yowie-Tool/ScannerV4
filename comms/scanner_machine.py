@@ -65,7 +65,8 @@ class ScannerMachine(object):
 	for_calc_2=[]
 
 	output=[]
-
+	outputAB=[]
+	
 	maxdistance=0
 	alllengths=[]
 	low_res = True
@@ -86,8 +87,10 @@ class ScannerMachine(object):
 		self.s = serial_connection.SerialConnection(self, self.sm)
 		self.s.establish_connection()
 		self.world = ScannerPart()
-		self.camera1Scanner = Scanner(world, Vector3(0, 0, 0), Vector3(0, 0, 0), 2, Vector3(0, 0, 345), 2464, 3280, 2.76, 3.68, 8)
-		self.camera2Scanner = Scanner(world, Vector3(0, 0, 0), Vector3(0, 0, 0), 2, Vector3(0, 0, 450), 2464, 3280, 2.76, 3.68, 25)
+		self.camera1Scanner = Scanner(world, Vector3(0, 0, 0), Vector3(36, 0, 25), 0.454, Vector3(-7.75, 0, 352.0), 2464, 3280, 2.76, 3.68, 8)
+		self.camera1Scanner.camera.RotateV(20.32*math.pi/180.0)
+		self.camera2Scanner = Scanner(world, Vector3(0, 0, 0), Vector3(36, 0, 25), 0.454, Vector3(-24.8, 0, 436.0), 2464, 3280, 2.76, 3.68, 25)
+		self.camera2Scanner.camera.RotateV(10.94*math.pi/180.0)
 		self.oldRotation = 0.0
 		if sys.platform != 'win32' and sys.platform != 'darwin':
 			global camera
@@ -452,6 +455,7 @@ class ScannerMachine(object):
 		
 	def read_images_1(self,scansteps,photoangle1):
 		succesful1=0
+		self.photoangle1 = photoangle1
 		for photographs in range(scansteps):
 			pnumstr=str(photographs)
 			loffname='c1loff' + pnumstr + '.jpg'
@@ -493,6 +497,7 @@ class ScannerMachine(object):
 	   
 	def read_images_2(self,scansteps,photoangle2):
 		succesful2=0
+		self.photoangle2 = photoangle2
 		for photographs in range(scansteps):
 			pnumstr=str(photographs)
 			loffname='c2loff' + pnumstr + '.jpg'
@@ -533,7 +538,7 @@ class ScannerMachine(object):
 		print ("long range points captured %d" % (succesful2))    
 
 	def calculate_cloud_1(self,for_calc,calibration):
-		self.oldRotation = 0.0 # IS THIS NEEDED HERE? - AB
+		self.oldRotation = self.photoangle1[0]
 		readlines = len(for_calc)
 		camangleh = ((float(calibration[0]))/(180/math.pi))
 		camanglev = ((float(calibration[1]))/(180/math.pi))
@@ -550,6 +555,7 @@ class ScannerMachine(object):
 			xresolution=3280
 			yresolution=2464
 		halfyres=yresolution/2
+		halfxres=xresolution/2
 		aconst = (xresolution*(math.sin(Bconst)))/(math.sin(camangleh))
 		aconstsqrd = math.pow(aconst,2)
 		a2const=halfyres/math.tan(camanglev/2)
@@ -669,11 +675,22 @@ class ScannerMachine(object):
 			yout=hyp1*math.cos(rrad+tan1) # y output adjusted for rotation around Z axis
 			
 			newR = rrad - self.oldRotation
-			self.camera1Scanner.scanner.RotateV(newR)
+			self.camera1Scanner.scanner.RotateW(newR)
 			self.oldRotation = rrad
-			pixel = (u, v)
+			pixelU = u - halfyres
+			if pixelU < 0.0:
+			 pixelU += 0.5
+			else:
+			 pixelU -= 0.5
+			pixelV = v - halfxres
+			if pixelV < 0.0:
+			 pixelV += 0.5
+			else:
+			 pixelV -= 0.5
+			pixel = (pixelU, pixelV)
 			cam1point = self.camera1Scanner.lightSource.CameraPixelCoordinatesArePointInMyPlane(self.camera1Scanner.camera, pixel)
-			#self.output.append([ cam1point[0], cam1point[1], cam1point[2] ])
+			self.outputAB.append([ cam1point[0], cam1point[1], cam1point[2] ])
+			
 			self.output.append([xout,yout,0]) # X, Y, Z coordinates for output. Z is assumed to be 0 for easy import into CAD
 	
 		log('CALCULATED CLOUD 1!')
@@ -683,7 +700,7 @@ class ScannerMachine(object):
 		self.sm.get_screen('s3').update_max_distance_output()
   
 	def calculate_cloud_2(self,for_calc,calibration):
-		self.oldRotation = 0.0 # IS THIS NEEDED HERE? - AB
+		self.oldRotation = self.photoangle2[0]
 		readlines=len(for_calc)
 		camangleh = ((float(calibration[6]))/(180/math.pi))
 		camanglev = ((float(calibration[7]))/(180/math.pi))
@@ -734,11 +751,22 @@ class ScannerMachine(object):
 			yout=hyp1*math.cos(rrad+tan1) # y output adjusted for rotation around Z axis
 			
 			newR = rrad - self.oldRotation
-			self.camera2Scanner.scanner.RotateV(newR)
+			self.camera2Scanner.scanner.RotateW(newR)
 			self.oldRotation = rrad
-			pixel = (u, v)
+			pixelU = u - halfyres
+			if pixelU < 0.0:
+			 pixelU += 0.5
+			else:
+			 pixelU -= 0.5
+			pixelV = v - halfxres
+			if pixelV < 0.0:
+			 pixelV += 0.5
+			else:
+			 pixelV -= 0.5
+			pixel = (pixelU, pixelV)
 			cam2point = self.camera2Scanner.lightSource.CameraPixelCoordinatesArePointInMyPlane(self.camera2Scanner.camera, pixel)
-			#self.output.append([ cam2point[0], cam2point[1], cam2point[2] ])
+			self.outputAB.append([ cam2point[0], cam2point[1], cam2point[2] ])
+			
 			self.output.append([xout,yout,0]) # X, Y, Z coordinates for output. Z is assumed to be 0 for easy import into CAD
 	  
 		log('CALCULATED CLOUD 2!')
