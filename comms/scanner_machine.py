@@ -87,7 +87,7 @@ class ScannerMachine(object):
 		self.s = serial_connection.SerialConnection(self, self.sm)
 		self.s.establish_connection()
 		self.world = ScannerPart()
-		self.camera1Scanner = Scanner(world, Vector3(0, 0, 0), Vector3(36, 0, 23.15), 0.454, Vector3(-7.75, 0, 352.0), 2464, 3280, 2.76, 3.68, 8)
+		self.camera1Scanner = Scanner(world, Vector3(0, 0, 0), Vector3(36, 0, 23.15), 0.454, Vector3(-7.75, 0, 352.0), 2464, 3280, 2.76, 3.68, 8) #Height set
 		self.camera1Scanner.camera.RotateV(20.32*math.pi/180.0)
 		self.camera2Scanner = Scanner(world, Vector3(0, 0, 0), Vector3(36, 0, 23.15), 0.454, Vector3(-24.8, 0, 436.0), 2464, 3280, 2.76, 3.68, 25)
 		self.camera2Scanner.camera.RotateV(10.94*math.pi/180.0)
