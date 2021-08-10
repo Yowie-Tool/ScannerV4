@@ -87,9 +87,9 @@ class ScannerMachine(object):
 		self.s = serial_connection.SerialConnection(self, self.sm)
 		self.s.establish_connection()
 		self.world = ScannerPart()
-		self.camera1Scanner = Scanner(world, Vector3(0, 0, 0), Vector3(36, 0, 23.15), 0.454, Vector3(-7.75, 0, 352.0), 2464, 3280, 2.76, 3.68, 8) #Height set
+		self.camera1Scanner = Scanner(self.world, Vector3(0, 0, 0), Vector3(36, 0, 23.15), 0.454, Vector3(-7.75, 0, 352.0), 2464, 3280, 2.76, 3.68, 8) #Height set
 		self.camera1Scanner.camera.RotateV(20.32*math.pi/180.0)
-		self.camera2Scanner = Scanner(world, Vector3(0, 0, 0), Vector3(36, 0, 23.15), 0.454, Vector3(-24.8, 0, 436.0), 2464, 3280, 2.76, 3.68, 25)
+		self.camera2Scanner = Scanner(self.world, Vector3(0, 0, 0), Vector3(36, 0, 23.15), 0.454, Vector3(-24.8, 0, 436.0), 2464, 3280, 2.76, 3.68, 25)
 		self.camera2Scanner.camera.RotateV(10.94*math.pi/180.0)
 		self.oldRotation = 0.0
 		if sys.platform != 'win32' and sys.platform != 'darwin':
@@ -689,7 +689,7 @@ class ScannerMachine(object):
 			 pixelV -= 0.5
 			pixel = (pixelU, pixelV)
 			cam1point = self.camera1Scanner.lightSource.CameraPixelCoordinatesArePointInMyPlane(self.camera1Scanner.camera, pixel)
-			self.outputAB.append([ cam1point[0], cam1point[1], cam1point[2] ])
+			self.outputAB.append([ cam1point.x, cam1point.y, cam1point.z ])
 			
 			self.output.append([xout,yout,0]) # X, Y, Z coordinates for output. Z is assumed to be 0 for easy import into CAD
 	
@@ -765,7 +765,7 @@ class ScannerMachine(object):
 			 pixelV -= 0.5
 			pixel = (pixelU, pixelV)
 			cam2point = self.camera2Scanner.lightSource.CameraPixelCoordinatesArePointInMyPlane(self.camera2Scanner.camera, pixel)
-			self.outputAB.append([ cam2point[0], cam2point[1], cam2point[2] ])
+			self.outputAB.append([ cam2point.x, cam2point.y, cam2point.z ])
 			
 			self.output.append([xout,yout,0]) # X, Y, Z coordinates for output. Z is assumed to be 0 for easy import into CAD
 	  
