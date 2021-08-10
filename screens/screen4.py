@@ -166,6 +166,7 @@ class YowieScreen4(Screen):
 	def save_output(self):
 
 		file_path = '/media/pi/SCANFILES/' + "RoomReaderScan.pts"
+		file_pathAB = '/media/pi/SCANFILES/' + "RoomReaderScanAB.pts"
 
 		# if self.usb_stick.is_usb_mounted_flag == True:
 
@@ -174,6 +175,7 @@ class YowieScreen4(Screen):
 
 		try:
 			file_object = open(file_path, "w")
+
 
 			print("Saving points file")
 			exportint = len(self.m.output) 
@@ -193,6 +195,25 @@ class YowieScreen4(Screen):
 				file_object.write(xout + " " + yout + " " + zout + "\n")
 
 			file_object.close()
+			file_objectAB = open(file_pathAB, "w")
+			
+			exportint = len(self.m.outputAB) 
+
+			for export in range(exportint):
+
+				print(export)
+
+				#I've deleted Z and RGB from this now. exports just a text file with X,Y coordinates
+				xout = str(self.m.output[exportAB][0])
+				yout = str(self.m.output[exportAB][1])
+				zout = str(self.m.output[exportAB][2])
+
+# 				xout = str(self.m.output[export,0])
+# 				yout = str(self.m.output[export,1])
+# 				zout = str(self.m.output[export,2])
+				file_objectAB.write(xout + " " + yout + " " + zout + "\n")
+
+			file_objectAB.close()
 
 			# self.usb_stick.disable()
 
