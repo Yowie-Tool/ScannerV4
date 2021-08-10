@@ -79,6 +79,11 @@ class ScannerMachine(object):
 	power_mgmt_1 = 0x6b
 	power_mgmt_2 = 0x6c
 
+	time_started = 0
+	time_finished = 0
+
+	progress_string = ''
+
 	def __init__(self, screen_manager):
 
 		self.sm = screen_manager
@@ -239,6 +244,7 @@ class ScannerMachine(object):
 
 	# DO SCAN
 	def start_scan(self):
+		self.time_started = time.time()
 		self.scan_setup()
 		self.start_scan_camera_1()
 		# NB: star_scan_camera_2 is called in the end_scan() function in order to maintain proper timing
@@ -282,6 +288,7 @@ class ScannerMachine(object):
 		angle_to_return_to_origin=float(360-current_angle)
 		self.jog_clockwise(angle_to_return_to_origin)
 		time.sleep(abs(angle_to_return_to_origin*0.15))
+		self.current_angle = self.current_angle - current_angle
 
 	# CAMERA FUNCTIONS
 	def camera_1_open(self,resolution_bool):
@@ -375,6 +382,11 @@ class ScannerMachine(object):
 		else:
 			self.end_scan()
 
+		self.progress_string = 'Scan progress camera 1: ' + str(int(float(self.photonum1/self.scanstepscamera1))) + '%' 
+		self.sm.get_screen('s3').update_scan_progress_output()
+		self.show_time_on_screen_3()
+
+
 	def start_scan_camera_2(self):
 		self.camera_2_open(self.low_res)
 		self.doing_scan_camera_2 = True
@@ -393,16 +405,47 @@ class ScannerMachine(object):
 		else:
 			self.end_scan()
 
+		self.progress_string = 'Scan progress camera 2: ' + str(int(float(self.photonum2/self.scanstepscamera2))) + '%' 
+		self.sm.get_screen('s3').update_scan_progress_output()
+		self.show_time_on_screen_3()
+
 	# SCAN PROCESSING
 
 	def process_scan(self):
+
+		self.progress_string = 'Reading images from camera 1...'
+		self.sm.get_screen('s3').update_scan_progress_output()
+		self.show_time_on_screen_3()
 		self.read_images_1(self.scanstepscamera1,self.photoangle1)
+
 		if self.scan_cameras == 2:
+			self.progress_string = 'Reading images from camera 2...'
+			self.sm.get_screen('s3').update_scan_progress_output()
+			self.show_time_on_screen_3()
 			self.read_images_2(self.scanstepscamera2,self.photoangle2)
 
+		self.progress_string = 'Calculating first cloud...'
+		self.sm.get_screen('s3').update_scan_progress_output()
+		self.show_time_on_screen_3()
 		self.calculate_cloud_1(self.for_calc_1,self.scannercalibration)
+
 		if self.scan_cameras == 2:
+			self.progress_string = 'Calculating second cloud...'
+			self.sm.get_screen('s3').update_scan_progress_output()
+			self.show_time_on_screen_3()
 			self.calculate_cloud_2(self.for_calc_2,self.scannercalibration)
+
+		self.progress_string = 'Finished processing'
+		self.sm.get_screen('s3').update_scan_progress_output()
+		self.show_time_on_screen_3()
+
+	def show_time_on_screen_3(self):
+		self.time_finished = time.time()
+		time_taken_seconds = int(self.time_finished - self.time_started)
+		minutes = int(time_taken_seconds / 60)
+		seconds_remainder = time_taken_seconds % 60
+		time_string = str(minutes) + ':' + str(seconds_remainder)
+		self.sm.get_screen('s3').update_scan_time_output(time_string)
 
 	def weighted_average(self,t):
 		t = t.flatten()
@@ -535,7 +578,7 @@ class ScannerMachine(object):
 				else: succesful2=succesful2
 			print ('Short Range Image [%d] of [%d] read\r'%(photographs,scansteps),end="")
 		print ("")
-		print ("long range points captured %d" % (succesful2))    
+		print ("long range points captured %d" % (succesful2))  
 
 	def calculate_cloud_1(self,for_calc,calibration):
 		self.oldRotation = self.photoangle1[0]
@@ -694,8 +737,8 @@ class ScannerMachine(object):
 			self.output.append([xout,yout,0]) # X, Y, Z coordinates for output. Z is assumed to be 0 for easy import into CAD
 	
 		log('CALCULATED CLOUD 1!')
-		string_to_update_screen_with = 'FIRST CLOUD CALCULATED!'
-		self.sm.get_screen('s3').update_scan_progress_output(string_to_update_screen_with)
+		self.progress_string = 'FIRST CLOUD CALCULATED!'
+		self.sm.get_screen('s3').update_scan_progress_output()
 		self.sm.get_screen('s3').update_average_distance_output()
 		self.sm.get_screen('s3').update_max_distance_output()
   
@@ -770,8 +813,8 @@ class ScannerMachine(object):
 			self.output.append([xout,yout,0]) # X, Y, Z coordinates for output. Z is assumed to be 0 for easy import into CAD
 	  
 		log('CALCULATED CLOUD 2!')
-		string_to_update_screen_with = 'SECOND CLOUD CALCULATED!'
-		self.sm.get_screen('s3').update_scan_progress_output(string_to_update_screen_with)
+		self.progress_string = 'SECOND CLOUD CALCULATED!'
+		self.sm.get_screen('s3').update_scan_progress_output()
 		self.sm.get_screen('s3').update_average_distance_output()
 		self.sm.get_screen('s3').update_max_distance_output()
 				
