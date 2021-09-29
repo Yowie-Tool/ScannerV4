@@ -87,10 +87,19 @@ class ScannerMachine(object):
 		self.s = serial_connection.SerialConnection(self, self.sm)
 		self.s.establish_connection()
 		self.world = ScannerPart()
+		
+		'''
 		self.camera1Scanner = Scanner(world, Vector3(0, 0, 0), Vector3(36, 0, 23.15), 0.454, Vector3(-7.75, 0, 352.0), 2464, 3280, 2.76, 3.68, 8) #Height set
 		self.camera1Scanner.camera.RotateV(20.32*math.pi/180.0)
 		self.camera2Scanner = Scanner(world, Vector3(0, 0, 0), Vector3(36, 0, 23.15), 0.454, Vector3(-24.8, 0, 436.0), 2464, 3280, 2.76, 3.68, 25)
 		self.camera2Scanner.camera.RotateV(10.94*math.pi/180.0)
+		'''
+		
+		self.camera1Scanner= Scanner(self.world, scannerOffset = Vector3(0, 0, 0), Vector3(36, 0, 23.15), lightAng = 0.454, lightToeIn = 0, cameraOffset = 
+		 Vector3(-7.75, 0, 352.0), cameraToeIn = -20.32*math.pi/180.0, uPix = 2464, vPix = 3280, uMM = 2.76, vMM = 3.68, focalLen = 8)
+		self.camera2Scanner= Scanner(self.world, scannerOffset = Vector3(0, 0, 0), Vector3(36, 0, 23.15), lightAng = 0.454, lightToeIn = 0, cameraOffset = 
+		 Vector3(-24.8, 0, 436.0), cameraToeIn = -10.94*math.pi/180.0, uPix = 2464, vPix = 3280, uMM = 2.76, vMM = 3.68, focalLen = 25)
+		
 		self.oldRotation = 0.0
 		if sys.platform != 'win32' and sys.platform != 'darwin':
 			global camera
