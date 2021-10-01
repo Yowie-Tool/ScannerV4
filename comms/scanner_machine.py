@@ -95,9 +95,9 @@ class ScannerMachine(object):
 		self.camera2Scanner.camera.RotateV(10.94*math.pi/180.0)
 		'''
 		
-		self.camera1Scanner= Scanner(self.world, scannerOffset = Vector3(0, 0, 0), Vector3(36, 0, 23.15), lightAng = 0.454, lightToeIn = 0, cameraOffset = 
+		self.camera1Scanner= Scanner(self.world, scannerOffset = Vector3(0, 0, 0), lightOffset = Vector3(36, 0, 23.15), lightAng = 0.454, lightToeIn = 0, cameraOffset = 
 		 Vector3(-7.75, 0, 352.0), cameraToeIn = -20.32*math.pi/180.0, uPix = 2464, vPix = 3280, uMM = 2.76, vMM = 3.68, focalLen = 8)
-		self.camera2Scanner= Scanner(self.world, scannerOffset = Vector3(0, 0, 0), Vector3(36, 0, 23.15), lightAng = 0.454, lightToeIn = 0, cameraOffset = 
+		self.camera2Scanner= Scanner(self.world, scannerOffset = Vector3(0, 0, 0), lightOffset = Vector3(36, 0, 23.15), lightAng = 0.454, lightToeIn = 0, cameraOffset = 
 		 Vector3(-24.8, 0, 436.0), cameraToeIn = -10.94*math.pi/180.0, uPix = 2464, vPix = 3280, uMM = 2.76, vMM = 3.68, focalLen = 25)
 		
 		self.oldRotation = 0.0
