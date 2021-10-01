@@ -698,7 +698,7 @@ class ScannerMachine(object):
 			 pixelV -= 0.5
 			pixel = (pixelU, pixelV)
 			cam1point = self.camera1Scanner.lightSource.CameraPixelCoordinatesArePointInMyPlane(self.camera1Scanner.camera, pixel)
-			self.outputAB.append([ cam1point[0], cam1point[1], cam1point[2] ])
+			self.outputAB.append([ cam1point.x, cam1point.y, cam1point.z ])
 			
 			self.output.append([xout,yout,0]) # X, Y, Z coordinates for output. Z is assumed to be 0 for easy import into CAD
 	
@@ -774,7 +774,7 @@ class ScannerMachine(object):
 			 pixelV -= 0.5
 			pixel = (pixelU, pixelV)
 			cam2point = self.camera2Scanner.lightSource.CameraPixelCoordinatesArePointInMyPlane(self.camera2Scanner.camera, pixel)
-			self.outputAB.append([ cam2point[0], cam2point[1], cam2point[2] ])
+			self.outputAB.append([ cam2point.x, cam2point.y, cam2point.z ])
 			
 			self.output.append([xout,yout,0]) # X, Y, Z coordinates for output. Z is assumed to be 0 for easy import into CAD
 	  
