@@ -577,7 +577,7 @@ class Scanner:
   scannerOffset = Vector3(self.parameters[0], self.parameters[1], self.parameters[2])
   lightOffset = Vector3(self.parameters[3], self.parameters[4], self.parameters[5])
   cameraOffset = Vector3(self.parameters[6], self.parameters[7], self.parameters[8])
-  focalLen = self.parameters[9]
+  focalLen = self.parameters[9] #!!! Need to stop this ever going negative or 0
 
   # These don't want to be in the parameters array because we assume
   # we know them accurately and we don't want the optimiser to change them.
