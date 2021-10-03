@@ -589,7 +589,7 @@ class Scanner:
   self.vMM = vMM
   self.scanner = ScannerPart(offset = scannerOffset, parent = world)
   self.lightSource = ScannerPart(offset = lightOffset, u = Vector3(0, 0, -1), v = Vector3(-1, 0, 0), w = Vector3(0, 1, 0), parent = self.scanner, lightAngle = self.lightAng)
-  self.camera = ScannerPart(offset = cameraOffset,  u = Vector3(1, 0, 0), v = Vector3(0, 0, -1), w = Vector3(0, 1, 0), parent = self.scanner, uPixels = self.uPix, vPixels =
+  self.camera = ScannerPart(offset = cameraOffset,  u = Vector3(0, 0, 1), v = Vector3(1, 0, 0), w = Vector3(0, 1, 0), parent = self.scanner, uPixels = self.uPix, vPixels =
    self.vPix, uMM =  self.uMM, vMM = self.vMM, focalLength = focalLen)
 
   lightToeIn = self.parameters[10]
@@ -612,7 +612,13 @@ class Scanner:
   cameraW = self.parameters[17]
   self.camera.RotateW(cameraW)
 
+ # pixel is [u, v], not necessarily integers
+ def PixelToPointInSpace(self, pixel):
+  return self.lightSource.CameraPixelCoordinatesArePointInMyPlane(self.camera, pixel)
 
+ # point is Vector3()
+ def PointInSpaceToPixel(self, point):
+  return self.camera.ProjectPointIntoCameraPlane(point)
 
  def Copy(self):
   return copy.deepcopy(self)
