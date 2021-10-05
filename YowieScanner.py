@@ -56,7 +56,7 @@ class Point2D:
   self.y = y
   self.face = f
 
- def __repr__(self):
+ def __str__(self):
   return "(Point2D x:%s y:%s)" % (self.x, self.y)
 
  # Vector addition and subtraction
@@ -108,7 +108,7 @@ class Line2D:
   self.face = f
   self.empty = self.Length2() < veryShort2
 
- def __repr__(self):
+ def __str__(self):
   return "<Line2D p0:%s direction:%s>" % (self.p0, self.direction)
 
 # The point at parameter value t
@@ -185,7 +185,7 @@ class Vector3:
    print("Attempt to normalize zero-length vector")
   return self.Multiply(1.0/maths.sqrt(d))
 
- def __repr__(self):
+ def __str__(self):
   return 'Vector3(' + str(self.x) + ', ' +  str(self.y) + ', ' +  str(self.z) + ')' 
 
 #---
@@ -250,7 +250,7 @@ class RotationM:
     result.r[i][j] = s
   return result
 
- def __repr__(self):
+ def __str__(self):
   result = 'RotationM('
   for i in range(3):
    if i != 0:
@@ -529,7 +529,13 @@ class ScannerPart:
 
 #---------------------------------------------------------------------------------------------------------------------------------
 
-# Small class to hold the parameters needed to build a complete scanner
+# Distance parameters
+
+distanceParameters = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+focusParameter = 9
+angleParameters = [10, 11, 12, 13, 14, 15, 16, 17]
+
+# Class to hold the parameters needed to build a complete scanner
 # Make a scanner in the standard configuration. The parameters are also recorded in a vector for optimisation.
 class Scanner:
  def __init__(self, world, scannerOffset, lightOffset, lightAng, lightToeIn, cameraOffset, cameraToeIn, uPix, vPix, uMM, vMM, focalLen):
@@ -565,11 +571,11 @@ class Scanner:
   parameters.append(0) # 16
   parameters.append(0) # 17
 
-
   return parameters
 
 
  def MakeScannerFromParameters(self, parameters, world, lightAng, uPix, vPix, uMM, vMM):
+  self.angle = 0 # Assume we start with no rotation
   self.parameters = []
   for p in parameters:
    self.parameters.append(p)
@@ -588,14 +594,14 @@ class Scanner:
   self.uMM = uMM
   self.vMM = vMM
   self.scanner = ScannerPart(offset = scannerOffset, parent = world)
-  self.lightSource = ScannerPart(offset = lightOffset, u = Vector3(0, 0, -1), v = Vector3(-1, 0, 0), w = Vector3(0, 1, 0), parent = self.scanner, lightAngle = self.lightAng)
+  self.lightSource = ScannerPart(offset = lightOffset, u = Vector3(0, 0, 1), v = Vector3(-1, 0, 0), w = Vector3(0, 1, 0), parent = self.scanner, lightAngle = self.lightAng)
   self.camera = ScannerPart(offset = cameraOffset,  u = Vector3(0, 0, 1), v = Vector3(1, 0, 0), w = Vector3(0, 1, 0), parent = self.scanner, uPixels = self.uPix, vPixels =
    self.vPix, uMM =  self.uMM, vMM = self.vMM, focalLength = focalLen)
 
   lightToeIn = self.parameters[10]
   self.lightSource.RotateV(lightToeIn)
   cameraToeIn = self.parameters[11]
-  self.camera.RotateU(cameraToeIn)
+  self.camera.RotateV(cameraToeIn)
 
   lightU = self.parameters[12]
   self.lightSource.RotateU(lightU)
@@ -620,6 +626,12 @@ class Scanner:
  def PointInSpaceToPixel(self, point):
   return self.camera.ProjectPointIntoCameraPlane(point)
 
+ def Turn(self, angle):
+  da = angle - self.angle
+  self.angle = angle
+  self.scanner.RotateW(da)
+
+
  def Copy(self):
   return copy.deepcopy(self)
 
@@ -639,9 +651,14 @@ class Scanner:
   result = self.Copy()
   if mean < veryShort2:
    return result
-  parameters = []
-  for p in self.parameters:
-   parameters.append(p + gauss(mean, sd))
+  parameters = copy.deepcopy(self.parameters)
+  for d in distanceParameters:
+   parameters[d] +=  gauss(mean, sd)
+  parameters[focusParameter] +=  gauss(0, sd)
+  angle = mean/veryLong
+  sda = sd*angle
+  for a in angleParameters:
+   parameters[a] +=  gauss(angle, sda)
   result.MakeScannerFromParameters(parameters, self.world, self.lightAng, self.uPix, self.vPix, self.uMM, self.vMM)
   return result
 
@@ -661,3 +678,77 @@ class Scanner:
    sum += d*d
   return maths.sqrt(sum/n)
 
+ def __str__(self):
+  result = "\nScanner -\n"
+  result += " scannerOffset: " + str(self.scanner.offset) + "\n"
+  result += " lightOffset: " + str(self.lightSource.offset) + "\n"
+  result += " cameraOffset: " + str(self.camera.offset) + "\n"
+  result += " focalLength: " + str(self.camera.focalLength) + "\n"
+
+  result += " lightAng: " + str(self.lightAng) + "\n"
+  result += " uPix, vPix, uMM, vMM: " + str(self.uPix) + ", " + str(self.vPix) + ", " + str(self.uMM) + ", " + str(self.vMM) + "\n"
+
+  lightToeIn = self.parameters[10]
+  cameraToeIn = self.parameters[11]
+  result += " lightToeIn, cameraToeIn: " + str(lightToeIn) + ", " + str(cameraToeIn) + "\n"
+
+  lightU = self.parameters[12]
+  lightV = self.parameters[13]
+  lightW = self.parameters[14]
+  result += " light U, V, W angles: " + str(lightU) + ", " + str(lightV) + ", " + str(lightW) + "\n"
+
+  cameraU = self.parameters[15]
+  cameraV = self.parameters[16]
+  cameraW = self.parameters[17]
+  result += " camera U, V, W angles: " + str(cameraU) + ", " + str(cameraV) + ", " + str(cameraW) + "\n\n"
+  return result
+
+ def CheckPoint(self, point, pixelIn, say):
+  plane = self.lightSource.GetLightPlane()
+  d = plane[0].Dot(point) + plane[1]
+  pointInLightSheet = point.Sub(plane[0].Multiply(d))
+  pixel = self.camera.ProjectPointIntoCameraPlane(point)
+  recoveredPoint = self.lightSource.CameraPixelCoordinatesArePointInMyPlane(self.camera, pixel)
+  if pixelIn is not None:
+   pixelPoint = self.lightSource.CameraPixelCoordinatesArePointInMyPlane(self.camera, pixelIn)
+  if say:
+   print("Point " + str(point) + " is " + str(d) + " from the light sheet, where the nearest point is " + str(pointInLightSheet) + ".")
+   print("It projects to pixel: " + str(pixel))
+   print("That pixel in the scanner reconstructs the point as: " + str(recoveredPoint))
+   if pixelIn is not None:
+    print("The input pixel is: " + str(pixelIn))
+    print("That pixel in the scanner reconstructs the point as: " + str(pixelPoint))
+  return recoveredPoint
+
+ def SelfCheck(self, room):
+  reconstructedRoom = []
+  sumSheetDistances = 0
+  plane = self.lightSource.GetLightPlane()
+  reconstructedRoomProjected = []
+  sheetPoints = []
+  for point in room:
+   d = plane[0].Dot(point) + plane[1]
+   pointInSheet = point.Sub(plane[0].Multiply(d))
+   sheetPoints.append(pointInSheet)
+   sumSheetDistances += d*d
+   pixel = self.camera.ProjectPointIntoCameraPlane(point)
+   reconstructedRoom.append(self.lightSource.CameraPixelCoordinatesArePointInMyPlane(self.camera, pixel))
+   pixel = self.camera.ProjectPointIntoCameraPlane(pointInSheet)
+   reconstructedRoomProjected.append(self.lightSource.CameraPixelCoordinatesArePointInMyPlane(self.camera, pixel))
+  rmsDistance = maths.sqrt(sumSheetDistances/len(room))
+  print("RMS distance of room points from light sheet: " + str(rmsDistance))
+  roomErrors = 0
+  projectedRoomErrors = 0
+  for r in range(len(room)):
+   point = room[r]
+   newPoint = reconstructedRoom[r]
+   diff = point.Sub(newPoint)
+   roomErrors += diff.Length2()
+   point = sheetPoints[r]
+   newPoint = reconstructedRoomProjected[r]
+   diff = point.Sub(newPoint)
+   projectedRoomErrors += diff.Length2()
+  rmsDistance = maths.sqrt(roomErrors/len(room))
+  print("RMS errors in room reconstruction: " + str(rmsDistance))
+  rmsDistance = maths.sqrt(projectedRoomErrors/len(room))
+  print("RMS errors in room reconstruction from projected sheet: " + str(rmsDistance))
