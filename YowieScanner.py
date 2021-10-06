@@ -594,8 +594,8 @@ class Scanner:
   self.uMM = uMM
   self.vMM = vMM
   self.scanner = ScannerPart(offset = scannerOffset, parent = world)
-  self.lightSource = ScannerPart(offset = lightOffset, u = Vector3(0, 0, 1), v = Vector3(-1, 0, 0), w = Vector3(0, 1, 0), parent = self.scanner, lightAngle = self.lightAng)
-  self.camera = ScannerPart(offset = cameraOffset,  u = Vector3(0, 0, 1), v = Vector3(1, 0, 0), w = Vector3(0, 1, 0), parent = self.scanner, uPixels = self.uPix, vPixels =
+  self.lightSource = ScannerPart(offset = lightOffset, u = Vector3(0, 0, -1), v = Vector3(-1, 0, 0), w = Vector3(0, 1, 0), parent = self.scanner, lightAngle = self.lightAng)
+  self.camera = ScannerPart(offset = cameraOffset,  u = Vector3(1, 0, 0), v = Vector3(0, 0, -1), w = Vector3(0, 1, 0), parent = self.scanner, uPixels = self.uPix, vPixels =
    self.vPix, uMM =  self.uMM, vMM = self.vMM, focalLength = focalLen)
 
   lightToeIn = self.parameters[10]
@@ -647,7 +647,7 @@ class Scanner:
 
 # Make a copy of a scanner perturbed by small Gaussian amounts with mean and sd standard deviation.
 
- def PerturbedCopy(self, mean, sd):
+ def PerturbedCopy(self, selectionVector, mean, sd):
   result = self.Copy()
   if mean < veryShort2:
    return result
