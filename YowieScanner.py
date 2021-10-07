@@ -8,6 +8,7 @@
 import copy, sys
 import math as maths
 from random import seed, random, gauss
+from scipy.optimize import minimize
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -539,8 +540,12 @@ angleParameters = [10, 11, 12, 13, 14, 15, 16, 17]
 # Make a scanner in the standard configuration. The parameters are also recorded in a vector for optimisation.
 class Scanner:
  def __init__(self, world, scannerOffset, lightOffset, lightAng, lightToeIn, cameraOffset, cameraToeIn, uPix, vPix, uMM, vMM, focalLen):
+  self.selectionVector = None
   parameters = self.SetParameters(scannerOffset, lightOffset, lightToeIn, cameraOffset, cameraToeIn, focalLen)
   self.MakeScannerFromParameters(parameters, world, lightAng, uPix, vPix, uMM, vMM)
+  self.progressCount = 0
+  self.lastCost = 0.0
+  self.reportProgress = True
 
  def SetParameters(self, scannerOffset, lightOffset, lightToeIn, cameraOffset, cameraToeIn, focalLen):
   parameters = []
@@ -571,14 +576,29 @@ class Scanner:
   parameters.append(0) # 16
   parameters.append(0) # 17
 
+  if self.selectionVector is None:
+   self.selectionVector = []
+   for s in range(len(parameters)):
+    self.selectionVector.append(s)
+
   return parameters
 
+ def DefineSelectionVector(self, v):
+  self.selectionVector = v
+
+ def SetParametersFromSelection(self, selection):
+  for s in range(len(self.selectionVector)):
+   self.parameters[self.selectionVector[s]] = selection[s]
+  self.MakeScannerFromParameters(self.parameters, self.world, self.lightAng, self.uPix, self.vPix, self.uMM, self.vMM)
+
+ def GetSelection(self):
+  selection = []
+  for s in self.selectionVector:
+   selection.append(self.parameters[s])
 
  def MakeScannerFromParameters(self, parameters, world, lightAng, uPix, vPix, uMM, vMM):
   self.angle = 0 # Assume we start with no rotation
-  self.parameters = []
-  for p in parameters:
-   self.parameters.append(p)
+  self.parameters = copy.deepcopy(parameters)
 
   scannerOffset = Vector3(self.parameters[0], self.parameters[1], self.parameters[2])
   lightOffset = Vector3(self.parameters[3], self.parameters[4], self.parameters[5])
@@ -631,7 +651,6 @@ class Scanner:
   self.angle = angle
   self.scanner.RotateW(da)
 
-
  def Copy(self):
   return copy.deepcopy(self)
 
@@ -644,29 +663,30 @@ class Scanner:
  def DebugOff(self):
   self.scanner.DebugOff()
 
-
 # Make a copy of a scanner perturbed by small Gaussian amounts with mean and sd standard deviation.
 
- def PerturbedCopy(self, selectionVector, mean, sd):
+ def PerturbedCopy(self, mean, sd):
   result = self.Copy()
-  if mean < veryShort2:
-   return result
-  parameters = copy.deepcopy(self.parameters)
   for d in distanceParameters:
-   parameters[d] +=  gauss(mean, sd)
-  parameters[focusParameter] +=  gauss(0, sd)
+   if d in result.selectionVector:
+    result.parameters[d] +=  gauss(mean, sd)
+  if focusParameter in self.selectionVector:
+   f1 = result.parameters[focusParameter] + gauss(0, sd)
+   if f1 > 1: # No focal length < 1mm???
+    result.parameters[focusParameter] = f1
   angle = mean/veryLong
   sda = sd*angle
   for a in angleParameters:
-   parameters[a] +=  gauss(angle, sda)
-  result.MakeScannerFromParameters(parameters, self.world, self.lightAng, self.uPix, self.vPix, self.uMM, self.vMM)
+   if a in self.selectionVector:
+    result.parameters[a] +=  gauss(angle, sda)
+  result.MakeScannerFromParameters(result.parameters, result.world, result.lightAng, result.uPix, result.vPix, result.uMM, result.vMM)
   return result
 
 
 # Take an existing scanner and modify it according to the given parameter vector, assumed to be derived from some optimisation process
 
- def ImposeParameters(self, parameters):
-  self.MakeScannerFromParameters(parameters, self.world, self.lightAng, self.uPix, self.vPix, self.uMM, self.vMM)
+ #def ImposeParameters(self, parameters):
+ # self.MakeScannerFromParameters(parameters, self.world, self.lightAng, self.uPix, self.vPix, self.uMM, self.vMM)
 
 # How different are two scanners?
 
@@ -703,7 +723,7 @@ class Scanner:
   result += " camera U, V, W angles: " + str(cameraU) + ", " + str(cameraV) + ", " + str(cameraW) + "\n\n"
   return result
 
- def CheckPoint(self, point, pixelIn, say):
+ def CheckPoint(self, point, pixelIn, report):
   plane = self.lightSource.GetLightPlane()
   d = plane[0].Dot(point) + plane[1]
   pointInLightSheet = point.Sub(plane[0].Multiply(d))
@@ -711,7 +731,7 @@ class Scanner:
   recoveredPoint = self.lightSource.CameraPixelCoordinatesArePointInMyPlane(self.camera, pixel)
   if pixelIn is not None:
    pixelPoint = self.lightSource.CameraPixelCoordinatesArePointInMyPlane(self.camera, pixelIn)
-  if say:
+  if report:
    print("Point " + str(point) + " is " + str(d) + " from the light sheet, where the nearest point is " + str(pointInLightSheet) + ".")
    print("It projects to pixel: " + str(pixel))
    print("That pixel in the scanner reconstructs the point as: " + str(recoveredPoint))
@@ -721,34 +741,72 @@ class Scanner:
   return recoveredPoint
 
  def SelfCheck(self, room):
-  reconstructedRoom = []
-  sumSheetDistances = 0
-  plane = self.lightSource.GetLightPlane()
-  reconstructedRoomProjected = []
-  sheetPoints = []
+  sum = 0
   for point in room:
-   d = plane[0].Dot(point) + plane[1]
-   pointInSheet = point.Sub(plane[0].Multiply(d))
-   sheetPoints.append(pointInSheet)
-   sumSheetDistances += d*d
-   pixel = self.camera.ProjectPointIntoCameraPlane(point)
-   reconstructedRoom.append(self.lightSource.CameraPixelCoordinatesArePointInMyPlane(self.camera, pixel))
-   pixel = self.camera.ProjectPointIntoCameraPlane(pointInSheet)
-   reconstructedRoomProjected.append(self.lightSource.CameraPixelCoordinatesArePointInMyPlane(self.camera, pixel))
-  rmsDistance = maths.sqrt(sumSheetDistances/len(room))
-  print("RMS distance of room points from light sheet: " + str(rmsDistance))
-  roomErrors = 0
-  projectedRoomErrors = 0
-  for r in range(len(room)):
-   point = room[r]
-   newPoint = reconstructedRoom[r]
-   diff = point.Sub(newPoint)
-   roomErrors += diff.Length2()
-   point = sheetPoints[r]
-   newPoint = reconstructedRoomProjected[r]
-   diff = point.Sub(newPoint)
-   projectedRoomErrors += diff.Length2()
-  rmsDistance = maths.sqrt(roomErrors/len(room))
+   recoveredPoint = self.CheckPoint(point, None, False)
+   d = recoveredPoint.Sub(point)
+   sum += d.Length2()
+  rmsDistance = maths.sqrt(sum/len(room))
   print("RMS errors in room reconstruction: " + str(rmsDistance))
-  rmsDistance = maths.sqrt(projectedRoomErrors/len(room))
-  print("RMS errors in room reconstruction from projected sheet: " + str(rmsDistance))
+
+ def ReconstructRoomFromPixelsAndAngles(self, pixelsAndAngles):
+  room = []
+  for pixel, angle in zip(pixelsAndAngles[0], pixelsAndAngles[1]):
+    self.Turn(angle)
+    room.append(self.PixelToPointInSpace(pixel))
+  return room
+
+
+ def CostFunctionWithoutChangingParameters(self, room, pixelsAndAngles):
+  recoveredRoom = self.ReconstructRoomFromPixelsAndAngles(pixelsAndAngles)
+  self.lastCost = 0.0
+  for point, rPoint in zip(room, recoveredRoom):
+   d = point.Sub(rPoint)
+   self.lastCost += d.Length2()
+  return self.lastCost
+
+ def CostFunction(self, minimiserX, room, pixelsAndAngles):
+  scratchScanner = self.Copy()
+  scratchScanner.SetParametersFromSelection(minimiserX)
+  return scratchScanner.CostFunctionWithoutChangingParameters(room, pixelsAndAngles)
+
+# Generate scanners at random, exploring the space of scanners, looking for a chance good fit
+
+ def ScatterGun(self, room, pixelsAndAngles, mean, sd, samples):
+  betterScanner = self.Copy()
+  minCost = betterScanner.CostFunctionWithoutChangingParameters(room, pixelsAndAngles)
+  if self.reportProgress:
+   print("Intitial MS error: " + str(minCost))
+  for s in range(samples):
+   randomScanner = self.PerturbedCopy(mean, sd)
+   cost = randomScanner.CostFunctionWithoutChangingParameters(room, pixelsAndAngles)
+   if cost < minCost:
+    betterScanner = randomScanner
+    minCost = cost
+    if self.reportProgress:
+     print("Scatter - best cost so far: " + str(minCost))
+   self.lastCost = minCost
+  return betterScanner
+
+ def Progress(self):
+  if not self.reportProgress:
+   return
+  self.progressCount += 1
+  if not self.progressCount % 10 == 0:
+   return
+  print("Last scanner MS error (mm^2): " + str(self.lastCost) + " after " + str(self.progressCount) + " iterations.")
+
+ # Use an optimiser to find a (local) best scanner with minimum cost
+
+ def Optimise(self, room, pixelsAndAngles):
+  betterScanner = self.Copy()
+  betterScanner.progressCount = 0
+  if betterScanner.reportProgress:
+   print("scipy.optimize.minimize using Broyden–Fletcher–Goldfarb–Shanno algorithm ...")
+  minimisationVector = betterScanner.GetSelection()
+  minResult = minimize(betterScanner.CostFunction, x0 = minimisationVector, args = (room, pixelsAndAngles), callback = betterScanner.Progress)
+  betterScanner.SetParametersFromSelection(minResult)
+  if betterScanner.reportProgress:
+   print("Final scanner RMS error (mm): ", maths.sqrt(betterScanner.lastCost))
+  return betterScanner
+
