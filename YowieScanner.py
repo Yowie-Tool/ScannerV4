@@ -579,7 +579,8 @@ class Scanner:
   if self.selectionVector is None:
    self.selectionVector = []
    for s in range(len(parameters)):
-    self.selectionVector.append(s)
+    if not s == focusParameter:
+     self.selectionVector.append(s)
 
   return parameters
 
@@ -595,6 +596,7 @@ class Scanner:
   selection = []
   for s in self.selectionVector:
    selection.append(self.parameters[s])
+  return selection
 
  def MakeScannerFromParameters(self, parameters, world, lightAng, uPix, vPix, uMM, vMM):
   self.angle = 0 # Assume we start with no rotation
@@ -681,12 +683,6 @@ class Scanner:
     result.parameters[a] +=  gauss(angle, sda)
   result.MakeScannerFromParameters(result.parameters, result.world, result.lightAng, result.uPix, result.vPix, result.uMM, result.vMM)
   return result
-
-
-# Take an existing scanner and modify it according to the given parameter vector, assumed to be derived from some optimisation process
-
- #def ImposeParameters(self, parameters):
- # self.MakeScannerFromParameters(parameters, self.world, self.lightAng, self.uPix, self.vPix, self.uMM, self.vMM)
 
 # How different are two scanners?
 
@@ -776,7 +772,7 @@ class Scanner:
   betterScanner = self.Copy()
   minCost = betterScanner.CostFunctionWithoutChangingParameters(room, pixelsAndAngles)
   if self.reportProgress:
-   print("Intitial MS error: " + str(minCost))
+   print("Intitial cost: " + str(minCost))
   for s in range(samples):
    randomScanner = self.PerturbedCopy(mean, sd)
    cost = randomScanner.CostFunctionWithoutChangingParameters(room, pixelsAndAngles)
@@ -788,7 +784,7 @@ class Scanner:
    self.lastCost = minCost
   return betterScanner
 
- def Progress(self):
+ def Progress(self, x):
   if not self.reportProgress:
    return
   self.progressCount += 1
@@ -804,9 +800,10 @@ class Scanner:
   if betterScanner.reportProgress:
    print("scipy.optimize.minimize using Broyden–Fletcher–Goldfarb–Shanno algorithm ...")
   minimisationVector = betterScanner.GetSelection()
-  minResult = minimize(betterScanner.CostFunction, x0 = minimisationVector, args = (room, pixelsAndAngles), callback = betterScanner.Progress)
+  minResult = minimize(betterScanner.CostFunction, x0 = minimisationVector, args = (room, pixelsAndAngles, ), callback = betterScanner.Progress)
   betterScanner.SetParametersFromSelection(minResult)
   if betterScanner.reportProgress:
    print("Final scanner RMS error (mm): ", maths.sqrt(betterScanner.lastCost))
   return betterScanner
+
 
