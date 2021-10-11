@@ -435,25 +435,25 @@ class ScannerPart:
 
 # Find the pixel coordinates point in the image plane (not necessarily an exact pixel) that point p projects into
 
- def ProjectPointIntoCameraPlane(self, p):
+ def ProjectPointIntoFractionalCameraPixel(self, point):
   if self.focalLength <= 0.0:
    print("Attempt to get a pixel from a scanner part that is not a camera.")
   w = self.w.Multiply(self.focalLength)
-  pRelativeInv = self.focalLength/p.Sub(self.AbsoluteOffset().Add(w)).Dot(self.w)
-  pd = self.AbsoluteOffset().Sub(p)
+  pRelativeInv = self.focalLength / point.Sub(self.AbsoluteOffset().Add(w)).Dot(self.w)
+  pd = self.AbsoluteOffset().Sub(point)
   u = pd.Dot(self.u)*pRelativeInv
   v = pd.Dot(self.v)*pRelativeInv
   uu = (u + 0.5*self.uMM)*(self.uPixels - 1)/self.uMM
   vv = (v + 0.5*self.vMM)*(self.vPixels - 1)/self.vMM
   pixel = (uu, vv)
   if self.debug:
-   print(self.name, " - Point ", p, " projects to pixel ", pixel, "(mm: ", u, ", ", v, ")")
+   print(self.name, " - Point ", point, " projects to pixel ", pixel, "(mm: ", u, ", ", v, ")")
   return pixel
 
 # Find the integer pixel (u, v) in the camera's image plane nearest where the point p projects into
 
- def ProjectPointIntoCameraPixel(self, p):
-  uv = self.ProjectPointIntoCameraPlane(p)
+ def ProjectPointIntoIntegerCameraPixel(self, point):
+  uv = self.ProjectPointIntoFractionalCameraPixel(point)
   u = int(round(uv[0]))
   v = int(round(uv[1]))
   return (u, v)
@@ -471,7 +471,7 @@ class ScannerPart:
 
 # Find the point in space where the ray from a camera pixel (mm coordinates) hits the light sheet from this light source
 
- def CameraPixelIsPointInMyPlane(self, camera, pixel):
+ def CameraPixelInMMIsPointInMyPlane(self, camera, pixel):
   plane = self.GetLightPlane()
   normal = plane[0]
   d = plane[1]
@@ -491,13 +491,13 @@ class ScannerPart:
 
 # Find the point in space where the ray from a camera pixel (pixel coordinates; not necessarily integers) hits the light sheet from this light source
 
- def CameraPixelCoordinatesArePointInMyPlane(self, camera, pixelCoordinates):
+ def CameraPixelIsPointInMyPlane(self, camera, pixelCoordinates):
   pixelU = camera.uMM*(pixelCoordinates[0]/(camera.uPixels - 1.0) - 0.5)
   pixelV = camera.vMM*(pixelCoordinates[1]/(camera.vPixels - 1.0) - 0.5)
   pixel = (pixelU, pixelV)
   if self.debug:
    print(self.name, "Pixel [", pixelCoordinates[0], ", ", pixelCoordinates[1], end = '')
-  tPoint = self.CameraPixelIsPointInMyPlane(camera, pixel)
+  tPoint = self.CameraPixelInMMIsPointInMyPlane(camera, pixel)
   return tPoint
 
 # Convert a point p in the [v, w] plane into a point in absolute 3D space.
@@ -642,11 +642,11 @@ class Scanner:
 
  # pixel is [u, v], not necessarily integers
  def PixelToPointInSpace(self, pixel):
-  return self.lightSource.CameraPixelCoordinatesArePointInMyPlane(self.camera, pixel)
+  return self.lightSource.CameraPixelIsPointInMyPlane(self.camera, pixel)
 
  # point is Vector3()
  def PointInSpaceToPixel(self, point):
-  return self.camera.ProjectPointIntoCameraPlane(point)
+  return self.camera.ProjectPointIntoFractionalCameraPixel(point)
 
  def Turn(self, angle):
   da = angle - self.angle
@@ -723,10 +723,10 @@ class Scanner:
   plane = self.lightSource.GetLightPlane()
   d = plane[0].Dot(point) + plane[1]
   pointInLightSheet = point.Sub(plane[0].Multiply(d))
-  pixel = self.camera.ProjectPointIntoCameraPlane(point)
-  recoveredPoint = self.lightSource.CameraPixelCoordinatesArePointInMyPlane(self.camera, pixel)
+  pixel = self.camera.ProjectPointIntoFractionalCameraPixel(point)
+  recoveredPoint = self.lightSource.CameraPixelIsPointInMyPlane(self.camera, pixel)
   if pixelIn is not None:
-   pixelPoint = self.lightSource.CameraPixelCoordinatesArePointInMyPlane(self.camera, pixelIn)
+   pixelPoint = self.lightSource.CameraPixelIsPointInMyPlane(self.camera, pixelIn)
   if report:
    print("Point " + str(point) + " is " + str(d) + " from the light sheet, where the nearest point is " + str(pointInLightSheet) + ".")
    print("It projects to pixel: " + str(pixel))
@@ -735,6 +735,18 @@ class Scanner:
     print("The input pixel is: " + str(pixelIn))
     print("That pixel in the scanner reconstructs the point as: " + str(pixelPoint))
   return recoveredPoint
+
+ def CheckCornersAndMiddle(self):
+  for x in range(2):
+   px = x*self.camera.uPixels
+   for y in range(2):
+    py = y*self.camera.vPixels
+    pixel = (px, py)
+    point = self.lightSource.CameraPixelIsPointInMyPlane(self.camera, pixel)
+    print("Pixel " + str(pixel) + " projects to point " + str(point))
+  pixel = (self.camera.uPixels/2.0, self.camera.vPixels/2.0)
+  point = self.lightSource.CameraPixelIsPointInMyPlane(self.camera, pixel)
+  print("Pixel " + str(pixel) + " projects to point " + str(point))
 
  def SelfCheck(self, room):
   sum = 0
