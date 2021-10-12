@@ -683,9 +683,9 @@ class ScannerMachine(object):
 			xout=hyp1*math.sin(rrad+tan1) # x output adjusted for rotation around Z axis
 			yout=hyp1*math.cos(rrad+tan1) # y output adjusted for rotation around Z axis
 			
-			newR = rrad - self.oldRotation
-			self.camera1Scanner.scanner.RotateW(newR)
-			self.oldRotation = rrad
+			#newR = rrad - self.oldRotation
+			self.camera1Scanner.Turn(rrad)
+			#self.oldRotation = rrad
 			pixelU = u - halfyres
 			if pixelU < 0.0:
 			 pixelU += 0.5
@@ -697,7 +697,7 @@ class ScannerMachine(object):
 			else:
 			 pixelV -= 0.5
 			pixel = (pixelU, pixelV)
-			cam1point = self.camera1Scanner.lightSource.CameraPixelCoordinatesArePointInMyPlane(self.camera1Scanner.camera, pixel)
+			cam1point = self.camera1Scanner.PixelToPointInSpace(pixel)
 			self.outputAB.append([ cam1point.x, cam1point.y, cam1point.z ])
 			
 			self.output.append([xout,yout,0]) # X, Y, Z coordinates for output. Z is assumed to be 0 for easy import into CAD
@@ -760,9 +760,9 @@ class ScannerMachine(object):
 			xout=hyp1*math.sin(rrad+tan1) # x output adjusted for rotation around Z axis
 			yout=hyp1*math.cos(rrad+tan1) # y output adjusted for rotation around Z axis
 			
-			newR = rrad - self.oldRotation
-			self.camera2Scanner.scanner.RotateW(newR)
-			self.oldRotation = rrad
+			#newR = rrad - self.oldRotation
+			self.camera2Scanner.Turn(rrad)
+			#self.oldRotation = rrad
 			pixelU = u - halfyres
 			if pixelU < 0.0:
 			 pixelU += 0.5
@@ -774,7 +774,7 @@ class ScannerMachine(object):
 			else:
 			 pixelV -= 0.5
 			pixel = (pixelU, pixelV)
-			cam2point = self.camera2Scanner.lightSource.CameraPixelCoordinatesArePointInMyPlane(self.camera2Scanner.camera, pixel)
+			cam2point = self.camera2Scanner.PixelToPointInSpace(pixel)
 			self.outputAB.append([ cam2point.x, cam2point.y, cam2point.z ])
 			
 			self.output.append([xout,yout,0]) # X, Y, Z coordinates for output. Z is assumed to be 0 for easy import into CAD
