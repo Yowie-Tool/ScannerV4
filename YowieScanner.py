@@ -814,7 +814,11 @@ class Scanner:
   minResult = minimize(betterScanner.CostFunction, x0 = minimisationVector, args = (room, pixelsAndAngles, ), callback = betterScanner.Progress)
   #betterScanner.SetParametersFromSelection(minResult)
   if betterScanner.reportProgress:
-   print("Final scanner RMS error (mm): ", maths.sqrt(betterScanner.lastCost))
+   print("Final scanner RMS error (mm): ", maths.sqrt(betterScanner.lastCost/len(room)))
+  for a in angleParameters:
+   betterScanner.parameters[a] %= 2.0*maths.pi
+  betterScanner.MakeScannerFromParameters(betterScanner.parameters, betterScanner.world, betterScanner.lightAng,
+     betterScanner.uPix, betterScanner.vPix, betterScanner.uMM, betterScanner.vMM)
   return betterScanner
 
 
