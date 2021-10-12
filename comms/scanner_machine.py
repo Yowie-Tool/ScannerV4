@@ -725,6 +725,7 @@ class ScannerMachine(object):
 		else:
 			xresolution = 3280
 			yresolution = 2464
+		halfxres = xresolution/2
 		halfyres = yresolution/2
 		aconst = (xresolution*(math.sin(Bconst)))/(math.sin(camangleh))
 		aconstsqrd = math.pow(aconst,2)

@@ -621,9 +621,9 @@ class Scanner:
    self.vPix, uMM =  self.uMM, vMM = self.vMM, focalLength = focalLen)
 
   lightToeIn = self.parameters[10]
-  self.lightSource.RotateV(lightToeIn)
+  self.lightSource.RotateV(-lightToeIn)
   cameraToeIn = self.parameters[11]
-  self.camera.RotateV(cameraToeIn)
+  self.camera.RotateU(cameraToeIn)
 
   lightU = self.parameters[12]
   self.lightSource.RotateU(lightU)
