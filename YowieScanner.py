@@ -579,7 +579,6 @@ class Scanner:
   if self.selectionVector is None:
    self.selectionVector = []
    for s in range(len(parameters)):
-    if not s == focusParameter:
      self.selectionVector.append(s)
 
   return parameters
@@ -716,7 +715,8 @@ class Scanner:
   cameraU = self.parameters[15]
   cameraV = self.parameters[16]
   cameraW = self.parameters[17]
-  result += " camera U, V, W angles: " + str(cameraU) + ", " + str(cameraV) + ", " + str(cameraW) + "\n\n"
+  result += " camera U, V, W angles: " + str(cameraU) + ", " + str(cameraV) + ", " + str(cameraW) + "\n"
+  result += " parameters: " + str(self.parameters) + "\n\n"
   return result
 
  def CheckPoint(self, point, pixelIn, report):
@@ -774,9 +774,8 @@ class Scanner:
   return self.lastCost
 
  def CostFunction(self, minimiserX, room, pixelsAndAngles):
-  scratchScanner = self.Copy()
-  scratchScanner.SetParametersFromSelection(minimiserX)
-  return scratchScanner.CostFunctionWithoutChangingParameters(room, pixelsAndAngles)
+  self.SetParametersFromSelection(minimiserX)
+  return self.CostFunctionWithoutChangingParameters(room, pixelsAndAngles)
 
 # Generate scanners at random, exploring the space of scanners, looking for a chance good fit
 
@@ -813,7 +812,7 @@ class Scanner:
    print("scipy.optimize.minimize using Broyden–Fletcher–Goldfarb–Shanno algorithm ...")
   minimisationVector = betterScanner.GetSelection()
   minResult = minimize(betterScanner.CostFunction, x0 = minimisationVector, args = (room, pixelsAndAngles, ), callback = betterScanner.Progress)
-  betterScanner.SetParametersFromSelection(minResult)
+  #betterScanner.SetParametersFromSelection(minResult)
   if betterScanner.reportProgress:
    print("Final scanner RMS error (mm): ", maths.sqrt(betterScanner.lastCost))
   return betterScanner
