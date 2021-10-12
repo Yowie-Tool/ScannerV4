@@ -534,7 +534,7 @@ class ScannerPart:
 
 distanceParameters = [0, 1, 2, 3, 4, 5, 6, 7, 8]
 focusParameter = 9
-angleParameters = [10, 11, 12, 13, 14, 15, 16, 17]
+angleParameters = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
 
 # Class to hold the parameters needed to build a complete scanner
 # Make a scanner in the standard configuration. The parameters are also recorded in a vector for optimisation.
@@ -576,6 +576,12 @@ class Scanner:
   parameters.append(0) # 16
   parameters.append(0) # 17
 
+  # Whole scanner
+  parameters.append(0) # 18
+  parameters.append(0) # 19
+  parameters.append(0) # 20
+
+
   if self.selectionVector is None:
    self.selectionVector = []
    for s in range(len(parameters)):
@@ -600,7 +606,6 @@ class Scanner:
  def MakeScannerFromParameters(self, parameters, world, lightAng, uPix, vPix, uMM, vMM):
   self.angle = 0 # Assume we start with no rotation
   self.parameters = copy.deepcopy(parameters)
-
   scannerOffset = Vector3(self.parameters[0], self.parameters[1], self.parameters[2])
   lightOffset = Vector3(self.parameters[3], self.parameters[4], self.parameters[5])
   cameraOffset = Vector3(self.parameters[6], self.parameters[7], self.parameters[8])
@@ -631,13 +636,19 @@ class Scanner:
   lightW = self.parameters[14]
   self.lightSource.RotateW(lightW)
 
-
   cameraU = self.parameters[15]
   self.camera.RotateU(cameraU)
   cameraV = self.parameters[16]
   self.camera.RotateV(cameraV)
   cameraW = self.parameters[17]
   self.camera.RotateW(cameraW)
+
+  scannerU = self.parameters[18]
+  self.scanner.RotateU(scannerU)
+  scannerV = self.parameters[19]
+  self.scanner.RotateV(scannerV)
+  scannerW = self.parameters[20]
+  self.scanner.RotateW(scannerW)
 
  # pixel is [u, v], not necessarily integers
  def PixelToPointInSpace(self, pixel):
@@ -716,6 +727,12 @@ class Scanner:
   cameraV = self.parameters[16]
   cameraW = self.parameters[17]
   result += " camera U, V, W angles: " + str(cameraU) + ", " + str(cameraV) + ", " + str(cameraW) + "\n"
+
+  scannerU = self.parameters[18]
+  scannerV = self.parameters[19]
+  scannerW = self.parameters[20]
+  result += " scanner U, V, W angles: " + str(scannerU) + ", " + str(scannerV) + ", " + str(scannerW) + "\n"
+
   result += " parameters: " + str(self.parameters) + "\n\n"
   return result
 
@@ -779,7 +796,7 @@ class Scanner:
 
 # Generate scanners at random, exploring the space of scanners, looking for a chance good fit
 
- def ScatterGun(self, room, pixelsAndAngles, mean, sd, samples):
+ def MonteCarlo(self, room, pixelsAndAngles, mean, sd, samples):
   betterScanner = self.Copy()
   minCost = betterScanner.CostFunctionWithoutChangingParameters(room, pixelsAndAngles)
   if self.reportProgress:
@@ -791,7 +808,7 @@ class Scanner:
     betterScanner = randomScanner
     minCost = cost
     if self.reportProgress:
-     print("Scatter - best cost so far: " + str(minCost))
+     print("Monte Carlo - best cost so far: " + str(minCost))
    self.lastCost = minCost
   return betterScanner
 
@@ -801,7 +818,7 @@ class Scanner:
   self.progressCount += 1
   if not self.progressCount % 10 == 0:
    return
-  print("Last scanner MS error (mm^2): " + str(self.lastCost) + " after " + str(self.progressCount) + " iterations.")
+  print("Scanner sum-of-squares error (mm^2): " + str(self.lastCost) + " after " + str(self.progressCount) + " iterations.")
 
  # Use an optimiser to find a (local) best scanner with minimum cost
 
