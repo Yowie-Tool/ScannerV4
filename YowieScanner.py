@@ -650,6 +650,9 @@ class Scanner:
   scannerW = self.parameters[20]
   self.scanner.RotateW(scannerW)
 
+ def ImposeParameters(self, parameters):
+  self.MakeScannerFromParameters(parameters, self.world, self.lightAng, self.uPix, self.vPix, self.uMM, self.vMM)
+
  # pixel is [u, v], not necessarily integers
  def PixelToPointInSpace(self, pixel):
   return self.lightSource.CameraPixelIsPointInMyPlane(self.camera, pixel)
