@@ -187,7 +187,6 @@ class YowieScreen4(Screen):
 				file_objectDebug.write(uout + " " + vout + " " + rout + " camera2\n")				
 			file_objectDebug.close()
 			
-			
 			# self.usb_stick.disable()
 		except:
 			print('Could not save file')
