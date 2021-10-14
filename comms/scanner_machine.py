@@ -690,7 +690,7 @@ class ScannerMachine(object):
 			#newR = rrad - self.oldRotation
 			self.camera1Scanner.Turn(rrad)
 			#self.oldRotation = rrad
-			pixelU = u - halfyres
+			'''pixelU = u - halfyres
 			if pixelU < 0.0:
 			 pixelU += 0.5
 			else:
@@ -700,7 +700,8 @@ class ScannerMachine(object):
 			 pixelV += 0.5
 			else:
 			 pixelV -= 0.5
-			pixel = (pixelU, pixelV)
+			pixel = (pixelU, pixelV)'''
+			pixel = (u, v)
 			cam1point = self.camera1Scanner.PixelToPointInSpace(pixel)
 			self.outputAB.append([ cam1point.x, cam1point.y, cam1point.z ])
 			
@@ -767,7 +768,7 @@ class ScannerMachine(object):
 			#newR = rrad - self.oldRotation
 			self.camera2Scanner.Turn(rrad)
 			#self.oldRotation = rrad
-			pixelU = u - halfyres
+			'''pixelU = u - halfyres
 			if pixelU < 0.0:
 			 pixelU += 0.5
 			else:
@@ -777,7 +778,8 @@ class ScannerMachine(object):
 			 pixelV += 0.5
 			else:
 			 pixelV -= 0.5
-			pixel = (pixelU, pixelV)
+			pixel = (pixelU, pixelV)'''
+			pixel = (u, v)
 			cam2point = self.camera2Scanner.PixelToPointInSpace(pixel)
 			self.outputAB.append([ cam2point.x, cam2point.y, cam2point.z ])
 			
