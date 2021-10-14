@@ -134,9 +134,12 @@ class YowieScreen4(Screen):
 		self.sm.current = 's4'
 # SAVE OUTPUT
 	def save_output(self):
-		file_path = '/media/pi/SCANFILES/' + "RoomReaderScan.pts"
-		file_pathAB = '/media/pi/SCANFILES/' + "RoomReaderScanAB.pts"
-		file_pathDebug = '/media/pi/SCANFILES/' + 'RoomReaderScanDebug.txt'
+		# file_path = '/media/pi/SCANFILES/' + "RoomReaderScan.pts" # commented out removable drive for the moment
+		file_path = '/home/pi/ScannerV4/Scans/' + "RoomReaderScan.pts"
+		#file_pathAB = '/media/pi/SCANFILES/' + "RoomReaderScanAB.pts"
+		file_pathAB = '/home/pi/ScannerV4/Scans/' + "RoomReaderScanAB.pts"
+		#file_pathDebug = '/media/pi/SCANFILES/' + 'RoomReaderScanDebug.txt'
+		file_pathDebug = '/home/pi/ScannerV4/Scans/' + 'RoomReaderScanDebug.txt'
 		# if self.usb_stick.is_usb_mounted_flag == True:
 		# 	file_path = self.usb_stick.get_path() + "RoomReaderScan.pts"
 		# 	#currently only one file name.
