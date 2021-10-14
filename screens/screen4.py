@@ -171,20 +171,20 @@ class YowieScreen4(Screen):
 			for export in range(exportint):
 				print(export)
 				#I've deleted Z and RGB from this now. exports just a text file with X,Y coordinates
-				xout = str(self.m.for_calc_1[export][0])
-				yout = str(self.m.for_calc_1[export][1])
+				uout = str(self.m.for_calc_1[export][0])
+				vout = str(self.m.for_calc_1[export][1])
 				rout = str(self.m.for_calc_1[export][2])
-				file_objectDebug.write(xout + " " + yout + " " + rout + " camera1\n")
+				file_objectDebug.write(uout + " " + vout + " " + rout + " camera1\n")
 				
 			exportint = len(self.m.for_calc_2)
 			for export in range(exportint):
 				print(export)
 				
 				#I've deleted Z and RGB from this now. exports just a text file with X,Y coordinates
-				xout = str(self.m.for_calc_2[export][0])
-				yout = str(self.m.for_calc_2[export][1])
+				uout = str(self.m.for_calc_2[export][0])
+				vout = str(self.m.for_calc_2[export][1])
 				rout = str(self.m.for_calc_2[export][2])
-				file_objectDebug.write(xout + " " + yout + " " + rout + " camera2\n")				
+				file_objectDebug.write(uout + " " + vout + " " + rout + " camera2\n")				
 			file_objectDebug.close()
 			
 			# self.usb_stick.disable()
