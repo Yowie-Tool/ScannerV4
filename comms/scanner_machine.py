@@ -690,7 +690,7 @@ class ScannerMachine(object):
 			yout=hyp1*math.cos(rrad+tan1) # y output adjusted for rotation around Z axis
 			
 			#newR = rrad - self.oldRotation
-			self.camera1Scanner.Turn(rrad)
+			self.camera1Scanner.Turn(-rrad)
 			#self.oldRotation = rrad
 			'''pixelU = u - halfyres
 			if pixelU < 0.0:
