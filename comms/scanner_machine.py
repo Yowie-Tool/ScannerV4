@@ -703,7 +703,7 @@ class ScannerMachine(object):
 			else:
 			 pixelV -= 0.5
 			pixel = (pixelU, pixelV)'''
-			pixel = (u, v)
+			pixel = (v, u)
 			cam1point = self.camera1Scanner.PixelToPointInSpace(pixel)
 			self.outputAB.append([ cam1point.x, cam1point.y, cam1point.z ])
 			file_objectDebugExtra.write(str(u) + " " + str(v) + " " + str(r) + " camera1\n")
