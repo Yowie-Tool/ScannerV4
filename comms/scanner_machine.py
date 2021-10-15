@@ -551,6 +551,8 @@ class ScannerMachine(object):
 		print ("long range points captured %d" % (succesful2))    
 
 	def calculate_cloud_1(self,for_calc,calibration):
+		file_pathDebugExtra = '/home/pi/ScannerV4/Scans/' + 'RoomReaderScanDebug2.txt'
+		file_objectDebugExtra = open(file_pathDebugExtra, "w")
 		self.oldRotation = self.photoangle1[0]
 		readlines = len(for_calc)
 		camangleh = ((float(calibration[0]))/(180/math.pi))
@@ -704,7 +706,7 @@ class ScannerMachine(object):
 			pixel = (u, v)
 			cam1point = self.camera1Scanner.PixelToPointInSpace(pixel)
 			self.outputAB.append([ cam1point.x, cam1point.y, cam1point.z ])
-			
+			file_objectDebugExtra.write(u + " " + v + " " + r + " camera1\n")
 			self.output.append([xout,yout,0]) # X, Y, Z coordinates for output. Z is assumed to be 0 for easy import into CAD
 	
 		log('CALCULATED CLOUD 1!')
@@ -712,6 +714,7 @@ class ScannerMachine(object):
 		self.sm.get_screen('s3').update_scan_progress_output(string_to_update_screen_with)
 		self.sm.get_screen('s3').update_average_distance_output()
 		self.sm.get_screen('s3').update_max_distance_output()
+		file_objectDebugExtra.close()
   
 	def calculate_cloud_2(self,for_calc,calibration):
 		self.oldRotation = self.photoangle2[0]
