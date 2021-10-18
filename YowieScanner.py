@@ -7,7 +7,7 @@
 
 import copy, sys
 import math as maths
-from random import seed, random, gauss
+from random import seed, random, gauss, uniform
 from scipy.optimize import minimize
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -785,7 +785,7 @@ class Scanner:
   return room
 
 
- def CostFunctionWithoutChangingParameters(self, room, pixelsAndAngles):
+ def PointCostFunctionWithoutChangingParameters(self, room, pixelsAndAngles):
   recoveredRoom = self.ReconstructRoomFromPixelsAndAngles(pixelsAndAngles)
   self.lastCost = 0.0
   for point, rPoint in zip(room, recoveredRoom):
@@ -793,20 +793,59 @@ class Scanner:
    self.lastCost += d.Length2()
   return self.lastCost
 
- def CostFunction(self, minimiserX, room, pixelsAndAngles):
+ def PointCostFunction(self, minimiserX, room, pixelsAndAngles):
   self.SetParametersFromSelection(minimiserX)
-  return self.CostFunctionWithoutChangingParameters(room, pixelsAndAngles)
+  return self.PointCostFunctionWithoutChangingParameters(room, pixelsAndAngles)
+
+ def TriangleCostFunctionWithoutChangingParameters(self, triangleSideLength, pixelsAndAngles):
+  self.lastCost = 0.0
+  triangleSideLength2 = triangleSideLength*triangleSideLength
+  trianglePixels = pixelsAndAngles[0]
+  angles = pixelsAndAngles[1]
+  for triangle, angle in zip(trianglePixels, angles):
+   self.Turn(angle)
+   vertices = []
+   for pixel in triangle:
+    vertices.append(self.PixelToPointInSpace(pixel))
+   d0 = vertices[0].Sub(vertices[1])
+   d0 = abs(d0.Length2() - triangleSideLength2)
+   d1 = vertices[1].Sub(vertices[2])
+   d1 = abs(d1.Length2() - triangleSideLength2)
+   d2 = vertices[2].Sub(vertices[0])
+   d2 = abs(d2.Length2() - triangleSideLength2*maths.sqrt(2.0))
+   self.lastCost += d0 + d1 + d2
+  return self.lastCost
+
+ def TriangleCostFunction(self, minimiserX, triangleSideLength, pixelsAndAngles):
+  self.SetParametersFromSelection(minimiserX)
+  return self.TriangleCostFunctionWithoutChangingParameters(triangleSideLength, pixelsAndAngles)
 
 # Generate scanners at random, exploring the space of scanners, looking for a chance good fit
 
- def MonteCarlo(self, room, pixelsAndAngles, mean, sd, samples):
+ def MonteCarloPoints(self, room, pixelsAndAngles, mean, sd, samples):
   betterScanner = self.Copy()
-  minCost = betterScanner.CostFunctionWithoutChangingParameters(room, pixelsAndAngles)
+  minCost = betterScanner.PointCostFunctionWithoutChangingParameters(room, pixelsAndAngles)
   if self.reportProgress:
    print("Intitial cost: " + str(minCost))
   for s in range(samples):
    randomScanner = self.PerturbedCopy(mean, sd)
-   cost = randomScanner.CostFunctionWithoutChangingParameters(room, pixelsAndAngles)
+   cost = randomScanner.PointCostFunctionWithoutChangingParameters(room, pixelsAndAngles)
+   if cost < minCost:
+    betterScanner = randomScanner
+    minCost = cost
+    if self.reportProgress:
+     print("Monte Carlo - best cost so far: " + str(minCost))
+   self.lastCost = minCost
+  return betterScanner
+
+ def MonteCarloTriangles(self, triangleSideLength, pixelsAndAngles, mean, sd, samples):
+  betterScanner = self.Copy()
+  minCost = betterScanner.TriangleCostFunctionWithoutChangingParameters(triangleSideLength, pixelsAndAngles)
+  if self.reportProgress:
+   print("Intitial cost: " + str(minCost))
+  for s in range(samples):
+   randomScanner = self.PerturbedCopy(mean, sd)
+   cost = randomScanner.TriangleCostFunctionWithoutChangingParameters(triangleSideLength, pixelsAndAngles)
    if cost < minCost:
     betterScanner = randomScanner
     minCost = cost
@@ -825,14 +864,13 @@ class Scanner:
 
  # Use an optimiser to find a (local) best scanner with minimum cost
 
- def Optimise(self, room, pixelsAndAngles):
+ def OptimisePoints(self, room, pixelsAndAngles):
   betterScanner = self.Copy()
   betterScanner.progressCount = 0
   if betterScanner.reportProgress:
-   print("scipy.optimize.minimize using Broyden–Fletcher–Goldfarb–Shanno algorithm ...")
+   print("scipy.optimize.minimize for point pattern using Broyden–Fletcher–Goldfarb–Shanno algorithm ...")
   minimisationVector = betterScanner.GetSelection()
-  minResult = minimize(betterScanner.CostFunction, x0 = minimisationVector, args = (room, pixelsAndAngles, ), callback = betterScanner.Progress)
-  #betterScanner.SetParametersFromSelection(minResult)
+  minResult = minimize(betterScanner.PointCostFunction, x0 = minimisationVector, args = (room, pixelsAndAngles,), callback = betterScanner.Progress)
   if betterScanner.reportProgress:
    print("Final scanner RMS error (mm): ", maths.sqrt(betterScanner.lastCost/len(room)))
   for a in angleParameters:
@@ -841,4 +879,17 @@ class Scanner:
      betterScanner.uPix, betterScanner.vPix, betterScanner.uMM, betterScanner.vMM)
   return betterScanner
 
-
+ def OptimiseTriangles(self, triangleSideLength, pixelsAndAngles):
+  betterScanner = self.Copy()
+  betterScanner.progressCount = 0
+  if betterScanner.reportProgress:
+   print("scipy.optimize.minimize for triangle pattern using Broyden–Fletcher–Goldfarb–Shanno algorithm ...")
+  minimisationVector = betterScanner.GetSelection()
+  minResult = minimize(betterScanner.TriangleCostFunction, x0 = minimisationVector, args = (triangleSideLength, pixelsAndAngles,), callback = betterScanner.Progress)
+  if betterScanner.reportProgress:
+   print("Final scanner RMS error (mm): ", maths.sqrt(betterScanner.lastCost/(3.0*len(pixelsAndAngles))))
+  for a in angleParameters:
+   betterScanner.parameters[a] %= 2.0*maths.pi
+  betterScanner.MakeScannerFromParameters(betterScanner.parameters, betterScanner.world, betterScanner.lightAng,
+     betterScanner.uPix, betterScanner.vPix, betterScanner.uMM, betterScanner.vMM)
+  return betterScanner
