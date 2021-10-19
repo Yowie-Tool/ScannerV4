@@ -544,7 +544,8 @@ class Scanner:
   parameters = self.SetParameters(scannerOffset, lightOffset, lightToeIn, cameraOffset, cameraToeIn, focalLen)
   self.MakeScannerFromParameters(parameters, world, lightAng, uPix, vPix, uMM, vMM)
   self.progressCount = 0
-  self.lastCost = 0.0
+  self.lastSumOfSquaresCost = 0.0
+  self.lastRMSCost = 0.0
   self.reportProgress = True
 
  def SetParameters(self, scannerOffset, lightOffset, lightToeIn, cameraOffset, cameraToeIn, focalLen):
@@ -787,18 +788,19 @@ class Scanner:
 
  def PointCostFunctionWithoutChangingParameters(self, room, pixelsAndAngles):
   recoveredRoom = self.ReconstructRoomFromPixelsAndAngles(pixelsAndAngles)
-  self.lastCost = 0.0
+  self.lastSumOfSquaresCost = 0.0
   for point, rPoint in zip(room, recoveredRoom):
    d = point.Sub(rPoint)
-   self.lastCost += d.Length2()
-  return self.lastCost
+   self.lastSumOfSquaresCost += d.Length2()
+  self.lastRMSCost = maths.sqrt(self.lastSumOfSquaresCost/len(pixelsAndAngles[0]))
+  return self.lastSumOfSquaresCost
 
  def PointCostFunction(self, minimiserX, room, pixelsAndAngles):
   self.SetParametersFromSelection(minimiserX)
   return self.PointCostFunctionWithoutChangingParameters(room, pixelsAndAngles)
 
  def TriangleCostFunctionWithoutChangingParameters(self, triangleSideLength, pixelsAndAngles):
-  self.lastCost = 0.0
+  self.lastSumOfSquaresCost = 0.0
   triangleSideLength2 = triangleSideLength*triangleSideLength
   trianglePixels = pixelsAndAngles[0]
   angles = pixelsAndAngles[1]
@@ -813,8 +815,9 @@ class Scanner:
    d1 = abs(d1.Length2() - triangleSideLength2)
    d2 = vertices[2].Sub(vertices[0])
    d2 = abs(d2.Length2() - triangleSideLength2*maths.sqrt(2.0))
-   self.lastCost += d0 + d1 + d2
-  return self.lastCost
+   self.lastSumOfSquaresCost += d0 + d1 + d2
+  self.lastRMSCost = maths.sqrt(self.lastSumOfSquaresCost/(3.0*len(pixelsAndAngles[0])))
+  return self.lastSumOfSquaresCost
 
  def TriangleCostFunction(self, minimiserX, triangleSideLength, pixelsAndAngles):
   self.SetParametersFromSelection(minimiserX)
@@ -825,33 +828,31 @@ class Scanner:
  def MonteCarloPoints(self, room, pixelsAndAngles, mean, sd, samples):
   betterScanner = self.Copy()
   minCost = betterScanner.PointCostFunctionWithoutChangingParameters(room, pixelsAndAngles)
-  if self.reportProgress:
-   print("Intitial cost: " + str(minCost))
+  if betterScanner.reportProgress:
+   print("Intitial RMS cost (mm): ", betterScanner.lastRMSCost)
   for s in range(samples):
    randomScanner = self.PerturbedCopy(mean, sd)
    cost = randomScanner.PointCostFunctionWithoutChangingParameters(room, pixelsAndAngles)
    if cost < minCost:
     betterScanner = randomScanner
     minCost = cost
-    if self.reportProgress:
-     print("Monte Carlo - best cost so far: " + str(minCost))
-   self.lastCost = minCost
+    if betterScanner.reportProgress:
+     print("Monte Carlo - best RMS cost so far (mm): ", betterScanner.lastRMSCost)
   return betterScanner
 
  def MonteCarloTriangles(self, triangleSideLength, pixelsAndAngles, mean, sd, samples):
   betterScanner = self.Copy()
   minCost = betterScanner.TriangleCostFunctionWithoutChangingParameters(triangleSideLength, pixelsAndAngles)
-  if self.reportProgress:
-   print("Intitial cost: " + str(minCost))
+  if betterScanner.reportProgress:
+   print("Intitial RMS cost (mm): ", betterScanner.lastRMSCost)
   for s in range(samples):
    randomScanner = self.PerturbedCopy(mean, sd)
    cost = randomScanner.TriangleCostFunctionWithoutChangingParameters(triangleSideLength, pixelsAndAngles)
    if cost < minCost:
     betterScanner = randomScanner
     minCost = cost
-    if self.reportProgress:
-     print("Monte Carlo - best cost so far: " + str(minCost))
-   self.lastCost = minCost
+    if betterScanner.reportProgress:
+     print("Monte Carlo - best RMS cost so far (mm): ", betterScanner.lastRMSCost)
   return betterScanner
 
  def Progress(self, x):
@@ -860,7 +861,7 @@ class Scanner:
   self.progressCount += 1
   if not self.progressCount % 10 == 0:
    return
-  print("Scanner sum-of-squares error (mm^2): " + str(self.lastCost) + " after " + str(self.progressCount) + " iterations.")
+  print("Scanner RMS error (mm): " + str(self.lastRMSCost) + " after " + str(self.progressCount) + " iterations.")
 
  # Use an optimiser to find a (local) best scanner with minimum cost
 
@@ -872,9 +873,12 @@ class Scanner:
   minimisationVector = betterScanner.GetSelection()
   minResult = minimize(betterScanner.PointCostFunction, x0 = minimisationVector, args = (room, pixelsAndAngles,), callback = betterScanner.Progress)
   if betterScanner.reportProgress:
-   print("Final scanner RMS error (mm): ", maths.sqrt(betterScanner.lastCost/len(room)))
+   print("Final scanner RMS error (mm): ", betterScanner.lastRMSCost )
   for a in angleParameters:
-   betterScanner.parameters[a] %= 2.0*maths.pi
+   ang = betterScanner.parameters[a]%(2.0*maths.pi)
+   if ang > maths.pi:
+    ang = ang - 2.0*maths.pi
+   betterScanner.parameters[a] = ang
   betterScanner.MakeScannerFromParameters(betterScanner.parameters, betterScanner.world, betterScanner.lightAng,
      betterScanner.uPix, betterScanner.vPix, betterScanner.uMM, betterScanner.vMM)
   return betterScanner
@@ -887,9 +891,12 @@ class Scanner:
   minimisationVector = betterScanner.GetSelection()
   minResult = minimize(betterScanner.TriangleCostFunction, x0 = minimisationVector, args = (triangleSideLength, pixelsAndAngles,), callback = betterScanner.Progress)
   if betterScanner.reportProgress:
-   print("Final scanner RMS error (mm): ", maths.sqrt(betterScanner.lastCost/(3.0*len(pixelsAndAngles))))
+   print("Final scanner RMS error (mm): ", betterScanner.lastRMSCost )
   for a in angleParameters:
-   betterScanner.parameters[a] %= 2.0*maths.pi
+   ang = betterScanner.parameters[a]%(2.0*maths.pi)
+   if ang > maths.pi:
+    ang = ang - 2.0*maths.pi
+   betterScanner.parameters[a] = ang
   betterScanner.MakeScannerFromParameters(betterScanner.parameters, betterScanner.world, betterScanner.lightAng,
      betterScanner.uPix, betterScanner.vPix, betterScanner.uMM, betterScanner.vMM)
   return betterScanner
