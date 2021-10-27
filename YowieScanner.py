@@ -186,6 +186,11 @@ class Vector3:
    print("Attempt to normalize zero-length vector")
   return self.Multiply(1.0/maths.sqrt(d))
 
+ # Put this vector into the (u, v, w) coordinate system
+ # (u, v, w) must be unit vectors
+ def InOtherCoordinates(self, u, v, w):
+  return Vector3(self.Dot(u), self.Dot(v), self.Dot(w))
+
  def __str__(self):
   return 'Vector3(' + str(self.x) + ', ' +  str(self.y) + ', ' +  str(self.z) + ')' 
 
@@ -679,7 +684,43 @@ class Scanner:
  def DebugOff(self):
   self.scanner.DebugOff()
 
-# Make a copy of a scanner perturbed by small Gaussian amounts with mean and sd standard deviation.
+ # The optimiser has no way of telling if the camera is above or below the light sheet...
+
+ def MirrorTheCameraInTheLightSheet(self):
+  lightSheetPlane = self.lightSource.GetLightPlane()
+  cameraPosition = self.camera.AbsoluteOffset()
+  distance = lightSheetPlane[0].Dot(cameraPosition) + lightSheetPlane[1]
+  offset = lightSheetPlane[0].Multiply(-2*distance)
+  cameraPosition = cameraPosition.Add(offset).Sub(self.camera.parent.AbsoluteOffset())
+
+  cameraU = self.camera.u.InOtherCoordinates(self.lightSource.u, self.lightSource.v, self.lightSource.w)
+  cameraU = Vector3(-cameraU.x, cameraU.y, cameraU.z)
+  cameraU = cameraU.InOtherCoordinates(self.world.u, self.world.v, self.world.w)
+  cameraV = self.camera.v.InOtherCoordinates(self.lightSource.u, self.lightSource.v, self.lightSource.w)
+  cameraV = Vector3(-cameraV.x, cameraV.y, cameraV.z)
+  cameraV = cameraV.InOtherCoordinates(self.world.u, self.world.v, self.world.w)
+  cameraW = self.camera.w.InOtherCoordinates(self.lightSource.u, self.lightSource.v, self.lightSource.w)
+  cameraW = Vector3(-cameraW.x, cameraW.y, cameraW.z)
+  cameraW = cameraW.InOtherCoordinates(self.world.u, self.world.v, self.world.w)
+
+  self.camera.offset = cameraPosition
+  self.camera.u = cameraU
+  self.camera.v = cameraV
+  self.camera.w = cameraW
+
+  self.parameters[6] = self.camera.offset.x
+  self.parameters[7] = self.camera.offset.y
+  self.parameters[8] = self.camera.offset.z
+
+  # TODO - this needs to be sorted out
+  cameraU = self.parameters[15]
+  self.camera.RotateU(cameraU)
+  cameraV = self.parameters[16]
+  self.camera.RotateV(cameraV)
+  cameraW = self.parameters[17]
+  self.camera.RotateW(cameraW)
+
+ # Make a copy of a scanner perturbed by small Gaussian amounts with mean and sd standard deviation.
 
  def PerturbedCopy(self, mean, sd):
   result = self.Copy()
