@@ -87,22 +87,20 @@ class ScannerMachine(object):
 		self.s = serial_connection.SerialConnection(self, self.sm)
 		self.s.establish_connection()
 		self.world = ScannerPart()
-		
-		'''
-		self.camera1Scanner = Scanner(world, Vector3(0, 0, 0), Vector3(36, 0, 23.15), 0.454, Vector3(-7.75, 0, 352.0), 2464, 3280, 2.76, 3.68, 8) #Height set
-		self.camera1Scanner.camera.RotateV(20.32*math.pi/180.0)
-		self.camera2Scanner = Scanner(world, Vector3(0, 0, 0), Vector3(36, 0, 23.15), 0.454, Vector3(-24.8, 0, 436.0), 2464, 3280, 2.76, 3.68, 25)
-		self.camera2Scanner.camera.RotateV(10.94*math.pi/180.0)
-		'''
-		 		 
 		self.camera1Scanner = Scanner(self.world, scannerOffset = Vector3(0, 0, 0), lightOffset = Vector3(36, 0, 0), lightAng = 0.454, lightToeIn = 0,
 		 cameraOffset = Vector3(-7.75, 0, 352.0), cameraToeIn = -20.32*maths.pi/180.0, uPix = 2464, vPix = 3280, uMM = 2.76, vMM = 3.68, focalLen = 8)
-		 
-		parameters = [0, 0, 0, 36, 0, 0, 36.29020647040032, -64.73034918263649, 347.2584403909511, 9.132270456355052, 0.0, 2.536641779027073, 0.09830280745876545, 0.0014337786420365016, 0.007458111749965841, 3.344304399002978, 6.270129696264745, 1.5628220387349634, 6.283153237497993, 6.283152870577741, 6.221876183673617]
 
+		# From the optimiser. RMS = 2.52mm
+		parameters = [0, 0, 0, 36, 0, 0, 12.439261507779436, 85.07398479331971, 307.37393494542715, 8, 0.0, 1.0145322214287944, 0.011076482035381101, 
+		-7.119938967292683e-07, -2.7645354041538894e-06, -1.441521377175576, -0.15282795801825255, 1.4866218267968678, -9.38482980217259e-09, -2.8090019199566996e-09, -0.22434910788453966]
 		self.camera1Scanner.ImposeParameters(parameters)
+
+
 		self.camera2Scanner= Scanner(self.world, scannerOffset = Vector3(0, 0, 0), lightOffset = Vector3(36, 0, 23.15), lightAng = 0.454, lightToeIn = 0, cameraOffset = 
 		 Vector3(-24.8, 0, 436.0), cameraToeIn = -10.94*math.pi/180.0, uPix = 2464, vPix = 3280, uMM = 2.76, vMM = 3.68, focalLen = 25)
+		#parameters = [0, 0, 0, 36, 0, 0, 12.439261507779436, 85.07398479331971, 307.37393494542715, 8, 0.0, 1.0145322214287944, 0.011076482035381101, 
+		#-7.119938967292683e-07, -2.7645354041538894e-06, -1.441521377175576, -0.15282795801825255, 1.4866218267968678, -9.38482980217259e-09, -2.8090019199566996e-09, -0.22434910788453966]
+		#self.camera2Scanner.ImposeParameters(parameters)
 		
 		self.oldRotation = 0.0
 		if sys.platform != 'win32' and sys.platform != 'darwin':
@@ -689,23 +687,11 @@ class ScannerMachine(object):
 			xout=hyp1*math.sin(rrad+tan1) # x output adjusted for rotation around Z axis
 			yout=hyp1*math.cos(rrad+tan1) # y output adjusted for rotation around Z axis
 			
-			#newR = rrad - self.oldRotation
 			self.camera1Scanner.Turn(-rrad)
-			#self.oldRotation = rrad
-			'''pixelU = u - halfyres
-			if pixelU < 0.0:
-			 pixelU += 0.5
-			else:
-			 pixelU -= 0.5
-			pixelV = v - halfxres
-			if pixelV < 0.0:
-			 pixelV += 0.5
-			else:
-			 pixelV -= 0.5
-			pixel = (pixelU, pixelV)'''
-			pixel = (v, u)
+			pixel = (v, u) #Hmmm...
 			cam1point = self.camera1Scanner.PixelToPointInSpace(pixel)
 			self.outputAB.append([ cam1point.x, cam1point.y, cam1point.z ])
+			
 			file_objectDebugExtra.write(str(u) + " " + str(v) + " " + str(r) + " camera1\n")
 			self.output.append([xout,yout,0]) # X, Y, Z coordinates for output. Z is assumed to be 0 for easy import into CAD
 	
@@ -768,21 +754,9 @@ class ScannerMachine(object):
 			xout=hyp1*math.sin(rrad+tan1) # x output adjusted for rotation around Z axis
 			yout=hyp1*math.cos(rrad+tan1) # y output adjusted for rotation around Z axis
 			
-			#newR = rrad - self.oldRotation
+
 			self.camera2Scanner.Turn(rrad)
-			#self.oldRotation = rrad
-			'''pixelU = u - halfyres
-			if pixelU < 0.0:
-			 pixelU += 0.5
-			else:
-			 pixelU -= 0.5
-			pixelV = v - halfxres
-			if pixelV < 0.0:
-			 pixelV += 0.5
-			else:
-			 pixelV -= 0.5
-			pixel = (pixelU, pixelV)'''
-			pixel = (u, v)
+			pixel = (v, u)
 			cam2point = self.camera2Scanner.PixelToPointInSpace(pixel)
 			self.outputAB.append([ cam2point.x, cam2point.y, cam2point.z ])
 			
