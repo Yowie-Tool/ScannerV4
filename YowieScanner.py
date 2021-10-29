@@ -849,13 +849,14 @@ class Scanner:
    self.Turn(angle)
    vertices = []
    for pixel in triangle:
-    vertices.append(self.PixelToPointInSpace(pixel))
+    v = self.PixelToPointInSpace(pixel)
+    vertices.append(v)
    d0 = vertices[0].Sub(vertices[1])
    d0 = abs(d0.Length2() - triangleSideLength2)
    d1 = vertices[1].Sub(vertices[2])
    d1 = abs(d1.Length2() - triangleSideLength2)
    d2 = vertices[2].Sub(vertices[0])
-   d2 = abs(d2.Length2() - triangleSideLength2*maths.sqrt(2.0))
+   d2 = abs(d2.Length2() - triangleSideLength2*2.0)
    self.lastSumOfSquaresCost += d0 + d1 + d2
   self.lastRMSCost = maths.sqrt(self.lastSumOfSquaresCost/(3.0*len(pixelsAndAngles[0])))
   return self.lastSumOfSquaresCost
