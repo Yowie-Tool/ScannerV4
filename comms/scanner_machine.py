@@ -683,7 +683,7 @@ class ScannerMachine(object):
 			#self.alllengths.append(hyp1)
 			#self.averagedistance=np.mean(self.alllengths)
 			#tan1=math.atan(x1/y1) #find theta angle for new triangle				
-			#rrad=r/(180/math.pi) # rotation of unit in radians
+			rrad=r/(180/math.pi) # rotation of unit in radians
 			#xout=hyp1*math.sin(rrad+tan1) # x output adjusted for rotation around Z axis
 			#yout=hyp1*math.cos(rrad+tan1) # y output adjusted for rotation around Z axis
 			
