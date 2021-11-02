@@ -134,27 +134,24 @@ class YowieScreen4(Screen):
 		self.sm.current = 's4'
 # SAVE OUTPUT
 	def save_output(self):
-		# file_path = '/media/pi/SCANFILES/' + "RoomReaderScan.pts" # commented out removable drive for the moment
-		file_path = '/home/pi/ScannerV4/Scans/' + "RoomReaderScan.pts"
-		#file_pathAB = '/media/pi/SCANFILES/' + "RoomReaderScanAB.pts"
-		file_pathAB = '/home/pi/ScannerV4/Scans/' + "RoomReaderScanAB.pts"
-		#file_pathDebug = '/media/pi/SCANFILES/' + 'RoomReaderScanDebug.txt'
-		file_pathDebug = '/home/pi/ScannerV4/Scans/' + 'RoomReaderScanDebug.txt'
+		# file_path = '/media/pi/SCANFILES/' + "RoomReaderScan.pts" # Removable drive now a duplicate of the file saved in the Scans folder
+		# file_path = '/home/pi/ScannerV4/Scans/' + "RoomReaderScan.pts"
+		file_pathAB = '/media/roomreader/SCANFILES/' + "RoomReaderScanAB.pts"
+		# file_pathAB = '/home/pi/ScannerV4/Scans/' + "RoomReaderScanAB.pts" # Debug removed, done in the main program
 		# if self.usb_stick.is_usb_mounted_flag == True:
 		# 	file_path = self.usb_stick.get_path() + "RoomReaderScan.pts"
 		# 	#currently only one file name.
 		try:
-			file_object = open(file_path, "w")
-			print("Saving points file")
-			exportint = len(self.m.output)
-			for export in range(exportint):
-				print(export)
-				#I've deleted Z and RGB from this now. exports just a text file with X,Y coordinates
-				xout = str(self.m.output[export][0])
-				yout = str(self.m.output[export][1])
-				zout = str(self.m.output[export][2])
-				file_object.write(xout + " " + yout + " " + zout + "\n")
-			file_object.close()
+			#file_object = open(file_path, "w") # Now swapping to Vector method only
+			#print("Saving points file")
+			#exportint = len(self.m.output)
+			#for export in range(exportint):
+			#	print(export)
+			#	xout = str(self.m.output[export][0])
+			#	yout = str(self.m.output[export][1])
+			#	zout = str(self.m.output[export][2])
+			#	file_object.write(xout + " " + yout + " " + zout + "\n")
+			#file_object.close()
 			file_objectAB = open(file_pathAB, "w")
 			
 			exportint = len(self.m.outputAB)
@@ -168,27 +165,6 @@ class YowieScreen4(Screen):
 				file_objectAB.write(xout + " " + yout + " " + zout + "\n")
 			file_objectAB.close()
 			
-			file_objectDebug = open(file_pathDebug, "w")
-			
-			exportint = len(self.m.for_calc_1)
-			for export in range(exportint):
-				print(export)
-				#I've deleted Z and RGB from this now. exports just a text file with X,Y coordinates
-				uout = str(self.m.for_calc_1[export][0])
-				vout = str(self.m.for_calc_1[export][1])
-				rout = str(self.m.for_calc_1[export][2])
-				file_objectDebug.write(uout + " " + vout + " " + rout + " camera1\n")
-				
-			exportint = len(self.m.for_calc_2)
-			for export in range(exportint):
-				print(export)
-				
-				#I've deleted Z and RGB from this now. exports just a text file with X,Y coordinates
-				uout = str(self.m.for_calc_2[export][0])
-				vout = str(self.m.for_calc_2[export][1])
-				rout = str(self.m.for_calc_2[export][2])
-				file_objectDebug.write(uout + " " + vout + " " + rout + " camera2\n")				
-			file_objectDebug.close()
 			
 			# self.usb_stick.disable()
 		except:
