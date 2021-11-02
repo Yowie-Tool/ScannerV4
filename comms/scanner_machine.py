@@ -693,10 +693,7 @@ class ScannerMachine(object):
 			pixel = (v, u) #Hmmm...
 			cam1point = self.camera1Scanner.PixelToPointInSpace(pixel)
 			self.outputAB.append([ cam1point.x, cam1point.y, cam1point.z ])
-			xout = str(self.outputAB[export][0])
-			yout = str(self.outputAB[export][1])
-			zout = str(self.outputAB[export][2])
-			file_objectAB.write(xout + " " + yout + " " + zout + "\n")
+			file_objectAB.write(str(cam1point.x) + " " + str(cam1point.y) + " " + str(cam1point.z) + "\n")
 			
 			file_objectDebugExtra.write(str(u) + " " + str(v) + " " + str(r) + " camera1\n")
 			#self.output.append([xout,yout,0]) # X, Y, Z coordinates for output. Z is assumed to be 0 for easy import into CAD
