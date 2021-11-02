@@ -142,16 +142,7 @@ class YowieScreen4(Screen):
 		# 	file_path = self.usb_stick.get_path() + "RoomReaderScan.pts"
 		# 	#currently only one file name.
 		try:
-			#file_object = open(file_path, "w") # Now swapping to Vector method only
-			#print("Saving points file")
-			#exportint = len(self.m.output)
-			#for export in range(exportint):
-			#	print(export)
-			#	xout = str(self.m.output[export][0])
-			#	yout = str(self.m.output[export][1])
-			#	zout = str(self.m.output[export][2])
-			#	file_object.write(xout + " " + yout + " " + zout + "\n")
-			#file_object.close()
+
 			file_objectAB = open(file_pathAB, "w")
 			
 			exportint = len(self.m.outputAB)
