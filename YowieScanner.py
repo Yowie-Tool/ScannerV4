@@ -7,7 +7,7 @@
 
 import copy, sys
 import math as maths
-from random import seed, random, gauss
+from random import seed, random, gauss, uniform
 from scipy.optimize import minimize
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -185,6 +185,11 @@ class Vector3:
   if d <= 0.0:
    print("Attempt to normalize zero-length vector")
   return self.Multiply(1.0/maths.sqrt(d))
+
+ # Put this vector into the (u, v, w) coordinate system
+ # (u, v, w) must be unit vectors
+ def InOtherCoordinates(self, u, v, w):
+  return Vector3(self.Dot(u), self.Dot(v), self.Dot(w))
 
  def __str__(self):
   return 'Vector3(' + str(self.x) + ', ' +  str(self.y) + ', ' +  str(self.z) + ')' 
@@ -544,7 +549,8 @@ class Scanner:
   parameters = self.SetParameters(scannerOffset, lightOffset, lightToeIn, cameraOffset, cameraToeIn, focalLen)
   self.MakeScannerFromParameters(parameters, world, lightAng, uPix, vPix, uMM, vMM)
   self.progressCount = 0
-  self.lastCost = 0.0
+  self.lastSumOfSquaresCost = 0.0
+  self.lastRMSCost = 0.0
   self.reportProgress = True
 
  def SetParameters(self, scannerOffset, lightOffset, lightToeIn, cameraOffset, cameraToeIn, focalLen):
@@ -678,7 +684,43 @@ class Scanner:
  def DebugOff(self):
   self.scanner.DebugOff()
 
-# Make a copy of a scanner perturbed by small Gaussian amounts with mean and sd standard deviation.
+ # The optimiser has no way of telling if the camera is above or below the light sheet...
+
+ def MirrorTheCameraInTheLightSheet(self):
+  lightSheetPlane = self.lightSource.GetLightPlane()
+  cameraPosition = self.camera.AbsoluteOffset()
+  distance = lightSheetPlane[0].Dot(cameraPosition) + lightSheetPlane[1]
+  offset = lightSheetPlane[0].Multiply(-2*distance)
+  cameraPosition = cameraPosition.Add(offset).Sub(self.camera.parent.AbsoluteOffset())
+
+  cameraU = self.camera.u.InOtherCoordinates(self.lightSource.u, self.lightSource.v, self.lightSource.w)
+  cameraU = Vector3(-cameraU.x, cameraU.y, cameraU.z)
+  cameraU = cameraU.InOtherCoordinates(self.world.u, self.world.v, self.world.w)
+  cameraV = self.camera.v.InOtherCoordinates(self.lightSource.u, self.lightSource.v, self.lightSource.w)
+  cameraV = Vector3(-cameraV.x, cameraV.y, cameraV.z)
+  cameraV = cameraV.InOtherCoordinates(self.world.u, self.world.v, self.world.w)
+  cameraW = self.camera.w.InOtherCoordinates(self.lightSource.u, self.lightSource.v, self.lightSource.w)
+  cameraW = Vector3(-cameraW.x, cameraW.y, cameraW.z)
+  cameraW = cameraW.InOtherCoordinates(self.world.u, self.world.v, self.world.w)
+
+  self.camera.offset = cameraPosition
+  self.camera.u = cameraU
+  self.camera.v = cameraV
+  self.camera.w = cameraW
+
+  self.parameters[6] = self.camera.offset.x
+  self.parameters[7] = self.camera.offset.y
+  self.parameters[8] = self.camera.offset.z
+
+  # TODO - this needs to be sorted out
+  cameraU = self.parameters[15]
+  self.camera.RotateU(cameraU)
+  cameraV = self.parameters[16]
+  self.camera.RotateV(cameraV)
+  cameraW = self.parameters[17]
+  self.camera.RotateW(cameraW)
+
+ # Make a copy of a scanner perturbed by small Gaussian amounts with mean and sd standard deviation.
 
  def PerturbedCopy(self, mean, sd):
   result = self.Copy()
@@ -785,34 +827,74 @@ class Scanner:
   return room
 
 
- def CostFunctionWithoutChangingParameters(self, room, pixelsAndAngles):
+ def PointCostFunctionWithoutChangingParameters(self, room, pixelsAndAngles):
   recoveredRoom = self.ReconstructRoomFromPixelsAndAngles(pixelsAndAngles)
-  self.lastCost = 0.0
+  self.lastSumOfSquaresCost = 0.0
   for point, rPoint in zip(room, recoveredRoom):
    d = point.Sub(rPoint)
-   self.lastCost += d.Length2()
-  return self.lastCost
+   self.lastSumOfSquaresCost += d.Length2()
+  self.lastRMSCost = maths.sqrt(self.lastSumOfSquaresCost/len(pixelsAndAngles[0]))
+  return self.lastSumOfSquaresCost
 
- def CostFunction(self, minimiserX, room, pixelsAndAngles):
+ def PointCostFunction(self, minimiserX, room, pixelsAndAngles):
   self.SetParametersFromSelection(minimiserX)
-  return self.CostFunctionWithoutChangingParameters(room, pixelsAndAngles)
+  return self.PointCostFunctionWithoutChangingParameters(room, pixelsAndAngles)
+
+ def TriangleCostFunctionWithoutChangingParameters(self, triangleSideLength, pixelsAndAngles):
+  self.lastSumOfSquaresCost = 0.0
+  triangleSideLength2 = triangleSideLength*triangleSideLength
+  trianglePixels = pixelsAndAngles[0]
+  angles = pixelsAndAngles[1]
+  for triangle, angle in zip(trianglePixels, angles):
+   self.Turn(angle)
+   vertices = []
+   for pixel in triangle:
+    v = self.PixelToPointInSpace(pixel)
+    vertices.append(v)
+   d0 = vertices[0].Sub(vertices[1])
+   d0 = abs(d0.Length2() - triangleSideLength2)
+   d1 = vertices[1].Sub(vertices[2])
+   d1 = abs(d1.Length2() - triangleSideLength2)
+   d2 = vertices[2].Sub(vertices[0])
+   d2 = abs(d2.Length2() - triangleSideLength2*2.0)
+   self.lastSumOfSquaresCost += d0 + d1 + d2
+  self.lastRMSCost = maths.sqrt(self.lastSumOfSquaresCost/(3.0*len(pixelsAndAngles[0])))
+  return self.lastSumOfSquaresCost
+
+ def TriangleCostFunction(self, minimiserX, triangleSideLength, pixelsAndAngles):
+  self.SetParametersFromSelection(minimiserX)
+  return self.TriangleCostFunctionWithoutChangingParameters(triangleSideLength, pixelsAndAngles)
 
 # Generate scanners at random, exploring the space of scanners, looking for a chance good fit
 
- def MonteCarlo(self, room, pixelsAndAngles, mean, sd, samples):
+ def MonteCarloPoints(self, room, pixelsAndAngles, mean, sd, samples):
   betterScanner = self.Copy()
-  minCost = betterScanner.CostFunctionWithoutChangingParameters(room, pixelsAndAngles)
-  if self.reportProgress:
-   print("Intitial cost: " + str(minCost))
+  minCost = betterScanner.PointCostFunctionWithoutChangingParameters(room, pixelsAndAngles)
+  if betterScanner.reportProgress:
+   print("Intitial RMS cost (mm): ", betterScanner.lastRMSCost)
   for s in range(samples):
    randomScanner = self.PerturbedCopy(mean, sd)
-   cost = randomScanner.CostFunctionWithoutChangingParameters(room, pixelsAndAngles)
+   cost = randomScanner.PointCostFunctionWithoutChangingParameters(room, pixelsAndAngles)
    if cost < minCost:
     betterScanner = randomScanner
     minCost = cost
-    if self.reportProgress:
-     print("Monte Carlo - best cost so far: " + str(minCost))
-   self.lastCost = minCost
+    if betterScanner.reportProgress:
+     print("Monte Carlo - best RMS cost so far (mm): ", betterScanner.lastRMSCost)
+  return betterScanner
+
+ def MonteCarloTriangles(self, triangleSideLength, pixelsAndAngles, mean, sd, samples):
+  betterScanner = self.Copy()
+  minCost = betterScanner.TriangleCostFunctionWithoutChangingParameters(triangleSideLength, pixelsAndAngles)
+  if betterScanner.reportProgress:
+   print("Intitial RMS cost (mm): ", betterScanner.lastRMSCost)
+  for s in range(samples):
+   randomScanner = self.PerturbedCopy(mean, sd)
+   cost = randomScanner.TriangleCostFunctionWithoutChangingParameters(triangleSideLength, pixelsAndAngles)
+   if cost < minCost:
+    betterScanner = randomScanner
+    minCost = cost
+    if betterScanner.reportProgress:
+     print("Monte Carlo - best RMS cost so far (mm): ", betterScanner.lastRMSCost)
   return betterScanner
 
  def Progress(self, x):
@@ -821,24 +903,42 @@ class Scanner:
   self.progressCount += 1
   if not self.progressCount % 10 == 0:
    return
-  print("Scanner sum-of-squares error (mm^2): " + str(self.lastCost) + " after " + str(self.progressCount) + " iterations.")
+  print("Scanner RMS error (mm): " + str(self.lastRMSCost) + " after " + str(self.progressCount) + " iterations.")
 
  # Use an optimiser to find a (local) best scanner with minimum cost
 
- def Optimise(self, room, pixelsAndAngles):
+ def OptimisePoints(self, room, pixelsAndAngles):
   betterScanner = self.Copy()
   betterScanner.progressCount = 0
   if betterScanner.reportProgress:
-   print("scipy.optimize.minimize using Broyden–Fletcher–Goldfarb–Shanno algorithm ...")
+   print("scipy.optimize.minimize for point pattern using Broyden–Fletcher–Goldfarb–Shanno algorithm ...")
   minimisationVector = betterScanner.GetSelection()
-  minResult = minimize(betterScanner.CostFunction, x0 = minimisationVector, args = (room, pixelsAndAngles, ), callback = betterScanner.Progress)
-  #betterScanner.SetParametersFromSelection(minResult)
+  minResult = minimize(betterScanner.PointCostFunction, x0 = minimisationVector, args = (room, pixelsAndAngles,), callback = betterScanner.Progress)
   if betterScanner.reportProgress:
-   print("Final scanner RMS error (mm): ", maths.sqrt(betterScanner.lastCost/len(room)))
+   print("Final scanner RMS error (mm): ", betterScanner.lastRMSCost )
   for a in angleParameters:
-   betterScanner.parameters[a] %= 2.0*maths.pi
+   ang = betterScanner.parameters[a]%(2.0*maths.pi)
+   if ang > maths.pi:
+    ang = ang - 2.0*maths.pi
+   betterScanner.parameters[a] = ang
   betterScanner.MakeScannerFromParameters(betterScanner.parameters, betterScanner.world, betterScanner.lightAng,
      betterScanner.uPix, betterScanner.vPix, betterScanner.uMM, betterScanner.vMM)
   return betterScanner
 
-
+ def OptimiseTriangles(self, triangleSideLength, pixelsAndAngles):
+  betterScanner = self.Copy()
+  betterScanner.progressCount = 0
+  if betterScanner.reportProgress:
+   print("scipy.optimize.minimize for triangle pattern using Broyden–Fletcher–Goldfarb–Shanno algorithm ...")
+  minimisationVector = betterScanner.GetSelection()
+  minResult = minimize(betterScanner.TriangleCostFunction, x0 = minimisationVector, args = (triangleSideLength, pixelsAndAngles,), callback = betterScanner.Progress)
+  if betterScanner.reportProgress:
+   print("Final scanner RMS error (mm): ", betterScanner.lastRMSCost )
+  for a in angleParameters:
+   ang = betterScanner.parameters[a]%(2.0*maths.pi)
+   if ang > maths.pi:
+    ang = ang - 2.0*maths.pi
+   betterScanner.parameters[a] = ang
+  betterScanner.MakeScannerFromParameters(betterScanner.parameters, betterScanner.world, betterScanner.lightAng,
+     betterScanner.uPix, betterScanner.vPix, betterScanner.uMM, betterScanner.vMM)
+  return betterScanner
