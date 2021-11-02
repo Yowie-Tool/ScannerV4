@@ -550,7 +550,9 @@ class ScannerMachine(object):
 
 	def calculate_cloud_1(self,for_calc,calibration):
 		file_pathDebugExtra = '/home/roomreader/ScannerV4/Scans/' + 'RoomReaderScanDebug2.txt'
+		file_pathAB = '/home/roomreader/ScannerV4/Scans/' + "RoomReaderScanAB.pts"
 		file_objectDebugExtra = open(file_pathDebugExtra, "w")
+		file_objectAB = open(file_pathAB, "w")
 		self.oldRotation = self.photoangle1[0]
 		readlines = len(for_calc)
 		#camangleh = ((float(calibration[0]))/(180/math.pi))
@@ -691,6 +693,10 @@ class ScannerMachine(object):
 			pixel = (v, u) #Hmmm...
 			cam1point = self.camera1Scanner.PixelToPointInSpace(pixel)
 			self.outputAB.append([ cam1point.x, cam1point.y, cam1point.z ])
+			xout = str(self.m.outputAB[export][0])
+			yout = str(self.m.outputAB[export][1])
+			zout = str(self.m.outputAB[export][2])
+			file_objectAB.write(xout + " " + yout + " " + zout + "\n")
 			
 			file_objectDebugExtra.write(str(u) + " " + str(v) + " " + str(r) + " camera1\n")
 			#self.output.append([xout,yout,0]) # X, Y, Z coordinates for output. Z is assumed to be 0 for easy import into CAD
@@ -701,6 +707,7 @@ class ScannerMachine(object):
 		self.sm.get_screen('s3').update_average_distance_output()
 		self.sm.get_screen('s3').update_max_distance_output()
 		file_objectDebugExtra.close()
+		file_objectAB.close()
   
 	def calculate_cloud_2(self,for_calc,calibration):
 		self.oldRotation = self.photoangle2[0]
