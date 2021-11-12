@@ -191,7 +191,7 @@ class Vector3:
  def InOtherCoordinates(self, u, v, w):
   return Vector3(self.Dot(u), self.Dot(v), self.Dot(w))
 
- def __str__(self):
+ def __repr__(self):
   return 'Vector3(' + str(self.x) + ', ' +  str(self.y) + ', ' +  str(self.z) + ')' 
 
 #---
