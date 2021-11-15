@@ -144,6 +144,24 @@ class Line2D:
  def Length2(self):
   return self.direction.Length2()
 
+ # How far away is a point from the line?
+ # (Also parameter at the nearest point)
+
+ def DistanceToPoint2(self, point):
+  xd2 = self.direction.x * self.direction.x
+  yd2 = self.direction.y * self.direction.y
+  d2 = xd2 + yd2
+  if d2 < veryShort2:
+   print("Line2D.DistanceToPoint2() - line hs no direction!")
+  pd = point.Sub(self.p0)
+  dxy = self.direction.x * self.direction.y
+  d2Inv = 1.0/d2
+  dx = yd2*pd.x - dxy*pd.y
+  dy = xd2*pd.y - dxy*pd.x
+  r2 = dx*dx + dy*dy
+  parameter = self.direction.Dot(pd)*d2Inv
+  return (r2, parameter)
+
 #----------------------------------------------------------------------------------------------------------------------------
 
 # The simulator needs its own 3D vector algebra and rotation matrix classes so it can stand alone independently of FreeCAD
