@@ -152,12 +152,12 @@ class Line2D:
   yd2 = self.direction.y * self.direction.y
   d2 = xd2 + yd2
   if d2 < veryShort2:
-   print("Line2D.DistanceToPoint2() - line hs no direction!")
+   print("Line2D.DistanceToPoint2() - line has no direction!")
   pd = point.Sub(self.p0)
-  dxy = self.direction.x * self.direction.y
+  xdyd = self.direction.x * self.direction.y
   d2Inv = 1.0/d2
-  dx = yd2*pd.x - dxy*pd.y
-  dy = xd2*pd.y - dxy*pd.x
+  dx = yd2*pd.x - xdyd*pd.y
+  dy = xd2*pd.y - xdyd*pd.x
   r2 = dx*dx + dy*dy
   parameter = self.direction.Dot(pd)*d2Inv
   return (r2, parameter)
@@ -858,24 +858,35 @@ class Scanner:
   self.SetParametersFromSelection(minimiserX)
   return self.PointCostFunctionWithoutChangingParameters(room, pixelsAndAngles)
 
+ def OneTriangleCost(self, triangleSideLength, triangle):
+  triangleSideLength2 = triangleSideLength*triangleSideLength
+  lengths2 = []
+  longest = -1
+  for c0 in range(len(triangle)):
+   c1 = (c0 + 1)%3
+   d2 = triangle[c1].Sub(triangle[c0]).Length2()
+   lengths2.append(d2)
+   if d2 > longest:
+    longest = c0
+  sum = 0.0
+  for l2 in range(len(lengths2)):
+   if l2 == longest:
+    sum += abs(lengths2[l2] - triangleSideLength2*2.0)
+   else:
+    sum += abs(lengths2[l2] - triangleSideLength2)
+  return sum
+
  def TriangleCostFunctionWithoutChangingParameters(self, triangleSideLength, pixelsAndAngles):
   self.lastSumOfSquaresCost = 0.0
-  triangleSideLength2 = triangleSideLength*triangleSideLength
   trianglePixels = pixelsAndAngles[0]
   angles = pixelsAndAngles[1]
   for triangle, angle in zip(trianglePixels, angles):
    self.Turn(angle)
-   vertices = []
+   triangle = []
    for pixel in triangle:
     v = self.PixelToPointInSpace(pixel)
-    vertices.append(v)
-   d0 = vertices[0].Sub(vertices[1])
-   d0 = abs(d0.Length2() - triangleSideLength2)
-   d1 = vertices[1].Sub(vertices[2])
-   d1 = abs(d1.Length2() - triangleSideLength2)
-   d2 = vertices[2].Sub(vertices[0])
-   d2 = abs(d2.Length2() - triangleSideLength2*2.0)
-   self.lastSumOfSquaresCost += d0 + d1 + d2
+    triangle.append(v)
+   self.lastSumOfSquaresCost += self.OneTriangleCost(triangleSideLength, triangle)
   self.lastRMSCost = maths.sqrt(self.lastSumOfSquaresCost/(3.0*len(pixelsAndAngles[0])))
   return self.lastSumOfSquaresCost
 
