@@ -88,6 +88,12 @@ class Point2D:
  def Cross(self, p):
   return self.x*p.y - self.y*p.x
 
+ def Normalise(self):
+  l = maths.sqrt(self.Length2())
+  if l < veryShort:
+   print("Point2D.Normalise() - vector too short!")
+  return self.Multiply(1/l)
+
 # Set or change the associated face
 
  def SetFace(self, f):
@@ -148,19 +154,11 @@ class Line2D:
  # (Also parameter at the nearest point)
 
  def DistanceToPoint2(self, point):
-  xd2 = self.direction.x * self.direction.x
-  yd2 = self.direction.y * self.direction.y
-  d2 = xd2 + yd2
-  if d2 < veryShort2:
-   print("Line2D.DistanceToPoint2() - line has no direction!")
+  normal = Point2D(-self.direction.y, self.direction.x).Normalise()
   pd = point.Sub(self.p0)
-  xdyd = self.direction.x * self.direction.y
-  d2Inv = 1.0/d2
-  dx = yd2*pd.x - xdyd*pd.y
-  dy = xd2*pd.y - xdyd*pd.x
-  r2 = dx*dx + dy*dy
-  parameter = self.direction.Dot(pd)*d2Inv
-  return (r2, parameter)
+  distance = pd.Dot(normal)
+  parameter = pd.Dot(self.direction)/self.direction.Length2()
+  return (distance*distance, parameter)
 
 #----------------------------------------------------------------------------------------------------------------------------
 
