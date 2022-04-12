@@ -34,8 +34,8 @@ class ScannerMachine(object):
 		GPIO.setup(chan_listc, GPIO.OUT)
 		GPIO.setup(chan_listl, GPIO.OUT)
 		GPIO.output(chan_listl,0)
-		bus = smbus.SMBus(1) # bus = smbus.SMBus(0) fuer Revision 1
-		address = 0x69       # Need to check address, will do when plugged in!
+		# bus = smbus.SMBus(1) # bus = No Accelerometer on CM4 currently
+		# address = 0x69       # Need to check address, will do when plugged in!
 
 	photonum1 = 0
 	photonum2 = 0
@@ -76,8 +76,8 @@ class ScannerMachine(object):
 	doing_scan_camera_2 = False
 	scan_progress = 0
 	
-	power_mgmt_1 = 0x6b
-	power_mgmt_2 = 0x6c
+	#power_mgmt_1 = 0x6b
+	#power_mgmt_2 = 0x6c
 
 	def __init__(self, screen_manager):
 
@@ -104,13 +104,15 @@ class ScannerMachine(object):
 		
 		self.oldRotation = 0.0
 		if sys.platform != 'win32' and sys.platform != 'darwin':
-			global camera
-			camera=PiCamera()
+			global camera0
+			global camera1
+			camera0=PiCamera(0)
+			camera1=PiCamera(1)
 		
-		try:
-			bus.write_byte_data(address, power_mgmt_1, 0)
-		except:
-			print("Gyro not available")
+		#try:
+			#bus.write_byte_data(address, power_mgmt_1, 0)
+		#except:
+			#print("Gyro not available")
 
 	def read_in_calibration_values(self):
 
@@ -137,14 +139,15 @@ class ScannerMachine(object):
 			log('Could not read in calibration values, please check file!')
 			
 	def camera_test_part_1(self):
-		i2c='i2cset -y 1 0x70 0x00 0x04'
+		#i2c='i2cset -y 1 0x70 0x00 0x04'
 		try:
-			os.system(i2c)
-			GPIO.output(self.chan_listc,(1,0,0))
-			camera.resolution=(3280,2464)
-			camera.start_preview()
+			#os.system(i2c)
+			#GPIO.output(self.chan_listc,(1,0,0))
+			camera0.resolution=(3280,2464)
+			camera0.start_preview()
 			time.sleep(1)
 			log("i2c switch succeeded camera 1")
+			camera0.stop_preview()
 			self.camera_test_part_2()
 
 		except:
@@ -152,13 +155,15 @@ class ScannerMachine(object):
 			self.camera_test_part_1()
 
 	def camera_test_part_2(self):
-		i2c='i2cset -y 1 0x70 0x00 0x06' #set camera 2 i2c
+		#i2c='i2cset -y 1 0x70 0x00 0x06' #set camera 2 i2c
 		try:
-			os.system(i2c)
-			GPIO.output(self.chan_listc,(0,1,0))
+			#os.system(i2c)
+			#GPIO.output(self.chan_listc,(0,1,0))
+			camera1.resolution=(3280,2464)
+			camera1.start_preview()
 			time.sleep(1)
-			camera.stop_preview()
 			log("i2c switch succeeded camera 2")
+			camera1.stop_preview()
 
 		except:
 			log("i2c switch failed")
@@ -272,7 +277,8 @@ class ScannerMachine(object):
 			self.scanstepstotal = self.scanstepscamera1
 
 	def end_scan(self):
-		self.camera_close()
+		self.camera0_close()
+		self.camera1_close()
 
 		if self.doing_scan_camera_1:
 			self.doing_scan_camera_1 = False
@@ -296,76 +302,80 @@ class ScannerMachine(object):
 
 	# CAMERA FUNCTIONS
 	def camera_1_open(self,resolution_bool):
-		i2c='i2cset -y 1 0x70 0x00 0x04' #set camera 1 i2c
-		try:
-			os.system(i2c)
-		except:
-			print("i2c switch failed")
-			Clock.schedule_once(lambda dt: self.camera_1_open(), 0.2)
-		GPIO.output(self.chan_listc,(1,0,0))
+		#i2c='i2cset -y 1 0x70 0x00 0x04' #set camera 1 i2c
+		#try:
+		#	os.system(i2c)
+		#except:
+		#	print("i2c switch failed")
+		#	Clock.schedule_once(lambda dt: self.camera_1_open(), 0.2)
+		#GPIO.output(self.chan_listc,(1,0,0))
 		#select camera 1 GPIO
 		if resolution_bool:
-			camera.resolution=(1640,1232)
+			camera0.resolution=(1640,1232)
 		else:
-			camera.resolution=(3280,2464)
-		camera.meter_mode='backlit'
-		camera.start_preview(fullscreen=False,window=(200,0,600,400)) # check that this ends up with our screen in the right place!
+			camera0.resolution=(3280,2464)
+		camera0.meter_mode='backlit'
+		camera0.start_preview(fullscreen=False,window=(200,0,600,400)) # check that this ends up with our screen in the right place!
 		time.sleep(2)
 		
 	def camera_2_open(self,resolution_bool):
-		i2c='i2cset -y 1 0x70 0x00 0x06' #set camera 1 i2c
-		try:
-			os.system(i2c)
-		except:
-			print("i2c switch failed")
-			Clock.schedule_once(lambda dt: self.camera_2_open(), 0.2)
-		GPIO.output(self.chan_listc,(0,1,0))
+		#i2c='i2cset -y 1 0x70 0x00 0x06' #set camera 1 i2c
+		#try:
+		#	os.system(i2c)
+		#except:
+		#	print("i2c switch failed")
+		#	Clock.schedule_once(lambda dt: self.camera_2_open(), 0.2)
+		#GPIO.output(self.chan_listc,(0,1,0))
 		#select camera 2 GPIO
 		if resolution_bool:
-			camera.resolution = (1640,1232)
+			camera1.resolution = (1640,1232)
 		else:
-			camera.resolution = (3280,2464)
-		camera.meter_mode = 'backlit'
-		camera.start_preview(fullscreen=False,window=(200,0,600,400)) # check that this ends up with our screen in the right place!
+			camera1.resolution = (3280,2464)
+		camera1.meter_mode = 'backlit'
+		camera1.start_preview(fullscreen=False,window=(200,0,600,400)) # check that this ends up with our screen in the right place!
 		time.sleep(2)
 
-	def camera_close(self):
-		camera.stop_preview()
-		GPIO.output(self.chan_listl, (0,0,0))
+	def camera0_close(self):
+		camera0.stop_preview()
+		#GPIO.output(self.chan_listl, (0,0,0))
+		
+	def camera1_close(self):
+		camera1.stop_preview()
+		#GPIO.output(self.chan_listl, (0,0,0))	
 		
 	def camera_1_take(self,photonum):
 		loffname = 'c1loff' + str(photonum) + '.jpg'
 		lonname = 'c1on' + str(photonum) + '.jpg'
-		expt = camera.exposure_speed
+		expt = camera0.exposure_speed
 		#query exposure speed from camera
 		if expt < 4000:
-			camera.shutter_speed=4000
+			camera0.shutter_speed=4000
 		#sets shutter speed to maximum (minimum speed)
 		else:
-			camera.shutter_speed=0
+			camera0.shutter_speed=0
 		#doesn't override
 		GPIO.output(self.chan_listl, (0,0,0))
-		camera.capture(loffname,'jpeg',use_video_port=True)
-		GPIO.output(self.chan_listl, (0,1,1)) # this needs to be the IR laser, double check when able
-		camera.capture(lonname,'jpeg',use_video_port=True)
-		camera.shutter_speed=0 # allows camera to adjust after taking both photos
+		camera0.capture(loffname,'jpeg',use_video_port=True)
+		GPIO.output(self.chan_listl, (1,0,1)) # this needs to be the IR laser, double check when able
+		camera0.capture(lonname,'jpeg',use_video_port=True)
+		camera0.shutter_speed=0 # allows camera to adjust after taking both photos
 		
 	def camera_2_take(self,photonum):
 		loffname = 'c2loff' + str(photonum) + '.jpg'
 		lonname = 'c2on' + str(photonum) +'.jpg'
-		expt = camera.exposure_speed
+		expt = camera1.exposure_speed
 		#query exposure speed from camera
 		if expt < 4000:
-			camera.shutter_speed=4000
+			camera1.shutter_speed=4000
 		#sets shutter speed to maximum (minimum speed)
 		else:
-			camera.shutter_speed=0
+			camera1.shutter_speed=0
 		#doesn't override
 		GPIO.output(self.chan_listl, (0,0,0))
-		camera.capture(loffname,'jpeg',use_video_port=True)
-		GPIO.output(self.chan_listl, (0,1,1)) # this needs to be the IR laser, double check when able
-		camera.capture(lonname,'jpeg',use_video_port=True)
-		camera.shutter_speed=0 # allows camera to adjust after taking both photos	
+		camera1.capture(loffname,'jpeg',use_video_port=True)
+		GPIO.output(self.chan_listl, (1,0,1)) # this needs to be the IR laser, double check when able
+		camera1.capture(lonname,'jpeg',use_video_port=True)
+		camera1.shutter_speed=0 # allows camera to adjust after taking both photos	
 
 	# CAMERA STEPS - THESE GET CALLED IN THE SERIAL LOOP EACH TIME A NEW LINE COMES IN
 	def start_scan_camera_1(self):
