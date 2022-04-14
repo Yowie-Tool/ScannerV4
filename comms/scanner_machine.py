@@ -315,7 +315,7 @@ class ScannerMachine(object):
 		else:
 			camera0.resolution=(3280,2464)
 		camera0.meter_mode='backlit'
-		camera0.start_preview(fullscreen=False,window=(200,0,600,400)) # check that this ends up with our screen in the right place!
+		camera0.start_preview(fullscreen=False,window=(200,0,300,225)) # check that this ends up with our screen in the right place!
 		time.sleep(2)
 		
 	def camera_2_open(self,resolution_bool):
@@ -332,7 +332,7 @@ class ScannerMachine(object):
 		else:
 			camera1.resolution = (3280,2464)
 		camera1.meter_mode = 'backlit'
-		camera1.start_preview(fullscreen=False,window=(200,0,600,400)) # check that this ends up with our screen in the right place!
+		camera1.start_preview(fullscreen=False,window=(425,0,300,225)) # check that this ends up with our screen in the right place!
 		time.sleep(2)
 
 	def camera0_close(self):
